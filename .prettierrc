@@ -1,0 +1,16 @@
+{
+  "singleQuote": true,
+  "jsxBracketSameLine": true,
+  "tabWidth": 2,
+  "useTabs": false,
+  "printWidth": 130,
+  "semi": true,
+  "overrides": [
+    {
+      "files": ".ts?x",
+      "options": {
+        "parser": "typescript"
+      }
+    }
+  ]
+}
