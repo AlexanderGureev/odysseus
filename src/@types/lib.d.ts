@@ -12,12 +12,14 @@ interface Window {
     NODE_ENV: string;
     SENTRY_DSN: string;
     SENTRY_EVENT_RATE: number;
-    SIREN_PUBLIC_HOST: string;
+    SIREN_HOST: string;
     USE_MOCKS: boolean;
     WHAT_IS_MY_BROWSER_KEY: string;
     WHAT_IS_MY_BROWSER_LINK: string;
+    SAURON_API_URL?: string;
   };
   ODYSSEUS_PLAYER_CONFIG: import('../../server/types').TConfig;
+  CONTEXT: import('../../server/utils').TParams;
   WebKitMediaSource?: any;
   WebKitSourceBuffer?: any;
 }

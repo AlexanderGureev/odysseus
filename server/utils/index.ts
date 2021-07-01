@@ -75,7 +75,7 @@ export const createEnv = (req: express.Request) => ({
   USE_MOCKS: process.env.USE_MOCKS === '1',
   DEV_TOOLS: process.env.DEV_TOOLS === 'enabled',
   LOG_LEVEL: process.env.LOG_LEVEL,
-  SIREN_PUBLIC_HOST: process.env.SIREN_PUBLIC_HOST,
+  SIREN_HOST: process.env.SIREN_HOST,
   HORUS_SRC: process.env.HORUS_SRC,
   INDEXED_DB_LIMIT: process.env.INDEXED_DB_LIMIT,
   HORUS_ENABLED: process.env.HORUS_ENABLED ? JSON.parse(process.env.HORUS_ENABLED) : true,
@@ -85,6 +85,7 @@ export const createEnv = (req: express.Request) => ({
   IP: req.clientIp,
   SENTRY_EVENT_RATE: process.env.SENTRY_EVENT_RATE ? Number(process.env.SENTRY_EVENT_RATE) : undefined,
   SENTRY_DSN: process.env.SENTRY_DSN,
+  SAURON_API_URL: process.env.SAURON_API_URL,
 });
 
-export const isNumber = (num: string | undefined) => num && Number(num) !== NaN;
+export const isNumber = (num: string | undefined) => num && !Number.isNaN(Number(num));

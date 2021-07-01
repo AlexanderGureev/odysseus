@@ -3,7 +3,7 @@
   "jsxBracketSameLine": true,
   "tabWidth": 2,
   "useTabs": false,
-  "printWidth": 130,
+  "printWidth": 120,
   "semi": true,
   "overrides": [
     {

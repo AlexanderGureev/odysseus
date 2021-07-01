@@ -1,5 +1,6 @@
-import { DRM_TYPE, StreamProtocol, TStreamItem } from '../../../server/types';
-import { handleFairplaySource, handlePlayreadySource, handleWidevineSource } from '../../utils/drm';
+import { DRM_TYPE, StreamProtocol, TStreamItem } from 'server/types';
+import { Nullable } from 'types';
+import { handleFairplaySource, handlePlayreadySource, handleWidevineSource } from 'utils/drm';
 
 export enum STREAM_STATE {
   NOT_SUPPORTED = 'NOT_SUPPORTED',
@@ -29,7 +30,15 @@ export const isEncryptedStream = (s: TStreamItem) => {
   return Boolean(s.drm_type && s.ls_url);
 };
 
-export const StreamService = (sources: TStreamItem[], capabilities: string[], streamHistoryKeys: string[] = []) => {
+export type TStreamService = {
+  getStream: () => Nullable<TStreamItem>;
+};
+
+export const StreamService = (
+  sources: TStreamItem[],
+  capabilities: string[],
+  streamHistoryKeys: string[] = []
+): TStreamService => {
   const streams = createSupportedStreamsList(sources, capabilities);
   const streamIterator = streamGenerator();
 
@@ -46,7 +55,6 @@ export const StreamService = (sources: TStreamItem[], capabilities: string[], st
 
   function createSupportedStreamsList(streams: TStreamItem[] = [], capabilities: string[]) {
     const data = streams.reduce((acc: Record<string, TStreamItem>, source) => {
-      console.log(source, 'source');
       const key = createKey(source);
       if (!isSupported(source, capabilities)) return acc;
 
@@ -57,7 +65,10 @@ export const StreamService = (sources: TStreamItem[], capabilities: string[], st
     }, {});
 
     const priorityList = [...streamHistoryKeys, ...PRIORITY_BY_PROTOCOL.filter((k) => !streamHistoryKeys.includes(k))];
-    return priorityList.reduce((acc: Record<string, TStreamItem>, key) => (data[key] ? { ...acc, [key]: data[key] } : acc), {});
+    return priorityList.reduce(
+      (acc: Record<string, TStreamItem>, key) => (data[key] ? { ...acc, [key]: data[key] } : acc),
+      {}
+    );
   }
 
   function* streamGenerator() {

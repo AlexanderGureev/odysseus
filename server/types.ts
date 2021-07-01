@@ -15,6 +15,7 @@ export enum TSkinClass {
   CTC_LOVE = 'CTC_LOVE',
   CTC_KIDS = 'CTC_KIDS',
   CHE = 'CHE',
+  DEFAULT = 'DEFAULT',
 }
 
 export type TFeatureConfig = {
@@ -241,6 +242,11 @@ export type TRawPlaylist = {
 export type TBaseConfig = {
   config: TRawConfig;
   playlist: TRawPlaylist;
+};
+
+export type TSessionState = {
+  id: string;
+  videosession_id: string;
 };
 
 export type TConfig = {

@@ -5,6 +5,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 
 const config: webpack.Configuration = {
   mode: 'production',
@@ -99,6 +100,12 @@ const config: webpack.Configuration = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+    fallback: {
+      crypto: 'crypto-browserify',
+      stream: false,
+      buffer: 'buffer',
+    },
+    plugins: [new TsconfigPathsPlugin()],
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -126,6 +133,7 @@ const config: webpack.Configuration = {
     }),
     new webpack.ProvidePlugin({
       process: 'process/browser',
+      Buffer: ['buffer', 'Buffer'],
     }),
   ],
 };

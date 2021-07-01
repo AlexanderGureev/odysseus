@@ -1,9 +1,9 @@
 import React from 'react';
-import { useTheme } from '../../hooks';
+import { useTheme } from 'hooks';
 
 const DEFAULT_SKIN_CONTROLS = 'skin-controls';
 
-const Skin: React.FC = ({ children }) => {
+const SkinConstructor: React.FC = ({ children }) => {
   const theme = useTheme();
 
   return (
@@ -14,4 +14,4 @@ const Skin: React.FC = ({ children }) => {
   );
 };
 
-export { Skin };
+export { SkinConstructor };

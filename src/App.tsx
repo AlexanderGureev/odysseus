@@ -1,50 +1,74 @@
 import React from 'react';
-import { getCapabilities } from './utils/supports';
-import { Player } from './modules/player';
-import { MediatorService } from './modules/mediator';
-import { StreamService, createSource, TSource } from './modules/streamService';
-import { THEME, ThemeContext } from './context';
-import { usePlayerConfig } from './hooks';
-import { Nullable } from '../types';
+import { Player } from 'components/Player';
+import { THEME, ThemeContext } from 'context';
+import { SauronService } from 'services/SauronService';
+import { YMContainer } from 'services/YmService';
+
+import { OUTPUT_PLAYER_POST_MESSAGE, PostMessageService } from 'services/PostMessageService';
+import { useAdConfig, usePlayerConfig, useQueryParams } from 'hooks';
+import { GAContainer } from 'services/GaService';
+import { EmbeddedCheckService } from 'services/EmbeddedCheckService';
+import { useCurrentStream } from 'hooks/useCurrentStream';
+import { AgeConfirmationPopup } from 'components/AgeConfirmationPopup';
+import { AmberdataService } from 'services/AmberdataService';
 
 export const App = () => {
-  const [source, set] = React.useState<Nullable<TSource>>(null);
-  const [config] = usePlayerConfig();
+  const { isEmbedded } = EmbeddedCheckService.getState();
+  const query = useQueryParams();
+
+  const { config } = usePlayerConfig();
+  const { adConfig } = useAdConfig();
+  const { source } = useCurrentStream();
 
   React.useEffect(() => {
-    getCapabilities().then((capabilities) => {
-      if (!config?.playlist?.items?.[0]?.streams) {
-        console.error('streams is undefined');
-        return;
-      }
+    PostMessageService.init();
+    SauronService.init();
+  }, []);
 
-      const streamService = StreamService(config?.playlist?.items?.[0]?.streams, capabilities);
-
-      const selectStream = () => {
-        const stream = streamService.getStream();
-        if (stream) {
-          set(createSource(stream));
-        }
-      };
-
-      MediatorService.on('change_stream', selectStream);
-      selectStream();
+  React.useEffect(() => {
+    SauronService.subscribe((sid) => {
+      AmberdataService.init({
+        adConfig,
+        params: {
+          partnerId: config.features.partner_id,
+          projectId: config.config.project_id,
+          sid,
+          skinId: config.config.skin_id,
+          videoId: config.config.videofile_id,
+          videosessionId: config.session.videosession_id,
+        },
+        skinName: config.features.skin_theme_class,
+        isEmbedded,
+        partnerId: config.features.partner_id,
+        referrer: config.config.ref,
+      });
     });
-  }, [config]);
+  }, [adConfig, config, isEmbedded]);
 
-  // React.useEffect(() => {
-  //   setTimeout(() => {
-  //     MediatorService.emit("change_stream");
-  //   }, 5000);
-  // }, []);
+  React.useEffect(() => {
+    const adv = Object.keys(adConfig).length > 0;
+    PostMessageService.emit(OUTPUT_PLAYER_POST_MESSAGE.INITED, { payload: { adv } }); // TODO LOAD YA SDK
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!source) return null;
 
+  console.log('is embeded: ', isEmbedded);
+  console.log('query', query);
   console.log('selected source - ', source);
+  console.log('config: ', config);
 
   return (
-    <ThemeContext.Provider value={THEME.MORETV}>
-      <Player source={source} />
-    </ThemeContext.Provider>
+    <>
+      <GAContainer />
+      <YMContainer
+        params={{ user_id: config?.config?.user_id || -1, videosession_id: config?.session.videosession_id }}
+      />
+      <ThemeContext.Provider value={THEME.MORETV}>
+        <AgeConfirmationPopup>
+          <Player source={source} />
+        </AgeConfirmationPopup>
+      </ThemeContext.Provider>
+    </>
   );
 };

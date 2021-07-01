@@ -68,6 +68,9 @@ const bootstrap = async () => {
         features,
         serviceTariffs,
       },
+      context: {
+        ...params,
+      },
     });
   });
 
@@ -108,7 +111,12 @@ const bootstrap = async () => {
       },
       [TConfigSource.PAK]: () => {
         const result = pathname.split('/');
-        if (result.length !== 5 || result[1] !== 'video' || result[2] !== 'tracks' || result[4] !== 'track_config.json') {
+        if (
+          result.length !== 5 ||
+          result[1] !== 'video' ||
+          result[2] !== 'tracks' ||
+          result[4] !== 'track_config.json'
+        ) {
           throw new Error(ERROR.INVALID_BODY);
         }
 

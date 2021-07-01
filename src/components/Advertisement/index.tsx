@@ -1,118 +1,20 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React from 'react';
-import { useFeatures, usePlayerConfig, usePlayerApi } from '../../hooks';
+import { useFeatures, usePlayerApi, useAdConfig } from 'hooks';
 import { getAdFoxParameters } from './utils';
-import { DEFAULT_PLAYER_ID, VIDEO_TYPE } from '../player';
-import { MediatorService } from '../mediator';
+import { VIDEO_TYPE } from '../Player';
+
 import { loadYaSdk } from './yaSdkLoader';
-import { MediatorFactory } from '../mediator';
-import {
-  AdCategory,
-  TContentRollsConfig,
-  TMiddleRollsConfig,
-  TPlaceholder,
-  TPreRollsConfig,
-  TRawAdConfig,
-  TRawPlaylist,
-} from '../../../server/types';
-import { Nullable } from '../../../types';
+import { MediatorFactory } from 'services/MediatorService';
+import { AdCategory } from 'server/types';
+
+import { TAdPointConfig } from 'providers/AdConfigProvider';
+import { Nullable } from 'types';
 
 const DEFAULT_ADV_CONTROLS_ID = 'adv-controls';
 
-const AD_CATEGORY = {
-  PRE_ROLL: 'pre_roll',
-  MID_ROLL: 'mid_roll',
-  PAUSE_ROLL: 'pause_roll',
-  POST_ROLL: 'post_roll',
-  CONTENT_ROLL: 'content_roll',
-};
-
-type TAdPointConfig = {
-  point: number;
-  category: AdCategory;
-  placeholders?: TPlaceholder;
-};
-
-type TAdPointsConfig = TAdPointConfig[];
-type TAdKeys = 'midrolls' | 'contentrolls' | 'prerolls';
-
-type TMap = {
-  midrolls: (p: TMiddleRollsConfig) => TAdPointsConfig;
-  contentrolls: (p: TContentRollsConfig) => TAdPointsConfig;
-  prerolls: (p: TPreRollsConfig) => TAdPointsConfig;
-};
-
-const ParseMap: TMap = {
-  midrolls: ({ points }: TMiddleRollsConfig) =>
-    points.map(({ point }) => ({
-      point,
-      category: AdCategory.MID_ROLL,
-    })),
-  contentrolls: ({ points }: TContentRollsConfig) =>
-    points.map(({ point, placeholders }) => ({
-      point,
-      placeholders,
-      category: AdCategory.CONTENT_ROLL,
-    })),
-  prerolls: ({ points }: TPreRollsConfig) => [
-    {
-      point: points.point,
-      category: AdCategory.PRE_ROLL,
-    },
-  ],
-};
-
-type TAdConfig = { links: string[]; limit: number };
-type TAdConfigByCategory = Partial<Record<AdCategory, TAdConfig>>;
-
-type TParsedAdConfig = {
-  adConfig: TAdConfigByCategory;
-  adPoints: TAdPointsConfig;
-};
-
-const createAdConfig = (ad: TRawAdConfig, playlist: TRawPlaylist) => {
-  const adConfig = Object.keys(ad).reduce((acc: TAdConfigByCategory, category) => {
-    const key = category as AdCategory;
-
-    const config = {
-      ...acc,
-      [key]: {
-        links: ad[key]?.items.filter((i) => i.item).map((i) => i.item),
-        limit: ad[key]?.params.limiter,
-      },
-    };
-
-    return config;
-  }, {});
-
-  const adPoints = ['midrolls', 'contentrolls', 'prerolls'].reduce((acc: TAdPointsConfig, key) => {
-    const category = key as TAdKeys;
-    const adConfig = playlist.items[0][category];
-    if (!adConfig) return acc;
-
-    const config = ParseMap[category](adConfig as any); // TODO FIX
-    return config ? [...acc, ...config] : acc;
-  }, []);
-
-  return { adConfig, adPoints };
-};
-
-const useAdConfig = () => {
-  const [
-    {
-      config: { ad = {} },
-      playlist,
-    },
-  ] = usePlayerConfig();
-
-  const [{ adConfig, adPoints }, set] = React.useState<TParsedAdConfig>({ adConfig: {}, adPoints: [] });
-
-  React.useEffect(() => {
-    set(createAdConfig(ad, playlist));
-  }, [ad, playlist]);
-
-  return { adConfig, adPoints };
-};
+export type TAdConfig = { links: string[]; limit: number };
+export type TAdConfigByCategory = Partial<Record<AdCategory, TAdConfig>>;
 
 export enum AD_BLOCK_STATUS {
   UNITIALIZED = 'UNITIALIZED',
@@ -140,6 +42,13 @@ export type TAdBlock = {
   play: () => Promise<void>;
   preload: () => Promise<void>;
   reset: () => void;
+};
+
+type TProps = {
+  currentTime: number;
+  videoNode: HTMLVideoElement;
+  videoType: VIDEO_TYPE;
+  paused: boolean;
 };
 
 const AdBlock = (adConfig: TAdConfig, video: HTMLVideoElement, slot: HTMLDivElement): TAdBlock => {
@@ -182,20 +91,21 @@ const AdBlock = (adConfig: TAdConfig, video: HTMLVideoElement, slot: HTMLDivElem
             item.status = AD_BLOCK_STATUS.INITIALIZED;
             return adLoader.loadAd();
           })
-          .then(function (adViewer: any) {
+          .then(function (adStore: any) {
             item.status = AD_BLOCK_STATUS.PRELOADING;
 
-            adViewer
+            // resolve(adStore);
+
+            adStore
               .preload({
                 videoSlot: _video,
+                desiredBitrate: 1000, //если не задать, то в safari реклама не играет
               })
               .then(() => {
                 item.status = AD_BLOCK_STATUS.PRELOADED;
-                resolve(adViewer);
+                resolve(adStore);
               })
-              .catch((e: any) => {
-                reject(e);
-              });
+              .catch(reject);
           })
           .catch((e: any) => {
             console.log('PRELOAD ERR', e);
@@ -211,7 +121,7 @@ const AdBlock = (adConfig: TAdConfig, video: HTMLVideoElement, slot: HTMLDivElem
     new Promise<void>((resolve, reject) => {
       if (!window.ya) return reject('yaSdk or link is undefined');
 
-      console.log('PLAY', item);
+      console.log('PLAY', item, _preload);
       Promise.resolve()
         .then(() => (_preload ? _preload : preload(item)))
         .then(function (adViewer: any) {
@@ -219,13 +129,13 @@ const AdBlock = (adConfig: TAdConfig, video: HTMLVideoElement, slot: HTMLDivElem
             return reject(new Error('adViewer is undefined'));
           }
 
-          console.log(adViewer);
+          console.log('adViewer', adViewer);
 
           // @ts-ignore
           const adPlaybackController = adViewer.createPlaybackController(_video, _slot, {
-            videoTimeout: 5000,
-            vpaidTimeout: 5000,
-            bufferFullTimeout: 30000,
+            // videoTimeout: 5000,
+            // vpaidTimeout: 5000,
+            // bufferFullTimeout: 30000,
             controlsSettings: {
               controlsVisibility: {
                 mute: false,
@@ -237,23 +147,52 @@ const AdBlock = (adConfig: TAdConfig, video: HTMLVideoElement, slot: HTMLDivElem
             },
           });
 
+          let isStarted = false;
+
           adPlaybackController.subscribe('AdPodError', (e: any) => {
-            console.log('Ad error', e);
+            console.error('Ad error', e);
             reject(e);
           });
 
           adPlaybackController.subscribe('AdStarted', () => {
             console.log('Ad start playing');
+
+            isStarted = true;
             mediator.emit('started');
           });
 
-          adPlaybackController.subscribe('AdStopped', function () {
-            console.log('Ad stopped playing');
+          adPlaybackController.subscribe('AdPlayingStateChange', (data: any) => {
+            const stateMap: Record<string, () => void> = {
+              play: () => mediator.emit('play'),
+              pause: () => {
+                if (!isStarted) {
+                  adPlaybackController.resumeAd(); // в сафари реклама не автоплеет
+                  return;
+                }
+
+                mediator.emit('pause');
+              },
+            };
+
+            stateMap[data?.playingState]?.();
+          });
+
+          adPlaybackController.subscribe('AdPodSkipped', (e: any) => {
+            console.log('AdPodSkipped');
+            // reject(e);
+          });
+          adPlaybackController.subscribe('AdPodStopped', (e: any) => {
+            console.log('AdPodStopped');
+            // reject(e);
+          });
+          adPlaybackController.subscribe('AdStopped', (e: any) => {
+            console.log('AdStopped');
             resolve();
           });
 
           item.status = AD_BLOCK_STATUS.PLAYING;
           adPlaybackController.playAd();
+          // adPlaybackController.resumeAd(); // в сафари не автоплеет реклама
         })
         .catch(function (error) {
           console.error(error);
@@ -307,13 +246,6 @@ const AdBlock = (adConfig: TAdConfig, video: HTMLVideoElement, slot: HTMLDivElem
   };
 };
 
-type TProps = {
-  currentTime: number;
-  videoNode: HTMLVideoElement;
-  videoType: VIDEO_TYPE;
-  paused: boolean;
-};
-
 const AdController: React.FC<TProps> = ({ currentTime, videoNode, videoType, paused }) => {
   const {
     ADV_CACHE_LOOKAHEAD = 10000,
@@ -325,7 +257,7 @@ const AdController: React.FC<TProps> = ({ currentTime, videoNode, videoType, pau
   } = useFeatures();
 
   const { adPoints, adConfig } = useAdConfig();
-  const { initializeAdvertisement, resumePlainVideo } = usePlayerApi();
+  const { initializeAdvertisement, resumePlainVideo, play, isPaused } = usePlayerApi();
   const cache = React.useRef<{ [key in string]: TAdBlock }>({});
   const stopTick = React.useRef(false);
   const slotRef = React.useRef<Nullable<HTMLDivElement>>(null);
@@ -386,9 +318,16 @@ const AdController: React.FC<TProps> = ({ currentTime, videoNode, videoType, pau
             }
           });
 
+          adBlock.on('loaded', () => {
+            console.log(isPaused(), 'test');
+            setTimeout(() => {
+              if (isPaused()) play();
+            }, 300);
+          });
+
           await adBlock.play();
         } catch (e) {
-          console.log(e);
+          console.error(e, 'startAd ERROR');
         } finally {
           // @ts-ignore
           state = filterState(adBlock, state);
@@ -398,7 +337,7 @@ const AdController: React.FC<TProps> = ({ currentTime, videoNode, videoType, pau
       await resumePlainVideo();
       stopTick.current = false;
     },
-    [adConfig, videoNode, initializeAdvertisement, resumePlainVideo]
+    [initializeAdvertisement, adConfig, resumePlainVideo, videoNode, isPaused, play]
   );
 
   // React.useEffect(() => {

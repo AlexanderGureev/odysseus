@@ -8,9 +8,7 @@ export interface IProcessEnv {
   HORUS_SRC: string;
 
   SIREN_HOST: string;
-  SIREN_PUBLIC_HOST: string;
   SIREN_CTC_HOST: string;
-  SIREN_CTC_PUBLIC_HOST: string;
 
   WHATISMYBROWSER_KEY?: string;
   WHATISMYBROWSER_LINK?: string;
@@ -27,6 +25,8 @@ export interface IProcessEnv {
   DATA_CACHE_TIME?: string;
   DATA_REQUEST_TIMEOUT?: string;
   CANARY_RELEASE?: string;
+
+  SAURON_API_URL?: string;
 }
 
 declare global {

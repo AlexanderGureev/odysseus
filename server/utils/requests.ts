@@ -33,7 +33,7 @@ export const configRequest = async (
     const ref = req.get('Referer');
     const origin = req.get('Origin');
     const host = `${req.protocol}://${req.get('host')}`;
-    const reqIp = IS_DEV ? '88.214.33.5' : req.clientIp;
+    const reqIp = IS_DEV ? '95.165.136.7' : req.clientIp; //'88.214.33.5'
 
     const finallyRef = xRef ?? ref ?? origin ?? host;
     const userAgent = req.get('User-Agent');
@@ -60,18 +60,25 @@ export const configRequest = async (
   }
 };
 
-export const serviceTariffsRequest = async (partnerId: string, userToken: string | undefined, options: TOptions = {}) => {
+export const serviceTariffsRequest = async (
+  partnerId: string,
+  userToken: string | undefined,
+  options: TOptions = {}
+) => {
   try {
     if (![1728, 1677, 1788].includes(Number(partnerId))) return null;
 
     const headers = options.headers || {};
     if (userToken) headers.Authorization = `Bearer ${userToken}`;
 
-    const { data } = await axios.get<SubscriptionTariffs>(`${process.env.BE_ENDPOINT}/web/Subscriptions/ServiceTariffs`, {
-      ...options,
-      timeout: DATA_REQUEST_TIMEOUT,
-      headers,
-    });
+    const { data } = await axios.get<SubscriptionTariffs>(
+      `${process.env.BE_ENDPOINT}/web/Subscriptions/ServiceTariffs`,
+      {
+        ...options,
+        timeout: DATA_REQUEST_TIMEOUT,
+        headers,
+      }
+    );
 
     return data;
   } catch (e) {
