@@ -1,15 +1,24 @@
 export type TSubscriber<T extends any = any> = (...params: T[]) => void;
 
-export const MediatorFactory = () => {
-  const state: Record<string, Set<TSubscriber>> = {};
+export type TMediatorHandlers = {
+  on: (event: string, callback: TSubscriber) => { on: TMediatorHandlers['on'] };
+  off: (event: string, callback: TSubscriber) => void;
+  emit: (event: string, ...payload: any[]) => void;
+  one: (event: string, callback: TSubscriber) => void;
+};
+
+export type TMediator = () => TMediatorHandlers;
+
+const MediatorService: TMediator = () => {
+  const state: Record<string, TSubscriber[]> = {};
 
   const on = (event: string, callback: TSubscriber) => {
-    if (!state[event]) state[event] = new Set();
+    state[event] = state[event] ? [...state[event], callback] : [callback];
+    return { on };
+  };
 
-    state[event].add(callback);
-    return () => {
-      state[event].delete(callback);
-    };
+  const off = (event: string, callback: TSubscriber) => {
+    state[event] = state[event].filter((f) => f !== callback);
   };
 
   const emit = (event: string, ...payload: any[]) => {
@@ -17,14 +26,16 @@ export const MediatorFactory = () => {
   };
 
   const one = (event: string, callback: TSubscriber) => {
-    const cb = on(event, (...args: any[]) => {
+    const cb = (...args: any[]) => {
+      off(event, cb);
       callback(...args);
-      cb();
-    });
+    };
+
+    on(event, cb);
   };
 
-  return { on, emit, one };
+  return { on, off, emit, one };
 };
 
-const instance = MediatorFactory();
-export { instance as MediatorService, MediatorFactory as Mediator };
+const instance = MediatorService();
+export { instance as MediatorService, MediatorService as Mediator };

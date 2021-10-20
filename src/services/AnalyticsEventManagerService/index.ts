@@ -1,4 +1,4 @@
-import { VIDEO_TYPE } from 'components/Player';
+import { VIDEO_TYPE } from 'components/Player/types';
 import { ViewedTimeContainer } from 'services/BeholderService';
 import { TPlayerService } from 'services/PlayerService';
 import { OUTPUT_PLAYER_POST_MESSAGE, PostMessageService } from 'services/PostMessageService';

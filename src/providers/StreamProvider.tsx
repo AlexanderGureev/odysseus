@@ -2,8 +2,9 @@ import React from 'react';
 import { Nullable } from 'types';
 import { StreamContext } from 'context';
 import { usePlayerConfig } from 'hooks';
-import { TSource, TStreamService, createSource, StreamService } from 'services/StreamService';
+import { TStreamService, createSource, StreamService } from 'services/StreamService';
 import { getCapabilities } from 'utils/supports';
+import { TSource } from 'services/StreamService/types';
 
 export const StreamProvider: React.FC = ({ children }) => {
   const { config } = usePlayerConfig();

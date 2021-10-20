@@ -1,12 +1,6 @@
-import { DRM_TYPE, StreamProtocol, TStreamItem } from 'server/types';
 import { Nullable } from 'types';
 import { handleFairplaySource, handlePlayreadySource, handleWidevineSource } from 'utils/drm';
-
-export enum STREAM_STATE {
-  NOT_SUPPORTED = 'NOT_SUPPORTED',
-  IN_PROCESS = 'IN_PROCESS',
-  NOT_USED = 'NOT_USED',
-}
+import { DRM_TYPE, StreamProtocol, TStreamItem, TKeySystemExt, TSource } from './types';
 
 export const VIDEO_EXTENSION: Record<StreamProtocol, string> = {
   [StreamProtocol.HLS]: 'application/x-mpegURL',
@@ -26,12 +20,14 @@ export const PRIORITY_BY_PROTOCOL = [
   StreamProtocol.MP4,
 ];
 
-export const isEncryptedStream = (s: TStreamItem) => {
-  return Boolean(s.drm_type && s.ls_url);
-};
+export type THistoryStreams = string[];
+export const LS_KEY_STREAM = '@stream_service';
+
+export const isEncryptedStream = (s: TStreamItem) => Boolean(s.drm_type && s.ls_url);
 
 export type TStreamService = {
   getStream: () => Nullable<TStreamItem>;
+  createKey: (stream: TStreamItem) => string;
 };
 
 export const StreamService = (
@@ -41,8 +37,6 @@ export const StreamService = (
 ): TStreamService => {
   const streams = createSupportedStreamsList(sources, capabilities);
   const streamIterator = streamGenerator();
-
-  console.log(streams, 'STREAMS');
 
   function createKey({ drm_type, protocol }: TStreamItem) {
     return drm_type ? `${protocol}:${drm_type}` : `${protocol}`;
@@ -79,19 +73,8 @@ export const StreamService = (
 
   return {
     getStream: () => streamIterator.next().value || null,
+    createKey,
   };
-};
-
-export type TKeySystemExt = {
-  keySystems: Record<
-    string,
-    | {
-        getLicense: (...args: any[]) => void;
-        getCertificate?: (...args: any[]) => void;
-        getContentId?: (...args: any[]) => string;
-      }
-    | string
-  >;
 };
 
 const keySystemsExtension = ({ drm_type, ls_url }: TStreamItem) => {
@@ -111,12 +94,6 @@ const keySystemsExtension = ({ drm_type, ls_url }: TStreamItem) => {
   return DataMap[drm_type](ls_url);
 };
 
-export type TSource = {
-  src: string;
-  type: string;
-  handleManifestRedirects: boolean;
-} & Partial<TKeySystemExt>;
-
 export const createSource = (stream: TStreamItem, options = {}): TSource => {
   const ext = isEncryptedStream(stream) ? keySystemsExtension(stream) : {};
 
@@ -128,3 +105,13 @@ export const createSource = (stream: TStreamItem, options = {}): TSource => {
     ...options,
   };
 };
+
+// export const FAKE_STREAM = {
+//   url: fakeVideoSrc,
+//   protocol: StreamProtocol.MP4,
+//   drm_type: null,
+//   ls_url: null,
+//   manifest_expires_at: null,
+// };
+
+// export const createFakeSource = () => createSource(FAKE_STREAM);

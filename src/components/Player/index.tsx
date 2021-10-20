@@ -6,43 +6,20 @@ import { AdController } from '../Advertisement';
 import { SkinConstructor } from '../SkinConstructor';
 import { fakeVideoSrc } from './fakeVideo';
 import { PlayerApiContext } from 'context';
-import { TSource } from 'services/StreamService';
 import { PlayerService, TPlayerService, TState } from 'services/PlayerService';
+import { TSource } from 'services/StreamService/types';
 import { Nullable } from 'types';
 import { MediatorService } from 'services/MediatorService';
 import { Beholder } from '../Beholder';
 import { AnalyticsEventManagerService } from 'services/AnalyticsEventManagerService';
 import { usePlayerConfig } from 'hooks';
-
-export const DEFAULT_PLAYER_ID = 'video-player';
-
-export enum PLAYER_ERROR {
-  MEDIA_ERR_CUSTOM,
-  MEDIA_ERR_ABORTED,
-  MEDIA_ERR_NETWORK,
-  MEDIA_ERR_DECODE,
-  MEDIA_ERR_SRC_NOT_SUPPORTED,
-  MEDIA_ERR_ENCRYPTED,
-}
-
-export enum VIDEO_TYPE {
-  PLAIN = 'PLAIN',
-  AD = 'AD',
-}
-
-export type TPlayerApi = TPlayerService & {
-  resumePlainVideo: () => Promise<void>;
-  initializeAdvertisement: () => Promise<void>;
-  isInitialized: boolean;
-};
-
-export type TPlayerState = TState;
-
-export type TProps = { source: TSource };
+import { PLAYER_ERROR } from 'utils/drm/utils';
+import { TProps, TPlayerState, VIDEO_TYPE, DEFAULT_PLAYER_ID, TPlayerApi } from './types';
+// import { StreamQualityManager } from 'services/ManifestParser';
 
 const Player: React.FC<TProps> = ({ source }) => {
   const { config } = usePlayerConfig();
-  const { current: player } = React.useRef<TPlayerService>(PlayerService());
+  const { current: player } = React.useRef<TPlayerService>(PlayerService);
   const [isInitialized, setInitialized] = React.useState(false);
 
   const [videoNode, setVideoNode] = React.useState<Nullable<HTMLVideoElement>>(null);
@@ -52,6 +29,9 @@ const Player: React.FC<TProps> = ({ source }) => {
   });
 
   const currentSource = React.useRef(source);
+
+  const [qualityList, setQualityList] = React.useState<Nullable<any[]>>(null);
+  const [activeQualityId, setActive] = React.useState(-1);
 
   const updateState = React.useCallback(
     (newState: Partial<TPlayerState> = {}) => {
@@ -102,6 +82,28 @@ const Player: React.FC<TProps> = ({ source }) => {
     player.pause();
     await player.setSource({ src: fakeVideoSrc, type: 'video/mp4' }, VIDEO_TYPE.AD);
   }, [player]);
+
+  // React.useEffect(() => {
+  //   if (!stream) return;
+
+  //   ManifestParser.fetchManifest(stream)
+  //     .then(({ url, responseUrl, manifest }) => {
+  //       const data = ManifestParser.parse(stream, manifest);
+
+  //       // todo убрать в PlayerManager
+  //       StreamQualityManager.init({
+  //         protocol: stream.protocol,
+  //         playlist: data.playlists,
+  //         manifestUrl: responseUrl
+  //       });
+
+  //       const list = StreamQualityManager.buildQualityList();
+  //       setQualityList(list);
+
+  //       console.log("[RES]", { data, responseUrl, list });
+  //     })
+  //     .catch(console.error);
+  // }, [stream]);
 
   React.useEffect(() => {
     player.init(DEFAULT_PLAYER_ID).then(() => {
@@ -157,6 +159,9 @@ const Player: React.FC<TProps> = ({ source }) => {
     () => ({ ...player, resumePlainVideo, initializeAdvertisement, isInitialized }),
     [player, resumePlainVideo, initializeAdvertisement, isInitialized]
   );
+
+  const style = { position: 'absolute', left: '20px', top: '20px' };
+  const style1 = { position: 'absolute', left: '250px', top: '20px' };
 
   return (
     <PlayerApiContext.Provider value={value}>
@@ -222,6 +227,30 @@ const Player: React.FC<TProps> = ({ source }) => {
           }}>
           -20 VOLUME
         </button>
+
+        {/* {qualityList && (
+          <div style={style1}>
+            <button
+              className={activeQualityId === -1 ? 'active' : ''}
+              onClick={() => {
+                StreamQualityManager.setQuality();
+                setActive(-1);
+              }}>
+              auto
+            </button>
+            {Object.keys(qualityList).map((key, i) => (
+              <button
+                className={i === activeQualityId ? 'active' : ''}
+                key={qualityList[key].qualityMark}
+                onClick={() => {
+                  StreamQualityManager.setQuality(qualityList[key]);
+                  setActive(i);
+                }}>
+                {qualityList[key].qualityMark}
+              </button>
+            ))}
+          </div>
+        )} */}
 
         <SkinConstructor>
           <Beholder>

@@ -2,14 +2,14 @@
 import React from 'react';
 import { useFeatures, usePlayerApi, useAdConfig } from 'hooks';
 import { getAdFoxParameters } from './utils';
-import { VIDEO_TYPE } from '../Player';
 
 import { loadYaSdk } from './yaSdkLoader';
-import { MediatorFactory } from 'services/MediatorService';
+import { Mediator } from 'services/MediatorService';
 import { AdCategory } from 'server/types';
 
 import { TAdPointConfig } from 'providers/AdConfigProvider';
 import { Nullable } from 'types';
+import { VIDEO_TYPE } from 'components/Player/types';
 
 const DEFAULT_ADV_CONTROLS_ID = 'adv-controls';
 
@@ -57,7 +57,7 @@ const AdBlock = (adConfig: TAdConfig, video: HTMLVideoElement, slot: HTMLDivElem
   const _slot = slot;
   let _preload: Nullable<Promise<void>> = null;
   let isActive = true;
-  const mediator = MediatorFactory();
+  const mediator = Mediator();
 
   function createState({ links }: TAdConfig): TAdLinkItem[] {
     return links.map((link, index) => ({

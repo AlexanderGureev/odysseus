@@ -7,7 +7,7 @@ import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
 import shaka from 'shaka-player';
 import { Mediator, TSubscriber } from '../MediatorService';
 import { Nullable } from 'types';
-import { VIDEO_TYPE } from 'components/Player';
+import { VIDEO_TYPE } from 'components/Player/types';
 
 export type TPlayerService = {
   init: (playerId: string, options?: VideoJsPlayerOptions) => Promise<void>;
@@ -28,6 +28,8 @@ export type TPlayerService = {
   isMuted: () => boolean;
   setMute: (status: boolean) => void;
   getState: () => TState;
+  getVhs: () => any;
+  getPlayer: () => Nullable<VideoJsPlayer>;
 };
 
 export type TState = {
@@ -117,6 +119,7 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS): TPlayerService
 
   const getBitrate = () => getVhs()?.bandwidth ?? null;
   const getRepresentations = () => getVhs()?.representations?.() ?? null;
+  const getPlayer = () => player;
 
   const init = (playerId: string, options: VideoJsPlayerOptions = {}) =>
     new Promise<void>((resolve) => {
@@ -259,7 +262,10 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS): TPlayerService
     isMuted,
     setMute,
     getState,
+    getVhs,
+    getPlayer,
   };
 };
 
-export { PlayerService };
+const instance = PlayerService();
+export { instance as PlayerService };

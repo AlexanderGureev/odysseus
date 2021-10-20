@@ -13,7 +13,6 @@ import { PlayerConfigProvider } from 'providers/PlayerConfigProvider';
 import { AdConfigProvider } from 'providers/AdConfigProvider';
 import { StreamProvider } from 'providers/StreamProvider';
 import { FeaturesProvider } from 'providers/FeaturesProvider';
-import { HorusService, WindowManagerService } from 'services/WindowManagerService';
 import { useAdConfig } from 'hooks';
 import { AdCategory } from 'server/types';
 import { AdBlock, AD_BLOCK_STATUS, TAdBlock, TAdConfig } from 'components/Advertisement';
@@ -21,6 +20,10 @@ import { Nullable } from 'types';
 import { loadYaSdk } from 'components/Advertisement/yaSdkLoader';
 import videojs, { VideoJsPlayer } from 'video.js';
 import { isAndroid } from 'react-device-detect';
+import Logger from 'fork-ts-checker-webpack-plugin/lib/logger/Logger';
+import { IDBService } from 'services/IDBService';
+import { APP_DB_NAME, CollectionName, Indexes } from 'services/IDBService/types';
+import { WindowController } from 'services/WindowController';
 
 const sharingUrl = window?.ODYSSEUS_PLAYER_CONFIG?.playlist?.items[0]?.sharing_url;
 
@@ -117,6 +120,29 @@ const TestApp = () => {
 
 // WindowManagerService.init();
 // HorusService.init();
+
+IDBService.connect(APP_DB_NAME, [
+  {
+    name: CollectionName.MASTER_WINDOW,
+    keyPath: 'key',
+  },
+  {
+    name: CollectionName.EVENTS,
+    keyPath: 'timestamp',
+    indexes: [
+      {
+        name: Indexes.BY_STATUS,
+        field: 'status',
+      },
+    ],
+  },
+])
+  .then(() => {
+    WindowController.init();
+  })
+  .catch((e) => {
+    console.error('[IDBService] connect failed', e?.message);
+  });
 
 EmbeddedCheckService.getEmbededStatus(sharingUrl).then(() => {
   ReactDOM.render(
