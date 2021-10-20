@@ -86,6 +86,7 @@ export const createEnv = (req: express.Request) => ({
   SENTRY_EVENT_RATE: process.env.SENTRY_EVENT_RATE ? Number(process.env.SENTRY_EVENT_RATE) : undefined,
   SENTRY_DSN: process.env.SENTRY_DSN,
   SAURON_API_URL: process.env.SAURON_API_URL,
+  CDN_HOSTNAME: process.env.CDN_HOSTNAME ? `//${process.env.CDN_HOSTNAME}` : '',
 });
 
 export const isNumber = (num: string | undefined) => num && !Number.isNaN(Number(num));

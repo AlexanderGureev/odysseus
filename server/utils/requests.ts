@@ -33,7 +33,7 @@ export const configRequest = async (
     const ref = req.get('Referer');
     const origin = req.get('Origin');
     const host = `${req.protocol}://${req.get('host')}`;
-    const reqIp = IS_DEV ? '95.165.136.7' : req.clientIp; //'88.214.33.5'
+    const reqIp = IS_DEV ? '88.214.33.5' : req.clientIp; //'88.214.33.5' 95.165.136.7
 
     const finallyRef = xRef ?? ref ?? origin ?? host;
     const userAgent = req.get('User-Agent');

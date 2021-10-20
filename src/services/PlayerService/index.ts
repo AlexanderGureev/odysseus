@@ -177,11 +177,12 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS): TPlayerService
     try {
       player.muted(muted);
       await playVideo();
-    } catch (e) {
-      console.error(e);
+    } catch (e: unknown) {
+      const error = e as Error;
+      console.error(error);
 
       if (muted) {
-        throw new Error(`autoplay with mute is blocked: ${e?.message}`);
+        throw new Error(`autoplay with mute is blocked: ${error?.message}`);
       }
 
       await initialPlay(true);

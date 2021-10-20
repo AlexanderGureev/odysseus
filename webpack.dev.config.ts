@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import path from 'path';
 import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -5,6 +6,8 @@ import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
+import HappyPack from 'happypack';
+import { ModifySrcPlugin } from './plugins/ModifySrcPlugin';
 
 const config: webpack.Configuration = {
   mode: 'development',
@@ -19,6 +22,10 @@ const config: webpack.Configuration = {
   },
   module: {
     rules: [
+      {
+        test: /\.(ts|js)x?$/,
+        use: 'happypack/loader?id=js',
+      },
       {
         test: /\.(ts|js)x?$/i,
         exclude: /node_modules/,
@@ -64,11 +71,6 @@ const config: webpack.Configuration = {
         test: /\.pug$/,
         loader: 'pug-loader',
       },
-      {
-        test: /-worker\.js$/,
-        exclude: /node_modules/,
-        use: 'worker-loader',
-      },
     ],
   },
   resolve: {
@@ -81,6 +83,12 @@ const config: webpack.Configuration = {
     plugins: [new TsconfigPathsPlugin()],
   },
   plugins: [
+    // @ts-ignore
+    new HappyPack({
+      id: 'js',
+      threads: 4,
+      loaders: ['babel-loader'],
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve('server', 'templates', 'index.pug'),
       filename: path.resolve('build', 'server', 'views', 'index.ejs'),
@@ -99,6 +107,7 @@ const config: webpack.Configuration = {
     new CopyPlugin({
       patterns: [{ from: path.resolve('src', 'static'), to: path.resolve('build', 'client') }],
     }),
+    new ModifySrcPlugin(),
   ],
 };
 

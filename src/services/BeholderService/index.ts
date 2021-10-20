@@ -182,10 +182,11 @@ const BeholderService = () => {
         },
         data: payload,
       });
-    } catch (e) {
-      console.error(e);
+    } catch (e: unknown) {
+      const error = e as { response: { status: number } };
+      console.error(error);
 
-      if (e?.response?.status === 401 && !state.disabled) {
+      if (error?.response?.status === 401 && !state.disabled) {
         const token = await fetchToken();
         if (token) {
           state.token = token;

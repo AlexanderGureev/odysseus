@@ -27,6 +27,7 @@ export interface IProcessEnv {
   CANARY_RELEASE?: string;
 
   SAURON_API_URL?: string;
+  CDN_HOSTNAME?: string;
 }
 
 declare global {

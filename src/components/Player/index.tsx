@@ -134,8 +134,8 @@ const Player: React.FC<TProps> = ({ source }) => {
   }, [player, updateState]);
 
   React.useEffect(() => {
-    // currentSource.current = source;
-    // resumePlainVideo().then(() => updateState());
+    currentSource.current = source;
+    resumePlainVideo().then(() => updateState());
   }, [source, resumePlainVideo, updateState]);
 
   React.useEffect(

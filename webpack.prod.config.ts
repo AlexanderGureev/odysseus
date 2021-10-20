@@ -6,6 +6,7 @@ import CopyPlugin from 'copy-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
+import { ModifySrcPlugin } from './plugins/ModifySrcPlugin';
 
 const config: webpack.Configuration = {
   mode: 'production',
@@ -91,11 +92,6 @@ const config: webpack.Configuration = {
         test: /\.pug$/,
         loader: 'pug-loader',
       },
-      {
-        test: /-worker\.js$/,
-        exclude: /node_modules/,
-        use: 'worker-loader',
-      },
     ],
   },
   resolve: {
@@ -135,6 +131,7 @@ const config: webpack.Configuration = {
       process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
     }),
+    new ModifySrcPlugin(),
   ],
 };
 

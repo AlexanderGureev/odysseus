@@ -126,8 +126,8 @@ EmbeddedCheckService.getEmbededStatus(sharingUrl).then(() => {
           <FeaturesProvider>
             <AdConfigProvider>
               <StreamProvider>
-                {/* <App /> */}
-                <TestApp />
+                <App />
+                {/* <TestApp /> */}
               </StreamProvider>
             </AdConfigProvider>
           </FeaturesProvider>

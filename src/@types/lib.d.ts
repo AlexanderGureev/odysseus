@@ -17,6 +17,7 @@ interface Window {
     WHAT_IS_MY_BROWSER_KEY: string;
     WHAT_IS_MY_BROWSER_LINK: string;
     SAURON_API_URL?: string;
+    CDN_HOSTNAME: string;
   };
   ODYSSEUS_PLAYER_CONFIG: import('../../server/types').TConfig;
   CONTEXT: import('../../server/utils').TParams;
