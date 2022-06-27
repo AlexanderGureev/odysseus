@@ -3,7 +3,7 @@ import { useTheme } from 'hooks';
 
 const DEFAULT_SKIN_CONTROLS = 'skin-controls';
 
-const SkinConstructor: React.FC = ({ children }) => {
+const SkinConstructor = ({ children }: React.PropsWithChildren) => {
   const theme = useTheme();
 
   return (

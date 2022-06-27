@@ -55,6 +55,25 @@ export type TFeatureConfig = {
   SENTRY_ENABLED: boolean;
 };
 
+export type TEnvConfig = {
+  AD_FOX_OWNER_ID: string;
+  NODE_ENV?: string;
+  APP_VERSION?: string;
+  LOG_LEVEL?: string;
+  SIREN_HOST: string;
+  HORUS_SRC: string;
+  INDEXED_DB_LIMIT: number | null;
+  HORUS_ENABLED: boolean;
+  HORUS_BLACKLIST: string | null;
+  WHAT_IS_MY_BROWSER_KEY?: string;
+  WHAT_IS_MY_BROWSER_LINK?: string;
+  IP?: string;
+  SENTRY_EVENT_RATE: number | null;
+  SENTRY_DSN?: string;
+  SAURON_API_URL?: string;
+  CDN_HOSTNAME: string;
+};
+
 export type THydraResponse = {
   config_source: TConfigSource;
   skin_theme_class: TSkinClass;

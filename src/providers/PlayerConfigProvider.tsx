@@ -7,7 +7,7 @@ import { randomHash12 } from 'utils/randomHash';
 
 export type TExtendedConfig = TConfig & { session: TSessionState; context: TParams };
 
-export const PlayerConfigProvider: React.FC = ({ children }) => {
+export const PlayerConfigProvider = ({ children }: React.PropsWithChildren) => {
   const videoSessionId = React.useRef(randomHash12());
   const ssid = React.useRef(uuidv4());
 

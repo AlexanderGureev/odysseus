@@ -1,6 +1,6 @@
 export type TDoneFunction<T> = (error?: any, result?: T) => void;
 export type TTransactionApi<DefaultT> = {
-  get: <T = DefaultT>(key?: string | IDBKeyRange) => Promise<T>;
+  get: <T = DefaultT>(key: string | IDBKeyRange) => Promise<T>;
   getAll: <T = DefaultT>(key?: string | IDBKeyRange) => Promise<T>;
   getByIndex: <T = DefaultT>(indexName: string, key: string) => Promise<T>;
   getCountByIndex: (indexName: string, key: string) => Promise<number>;
@@ -8,7 +8,11 @@ export type TTransactionApi<DefaultT> = {
   delete: (key: IDBValidKey | IDBKeyRange) => Promise<void>;
 };
 
-export type TQuery<T> = (store: IDBObjectStore, done: TDoneFunction<T>, transactionApi: TTransactionApi<T>) => Promise<void>;
+export type TQuery<T> = (
+  store: IDBObjectStore,
+  done: TDoneFunction<T>,
+  transactionApi: TTransactionApi<T>
+) => Promise<void>;
 
 export type TIndex = {
   name: string;

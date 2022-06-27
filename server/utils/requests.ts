@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import express from 'express';
 import { buildRequstByConfigSource, DATA_REQUEST_TIMEOUT, TParams } from '.';
 import { SubscriptionTariffs } from '../../types/SubscriptionTariffs';
@@ -38,7 +38,8 @@ export const configRequest = async (
     const finallyRef = xRef ?? ref ?? origin ?? host;
     const userAgent = req.get('User-Agent');
 
-    axios.defaults.headers.common.CLIENT_IP = reqIp;
+    if (reqIp) axios.defaults.headers.common.CLIENT_IP = reqIp;
+
     const headers = {
       'X-Real-Ip': reqIp,
       'X-Forwarded-For': reqIp,
@@ -46,7 +47,7 @@ export const configRequest = async (
       'X-Referer': finallyRef,
       Referer: finallyRef,
       ...options.headers,
-    };
+    } as AxiosRequestHeaders;
 
     const { data } = await axios.get<TConfigResponse>(config.url, {
       params: config.params,

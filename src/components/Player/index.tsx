@@ -13,8 +13,8 @@ import { MediatorService } from 'services/MediatorService';
 import { Beholder } from '../Beholder';
 import { AnalyticsEventManagerService } from 'services/AnalyticsEventManagerService';
 import { usePlayerConfig } from 'hooks';
-import { PLAYER_ERROR } from 'utils/drm/utils';
-import { TProps, TPlayerState, VIDEO_TYPE, DEFAULT_PLAYER_ID, TPlayerApi } from './types';
+
+import { TProps, TPlayerState, VIDEO_TYPE, DEFAULT_PLAYER_ID, TPlayerApi, PLAYER_ERROR } from './types';
 // import { StreamQualityManager } from 'services/ManifestParser';
 
 const Player: React.FC<TProps> = ({ source }) => {
@@ -44,7 +44,7 @@ const Player: React.FC<TProps> = ({ source }) => {
     [player]
   );
 
-  const setVideoRef = React.useCallback((node) => {
+  const setVideoRef = React.useCallback((node: HTMLVideoElement | null) => {
     setVideoNode(node);
   }, []);
 
@@ -129,7 +129,7 @@ const Player: React.FC<TProps> = ({ source }) => {
     });
 
     player.on('sourceset', (e) => {
-      console.log('[EVENT] sourceset', e);
+      // console.log('[EVENT] sourceset', e);
     });
 
     player.on('timeupdate', updateState);
@@ -140,20 +140,18 @@ const Player: React.FC<TProps> = ({ source }) => {
     resumePlainVideo().then(() => updateState());
   }, [source, resumePlainVideo, updateState]);
 
-  React.useEffect(
-    () =>
-      player.onError((error) => {
-        if (state.videoType === VIDEO_TYPE.AD) {
-          console.log('[PLAYER] AD ERR', error);
-          return;
-        }
+  React.useEffect(() => {
+    player.onError((error) => {
+      if (state.videoType === VIDEO_TYPE.AD) {
+        console.log('[PLAYER] AD ERR', error);
+        return;
+      }
 
-        if ([PLAYER_ERROR.MEDIA_ERR_DECODE, PLAYER_ERROR.MEDIA_ERR_SRC_NOT_SUPPORTED].includes(error.code)) {
-          MediatorService.emit('change_stream');
-        }
-      }),
-    [player, state.videoType]
-  );
+      if ([PLAYER_ERROR.MEDIA_ERR_DECODE, PLAYER_ERROR.MEDIA_ERR_SRC_NOT_SUPPORTED].includes(error.code)) {
+        MediatorService.emit('change_stream');
+      }
+    });
+  }, [player, state.videoType]);
 
   const value: TPlayerApi = React.useMemo(
     () => ({ ...player, resumePlainVideo, initializeAdvertisement, isInitialized }),

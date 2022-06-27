@@ -6,7 +6,7 @@ import { TStreamService, createSource, StreamService } from 'services/StreamServ
 import { getCapabilities } from 'utils/supports';
 import { TSource } from 'services/StreamService/types';
 
-export const StreamProvider: React.FC = ({ children }) => {
+export const StreamProvider = ({ children }: React.PropsWithChildren) => {
   const { config } = usePlayerConfig();
   const [source, set] = React.useState<Nullable<TSource>>(null);
   const service = React.useRef<Nullable<TStreamService>>(null);

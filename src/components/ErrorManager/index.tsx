@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ErrorManager: React.FC = ({ children }) => {
+const ErrorManager = ({ children }: React.PropsWithChildren) => {
   return <>{children}</>;
 };
 

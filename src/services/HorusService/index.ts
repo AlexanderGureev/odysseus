@@ -121,7 +121,7 @@ const HorusService = () => {
 
   const parseConfig = (data: THorusConfig): THorusConfig => ({
     ...data,
-    heartbeat_period: data.heartbeat_period > MIN_H_PERIOD ? data.heartbeat_period : undefined,
+    heartbeat_period: data.heartbeat_period > MIN_H_PERIOD ? data.heartbeat_period : MIN_H_PERIOD,
   });
 
   const fetchConfig = async (): Promise<Nullable<THorusConfig>> => {
@@ -162,7 +162,7 @@ const HorusService = () => {
       async (dbStore, done, { getByIndex }) => {
         const data = await getByIndex(Indexes.BY_STATUS, status);
 
-        if (!data.length) {
+        if (!data?.length) {
           done(null, null);
           return;
         }
@@ -273,7 +273,7 @@ const HorusService = () => {
 
       const payload = createPayload(eventName);
 
-      Logger.log(getLogInfo(), `routeEvent >>> ${eventName}, ${}`);
+      Logger.log(getLogInfo(), `routeEvent >>> ${eventName}, ${payload}`);
 
       if (!isStopSending && (await WindowController.isMaster()) && (await isNeedToSend())) {
         await sendEvents();
@@ -314,6 +314,7 @@ const HorusService = () => {
   const send = async (events: THorusEvent[]) => {
     try {
       const response = await request(EVENTS_PATH, events);
+      if (!response) throw new Error('response is undefined');
 
       const retryAfter = Number(response.headers.get(RETRY_AFTER_HEADER));
 

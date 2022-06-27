@@ -16,7 +16,8 @@ const ChannelService = () => {
   };
 
   const on = (channelKey: ChannelEvent, handler: () => void) => {
-    channelKeys[channelKey] = channelKeys[channelKey] ? [...channelKeys[channelKey], handler] : [handler];
+    const subscribers = channelKeys[channelKey];
+    channelKeys[channelKey] = subscribers ? [...subscribers, handler] : [handler];
   };
 
   const emit = (channelKey: ChannelEvent) => {
@@ -29,11 +30,13 @@ const ChannelService = () => {
   };
 
   const handleStorageEvent = (e: StorageEvent) => {
-    if (!Boolean(channelKeys[e.key])) return;
+    const key = e.key as ChannelEvent;
+
+    if (!Boolean(channelKeys[key])) return;
 
     console.log(getLogInfo(), 'handleStorageEvent', { key: e.key, value: e.newValue });
 
-    channelKeys[e.key]?.forEach((subscriber) => {
+    channelKeys[key]?.forEach((subscriber) => {
       subscriber?.(e.newValue);
     });
   };

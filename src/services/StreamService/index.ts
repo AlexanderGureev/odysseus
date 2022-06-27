@@ -66,7 +66,7 @@ export const StreamService = (
   }
 
   function* streamGenerator() {
-    for (const [key, value] of Object.entries(streams)) {
+    for (const [, value] of Object.entries(streams)) {
       yield value;
     }
   }

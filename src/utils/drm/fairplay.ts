@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { base64DecodeUint8Array, base64EncodeUint8Array, PLAYER_ERROR } from './utils';
 

@@ -1,0 +1,7 @@
+.vjs-text-track-display,
+.vjs-control-bar,
+.vjs-loading-spinner,
+.vjs-big-play-button,
+.vjs-modal-dialog {
+  display: none;
+}

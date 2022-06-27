@@ -148,6 +148,7 @@ const PostMessageService = (): TPostMessageService => {
   };
 
   const eventHandler = (event: MessageEvent<TInputMessage>) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { event: eventName, method = '', cmd: command, callback, ...rest } = event?.data ?? {};
 
     const name = eventName || method;
@@ -158,7 +159,11 @@ const PostMessageService = (): TPostMessageService => {
     window.addEventListener('message', eventHandler);
   };
 
-  const on = (event: INPUT_PLAYER_POST_MESSAGE, callback: TSubscriber) => mediator.on(event, callback);
+  const on = (event: INPUT_PLAYER_POST_MESSAGE, callback: TSubscriber) => {
+    mediator.on(event, callback);
+    return () => mediator.off(event, callback);
+  };
+
   const one = (event: INPUT_PLAYER_POST_MESSAGE, callback: TSubscriber) => mediator.one(event, callback);
 
   return { init, emit, on, one };

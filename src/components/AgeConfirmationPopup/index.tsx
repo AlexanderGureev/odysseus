@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePlayerConfig, useQueryParams } from 'hooks';
 
-export const AgeConfirmationPopup: React.FC = ({ children }) => {
+export const AgeConfirmationPopup = ({ children }: React.PropsWithChildren) => {
   const { config } = usePlayerConfig();
   const { adult = true } = useQueryParams();
 

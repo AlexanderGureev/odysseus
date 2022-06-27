@@ -2,7 +2,7 @@ import React from 'react';
 import { usePlayerConfig, useFeatures, usePlayerApi } from 'hooks';
 import { BeholderService } from 'services/BeholderService';
 
-export const Beholder: React.FC = ({ children }) => {
+export const Beholder = ({ children }: React.PropsWithChildren) => {
   const { config } = usePlayerConfig();
   const { DISABLE_BEHOLDER = false } = useFeatures();
   const player = usePlayerApi();

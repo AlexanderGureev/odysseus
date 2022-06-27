@@ -12,7 +12,7 @@ export interface IProcessEnv {
 
   WHATISMYBROWSER_KEY?: string;
   WHATISMYBROWSER_LINK?: string;
-  AD_FOX_OWNER_ID?: string;
+  AD_FOX_OWNER_ID: string;
   INDEXED_DB_LIMIT?: string;
   LOG_LEVEL?: string;
   HORUS_ENABLED?: string;

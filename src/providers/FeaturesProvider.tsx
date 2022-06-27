@@ -34,7 +34,7 @@ const createFeaturesConfig = (isEmbedded: boolean, { base, embedded }: THydraRes
   );
 };
 
-export const FeaturesProvider: React.FC = ({ children }) => {
+export const FeaturesProvider = ({ children }: React.PropsWithChildren) => {
   const { isEmbedded } = EmbeddedCheckService.getState();
   const { config } = usePlayerConfig();
   const [features, set] = useState(createFeaturesConfig(isEmbedded, config.features));

@@ -1,11 +1,11 @@
 import React from 'react';
 import { TConfig } from 'server/types';
 import { Nullable } from 'types';
-import { TPlayerApi } from 'components/Player';
 import { TParsedAdConfig } from 'providers/AdConfigProvider';
 import { TParsedFeatures } from 'providers/FeaturesProvider';
 import { TExtendedConfig } from 'providers/PlayerConfigProvider';
-import { TSource } from 'services/StreamService';
+import { TSource } from 'services/StreamService/types';
+import { TPlayerApi } from 'components/Player/types';
 
 export enum THEME {
   MORETV = 'MORETV',

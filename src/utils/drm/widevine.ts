@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PLAYER_ERROR } from './utils';
 
 export const handleWidevineSource = (licenseServerUrl: string) => {

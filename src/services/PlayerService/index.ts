@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import 'videojs-contrib-eme';
 import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
-import shaka from 'shaka-player';
+import 'videojs-contrib-eme';
+
 import { Mediator, TSubscriber } from '../MediatorService';
 import { Nullable } from 'types';
 import { VIDEO_TYPE } from 'components/Player/types';
@@ -52,7 +52,6 @@ export type TState = {
 
 export enum PLAYER_TYPE {
   VIDEO_JS = 'VIDEO_JS',
-  SHAKA_PLAYER = 'SHAKA_PLAYER',
 }
 
 type TInitProps = {
@@ -130,7 +129,8 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS): TPlayerService
         ...options,
       });
 
-      // @ts-ignore
+      console.log('[TEST]', player.eme);
+
       player.eme();
       player.on('error', onErrorHandler);
       player.one('ready', resolve);

@@ -80,7 +80,7 @@ const createAdConfig = (ad: TRawAdConfig, playlist: TRawPlaylist) => {
   return { adConfig, adPoints };
 };
 
-export const AdConfigProvider: React.FC = ({ children }) => {
+export const AdConfigProvider = ({ children }: React.PropsWithChildren) => {
   const {
     config: {
       config: { ad = {} },

@@ -1,4 +1,4 @@
-export type TSubscriber<T extends any = any> = (...params: T[]) => void;
+export type TSubscriber<T = any> = (...params: T[]) => void;
 
 export type TMediatorHandlers = {
   on: (event: string, callback: TSubscriber) => { on: TMediatorHandlers['on'] };

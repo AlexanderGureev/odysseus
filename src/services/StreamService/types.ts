@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Nullable } from '../../../types';
 
 export type TStreamItem = {

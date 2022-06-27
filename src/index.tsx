@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // import './publicPath';
 import React, { useEffect, useRef } from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import './styles/fonts.css';
 import './styles/index.css';
@@ -18,9 +18,7 @@ import { AdCategory } from 'server/types';
 import { AdBlock, AD_BLOCK_STATUS, TAdBlock, TAdConfig } from 'components/Advertisement';
 import { Nullable } from 'types';
 import { loadYaSdk } from 'components/Advertisement/yaSdkLoader';
-import videojs, { VideoJsPlayer } from 'video.js';
-import { isAndroid } from 'react-device-detect';
-import Logger from 'fork-ts-checker-webpack-plugin/lib/logger/Logger';
+
 import { IDBService } from 'services/IDBService';
 import { APP_DB_NAME, CollectionName, Indexes } from 'services/IDBService/types';
 import { WindowController } from 'services/WindowController';
@@ -39,7 +37,7 @@ const updateState = (adBlock: TAdBlock, { links, ...rest }: TAdConfig) => {
 const TestApp = () => {
   const slotRef = useRef<Nullable<HTMLDivElement>>(null);
   const videoRef = useRef<Nullable<HTMLVideoElement>>(null);
-  const player = useRef<Nullable<VideoJsPlayer>>(null);
+  // const player = useRef<Nullable<VideoJsPlayer>>(null);
   const { adConfig } = useAdConfig();
 
   useEffect(() => {
@@ -144,22 +142,22 @@ IDBService.connect(APP_DB_NAME, [
     console.error('[IDBService] connect failed', e?.message);
   });
 
+const node = document.getElementById('root');
+const root = createRoot(node as HTMLElement);
+
 EmbeddedCheckService.getEmbededStatus(sharingUrl).then(() => {
-  ReactDOM.render(
-    <React.StrictMode>
-      <ErrorManager>
-        <PlayerConfigProvider>
-          <FeaturesProvider>
-            <AdConfigProvider>
-              <StreamProvider>
-                <App />
-                {/* <TestApp /> */}
-              </StreamProvider>
-            </AdConfigProvider>
-          </FeaturesProvider>
-        </PlayerConfigProvider>
-      </ErrorManager>
-    </React.StrictMode>,
-    document.getElementById('root')
+  root.render(
+    <ErrorManager>
+      <PlayerConfigProvider>
+        <FeaturesProvider>
+          <AdConfigProvider>
+            <StreamProvider>
+              <App />
+              {/* <TestApp /> */}
+            </StreamProvider>
+          </AdConfigProvider>
+        </FeaturesProvider>
+      </PlayerConfigProvider>
+    </ErrorManager>
   );
 });

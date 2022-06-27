@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios';
-import { TPlayerApi } from 'components/Player';
 import { TScrobbling } from 'server/types';
 import { Nullable } from 'types';
 
