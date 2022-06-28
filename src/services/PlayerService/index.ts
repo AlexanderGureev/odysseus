@@ -129,24 +129,18 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS): TPlayerService
         ...options,
       });
 
-      console.log('[TEST]', player.eme);
-
       player.eme();
       player.on('error', onErrorHandler);
       player.one('ready', resolve);
 
-      createBaseListeners();
-    });
+      player.on('seeking', () => {
+        state.seeking = true;
+      });
 
-  const createBaseListeners = () => {
-    player?.on('seeking', () => {
-      state.seeking = true;
+      player.on('seeked', () => {
+        state.seeking = false;
+      });
     });
-
-    player?.on('seeked', () => {
-      state.seeking = false;
-    });
-  };
 
   const setSource = (source: videojs.Tech.SourceObject, type: VIDEO_TYPE = VIDEO_TYPE.PLAIN) =>
     new Promise<void>((resolve) => {

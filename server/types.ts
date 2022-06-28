@@ -57,6 +57,7 @@ export type TFeatureConfig = {
 
 export type TEnvConfig = {
   AD_FOX_OWNER_ID: string;
+  DEBUG_MODE: boolean;
   NODE_ENV?: string;
   APP_VERSION?: string;
   LOG_LEVEL?: string;
@@ -72,6 +73,9 @@ export type TEnvConfig = {
   SENTRY_DSN?: string;
   SAURON_API_URL?: string;
   CDN_HOSTNAME: string;
+  FAIRPLAY_CERT_ENDPOINT: string;
+  YOUBORA_ACCOUNT_CODE?: string;
+  YOUBORA_SERVICE_ENABLED: boolean;
 };
 
 export type THydraResponse = {

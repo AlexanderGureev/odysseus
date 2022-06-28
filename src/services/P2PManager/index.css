@@ -1,0 +1,16 @@
+#teleport-devtools {
+  position: absolute;
+  left: 20px;
+  top: 120px;
+  max-width: 700px;
+  max-height: 680px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.9);
+  overflow: scroll;
+  padding: 20px;
+  display: none;
+}
+
+#teleport-devtools.active {
+  display: block;
+}

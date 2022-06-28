@@ -3,8 +3,8 @@ import { Nullable } from 'types';
 import { StreamContext } from 'context';
 import { usePlayerConfig } from 'hooks';
 import { TStreamService, createSource, StreamService } from 'services/StreamService';
-import { getCapabilities } from 'utils/supports';
 import { TSource } from 'services/StreamService/types';
+import { getCapabilities } from 'services/StreamService/utils/supports';
 
 export const StreamProvider = ({ children }: React.PropsWithChildren) => {
   const { config } = usePlayerConfig();

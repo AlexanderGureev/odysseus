@@ -1,8 +1,6 @@
 import { Nullable } from 'types';
 import { INPUT_PLAYER_POST_MESSAGE, OUTPUT_PLAYER_POST_MESSAGE, PostMessageService } from '../PostMessageService';
 
-const getHighLevelDomain = (url: string) => url.split('.').slice(-2).join('.');
-
 type TState = {
   location: Nullable<string>;
   isEmbedded: boolean;
@@ -24,12 +22,8 @@ const EmbeddedCheckService = () => {
 
     const iframeHostname = new URL(outerHost).hostname;
     const sharingUrlHostname = new URL(sharingUrl).hostname;
-    const hostname = new URL(location.href).hostname;
 
-    // перезагрузка фрейма обновляет referrer
-    if (hostname === iframeHostname) return true;
-
-    return getHighLevelDomain(iframeHostname) !== getHighLevelDomain(sharingUrlHostname);
+    return iframeHostname !== sharingUrlHostname;
   };
 
   const getIframeLocation = (): Promise<string> =>

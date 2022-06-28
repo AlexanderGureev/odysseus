@@ -37,6 +37,7 @@ export enum QUALITY_MARKS {
   LD = 'LD',
   SD = 'SD',
   HD = 'HD',
+  UHD = 'UHD',
 }
 
 export const VIGO_QUALITY_INDEX: Record<QUALITY_MARKS, number> = {
@@ -44,6 +45,7 @@ export const VIGO_QUALITY_INDEX: Record<QUALITY_MARKS, number> = {
   [QUALITY_MARKS.LD]: 3,
   [QUALITY_MARKS.SD]: 4,
   [QUALITY_MARKS.HD]: 5,
+  [QUALITY_MARKS.UHD]: 6,
 };
 
 const VigoService = (): TVigoService => {

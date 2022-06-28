@@ -77,6 +77,7 @@ export const toBool = (value?: string) => String(value)?.toLowerCase().trim() ==
 
 export const createEnv = (req: express.Request): TEnvConfig => ({
   AD_FOX_OWNER_ID: process.env.AD_FOX_OWNER_ID,
+  DEBUG_MODE: toBool(process.env.DEBUG_MODE),
   NODE_ENV: process.env.NODE_ENV,
   APP_VERSION: process.env.APP_VERSION,
   LOG_LEVEL: process.env.LOG_LEVEL,
@@ -92,6 +93,9 @@ export const createEnv = (req: express.Request): TEnvConfig => ({
   SENTRY_DSN: process.env.SENTRY_DSN,
   SAURON_API_URL: process.env.SAURON_API_URL,
   CDN_HOSTNAME: process.env.CDN_HOSTNAME ? `//${process.env.CDN_HOSTNAME}` : '',
+  FAIRPLAY_CERT_ENDPOINT: process.env.FAIRPLAY_CERT_ENDPOINT || 'https://static.more.tv/cert/fp/ctc.der',
+  YOUBORA_ACCOUNT_CODE: process.env.YOUBORA_ACCOUNT_CODE,
+  YOUBORA_SERVICE_ENABLED: toBool(process.env.YOUBORA_SERVICE_ENABLED),
 });
 
 export const isNumber = (num: string | undefined) => num && !Number.isNaN(Number(num));

@@ -5,4 +5,6 @@ import { useQueryParams } from './useQueryParams';
 import { useTheme } from './useTheme';
 import { useAdConfig } from './useAdConfig';
 
+export * from './store';
+
 export { useAdConfig, useFeatures, usePlayerApi, usePlayerConfig, useQueryParams, useTheme };

@@ -1,6 +1,7 @@
 import { Nullable } from 'types';
-import { handleFairplaySource, handlePlayreadySource, handleWidevineSource } from 'utils/drm';
+import { fakeVideoSrc } from './fake-video';
 import { DRM_TYPE, StreamProtocol, TStreamItem, TKeySystemExt, TSource } from './types';
+import { handleWidevineSource, handleFairplaySource, handlePlayreadySource } from './utils';
 
 export const VIDEO_EXTENSION: Record<StreamProtocol, string> = {
   [StreamProtocol.HLS]: 'application/x-mpegURL',
@@ -79,15 +80,9 @@ export const StreamService = (
 
 const keySystemsExtension = ({ drm_type, ls_url }: TStreamItem) => {
   const DataMap: Record<DRM_TYPE, (url: string) => TKeySystemExt> = {
-    [DRM_TYPE.WIDEVINE]: (url: string) => ({
-      keySystems: handleWidevineSource(url),
-    }),
-    [DRM_TYPE.FAIRPLAY]: (url: string) => ({
-      keySystems: handleFairplaySource(url),
-    }),
-    [DRM_TYPE.PLAYREADY]: (url: string) => ({
-      keySystems: handlePlayreadySource(url),
-    }),
+    [DRM_TYPE.WIDEVINE]: (url: string) => handleWidevineSource(url),
+    [DRM_TYPE.FAIRPLAY]: (url: string) => handleFairplaySource(url),
+    [DRM_TYPE.PLAYREADY]: (url: string) => handlePlayreadySource(url),
   };
 
   if (!ls_url || !drm_type || !DataMap[drm_type]) return null;
@@ -106,12 +101,12 @@ export const createSource = (stream: TStreamItem, options = {}): TSource => {
   };
 };
 
-// export const FAKE_STREAM = {
-//   url: fakeVideoSrc,
-//   protocol: StreamProtocol.MP4,
-//   drm_type: null,
-//   ls_url: null,
-//   manifest_expires_at: null,
-// };
+export const FAKE_STREAM = {
+  url: fakeVideoSrc,
+  protocol: StreamProtocol.MP4,
+  drm_type: null,
+  ls_url: null,
+  manifest_expires_at: null,
+};
 
-// export const createFakeSource = () => createSource(FAKE_STREAM);
+export const createFakeSource = () => createSource(FAKE_STREAM);

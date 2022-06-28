@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Nullable } from '../../../types';
+
+import { Nullable } from 'types';
 
 export type TStreamItem = {
   drm_type: Nullable<DRM_TYPE>;
   ls_url: Nullable<string>;
-  manifest_expires_at: number;
+  manifest_expires_at: number | null;
   protocol: StreamProtocol;
   url: string;
   pak_fallback_stream?: boolean;

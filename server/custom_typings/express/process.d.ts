@@ -1,6 +1,7 @@
 export interface IProcessEnv {
   NODE_ENV?: string;
   PORT?: string;
+  DEBUG_MODE?: string;
 
   PAK_HOST: string;
   HYDRA_HOST: string;
@@ -28,6 +29,9 @@ export interface IProcessEnv {
 
   SAURON_API_URL?: string;
   CDN_HOSTNAME?: string;
+  FAIRPLAY_CERT_ENDPOINT?: string;
+  YOUBORA_ACCOUNT_CODE?: string;
+  YOUBORA_SERVICE_ENABLED?: string;
 }
 
 declare global {

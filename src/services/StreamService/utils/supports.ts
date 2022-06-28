@@ -1,5 +1,7 @@
+const createVideoTag = () => document.createElement('video');
+
 export const nativeHlsSupport = () => {
-  const video = document.createElement('video');
+  const video = createVideoTag();
   if (!video.canPlayType) return false;
 
   return ['probably', 'maybe'].includes(
@@ -89,23 +91,30 @@ const checkEMESupport = async (type: KEY_SYSTEMS) => {
   }
 };
 
-type TCapabilities = {
+async function checkEMELegacySupport() {
+  try {
+    createVideoTag().webkitSetMediaKeys(new window.WebKitMediaKeys(KEY_SYSTEMS.FPS1));
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+export type TCapabilities = {
   hls: boolean;
   dash: boolean;
   mss: boolean;
   widevine: boolean;
-  fireplay: boolean;
+  fairplay: boolean;
   playready: boolean;
 };
 
 type TKey = keyof TCapabilities;
 
-export const getCapabilities = async () => {
+export const getCapabilities = async (): Promise<TKey[]> => {
   const widevine = await checkEMESupport(KEY_SYSTEMS.WIDEVINE);
-  const fireplay = await Promise.all(
-    [KEY_SYSTEMS.FAIRPLAY, KEY_SYSTEMS.FPS1, KEY_SYSTEMS.FPS2, KEY_SYSTEMS.FPS3].map((type) => checkEMESupport(type))
-  ).then((res) => res.includes(true));
-
+  const promises = [KEY_SYSTEMS.FAIRPLAY, KEY_SYSTEMS.FPS1, KEY_SYSTEMS.FPS2, KEY_SYSTEMS.FPS3].map(checkEMESupport);
+  const fairplay = await Promise.all([...promises, checkEMELegacySupport()]).then((res) => res.includes(true));
   const playready = await checkEMESupport(KEY_SYSTEMS.PLAYERREADY);
 
   const capabilities: TCapabilities = {
@@ -113,11 +122,9 @@ export const getCapabilities = async () => {
     dash: isMediaSourceSupported,
     mss: isMediaSourceSupported,
     widevine,
-    fireplay,
+    fairplay,
     playready,
-  };
+  } as const;
 
-  console.log(capabilities, 'capabilities');
-
-  return Object.keys(capabilities).filter((k) => capabilities[k as TKey]);
+  return (Object.keys(capabilities) as TKey[]).filter((k) => capabilities[k]);
 };
