@@ -1,7 +1,7 @@
 interface Window {
   ya?: any;
-  ENV: import('../../server/types').TEnvConfig;
-  ODYSSEUS_PLAYER_CONFIG: import('../../server/types').TConfig;
+  ENV: import('../../types').TEnvConfig;
+  ODYSSEUS_PLAYER_CONFIG: import('../../types').TConfig;
   CONTEXT: import('../../server/utils').TParams;
   __type: 'MASTER' | 'WORKER';
 

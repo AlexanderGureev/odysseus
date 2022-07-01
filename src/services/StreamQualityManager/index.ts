@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Player } from 'components/Player';
-import { isSafari, browserVersion } from 'react-device-detect';
 import { findLastIndex } from 'lodash';
-
-import { StreamProtocol } from 'server/types';
+import { browserVersion,isSafari } from 'react-device-detect';
 import { HORUS_EVENT } from 'services/HorusService/types';
 import { LocalStorageService, STORAGE_SETTINGS } from 'services/LocalStorageService';
 import { Playlist } from 'services/ManifestParser';
@@ -11,8 +9,9 @@ import { Mediator } from 'services/MediatorService';
 import { createSource } from 'services/StreamService';
 import { QUALITY_MARKS } from 'services/VigoService';
 import { store } from 'store';
+import { StreamProtocol } from 'types';
 import { Nullable } from 'types';
-import { ERROR_ITEM_MAP, ERROR_CODES, ERROR_TYPE, Error } from 'types/errors';
+import { ERROR_CODES, ERROR_ITEM_MAP, ERROR_TYPE, PlayerError } from 'types/errors';
 
 const QUALITY_MARK_LIST = [QUALITY_MARKS.LD, QUALITY_MARKS.SD, QUALITY_MARKS.HD, QUALITY_MARKS.UHD];
 const RESOLUTIONS_LIST = [360, 480, 720, 1080];
@@ -189,7 +188,7 @@ const StreamQualityManager = ({ player, vigo }: TInitOptions): TQualityManager =
     } catch (e) {
       // Logger.error('[StreamQualityManager] setQuality error:', e?.message);
 
-      const error: Error = e?.code ? e : ERROR_ITEM_MAP[ERROR_CODES[ERROR_TYPE.DATA_LOADING]];
+      const error: PlayerError = e?.code ? e : ERROR_ITEM_MAP[ERROR_CODES[ERROR_TYPE.DATA_LOADING]];
       const details = e?.message || e?.details;
       await playerManager.showError({ ...error, details }, `StreamQualityManager / setQuality`);
     }

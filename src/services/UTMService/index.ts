@@ -1,12 +1,6 @@
-import { UTM_PARAMS, UTM_TERMS } from './types';
+import { Params, UTM_PARAMS, UTM_TERMS } from './types';
 
 const PARAMS_LIST = [UTM_PARAMS.UTM_SOURCE, UTM_PARAMS.UTM_MEDIUM, UTM_PARAMS.UTM_CONTENT, UTM_PARAMS.UTM_TERM];
-
-type Params = {
-  term: UTM_TERMS;
-  skinId: number;
-  videoId: number;
-};
 
 const PARAMS_SELECTOR: Record<UTM_PARAMS, (p: Params) => number | string | UTM_TERMS> = {
   [UTM_PARAMS.UTM_SOURCE]: () => 'player',

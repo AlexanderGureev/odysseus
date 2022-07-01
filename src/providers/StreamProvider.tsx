@@ -1,10 +1,10 @@
-import React from 'react';
-import { Nullable } from 'types';
 import { StreamContext } from 'context';
 import { usePlayerConfig } from 'hooks';
-import { TStreamService, createSource, StreamService } from 'services/StreamService';
+import React from 'react';
+import { createSource, StreamService, TStreamService } from 'services/StreamService';
 import { TSource } from 'services/StreamService/types';
 import { getCapabilities } from 'services/StreamService/utils/supports';
+import { Nullable } from 'types';
 
 export const StreamProvider = ({ children }: React.PropsWithChildren) => {
   const { config } = usePlayerConfig();
@@ -12,8 +12,8 @@ export const StreamProvider = ({ children }: React.PropsWithChildren) => {
   const service = React.useRef<Nullable<TStreamService>>(null);
 
   const nextStream = React.useCallback(() => {
-    const stream = service.current?.getStream();
-    if (stream) set(createSource(stream));
+    // const stream = service.current?.getStream();
+    // if (stream) set(createSource(stream));
   }, []);
 
   React.useEffect(() => {
@@ -25,8 +25,8 @@ export const StreamProvider = ({ children }: React.PropsWithChildren) => {
         return;
       }
 
-      service.current = StreamService(sources, capabilities);
-      nextStream();
+      // service.current = StreamService(sources, capabilities);
+      // nextStream();
     });
   }, [config, nextStream]);
 

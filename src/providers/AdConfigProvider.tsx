@@ -1,16 +1,17 @@
+import { TAdConfigByCategory } from 'components/Advertisement';
+import { usePlayerConfig } from 'hooks';
 import React from 'react';
-import { AdConfigContext } from '../context';
 import {
-  TRawAdConfig,
-  TRawPlaylist,
   AdCategory,
   TContentRollsConfig,
   TMiddleRollsConfig,
   TPlaceholder,
   TPreRollsConfig,
-} from 'server/types';
-import { TAdConfigByCategory } from 'components/Advertisement';
-import { usePlayerConfig } from 'hooks';
+  TRawAdConfig,
+  TRawPlaylist,
+} from 'types';
+
+import { AdConfigContext } from '../context';
 
 export type TAdPointConfig = {
   point: number;

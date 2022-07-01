@@ -1,20 +1,21 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import { AdCategory, TSkinClass } from 'server/types';
-import { Nullable } from 'types';
 import { TAdConfigByCategory } from 'components/Advertisement';
+import { AdCategory, SkinClass } from 'types';
+import { Nullable } from 'types';
 import { isNil } from 'utils';
 import { createCounter } from 'utils/counter';
+import { logger } from 'utils/logger';
 import { randomUnit32 } from 'utils/randomHash';
 import { sendStat } from 'utils/statistics';
 
-export const AMBERDATA_CODE_BY_SKIN_NAME: { [key in TSkinClass]?: number } = {
+export const AMBERDATA_CODE_BY_SKIN_NAME: { [key in SkinClass]?: number } = {
   MORE_TV: 6334,
   DEFAULT: 7267,
 };
 
 export type TAmberdataParams = {
-  skinName: TSkinClass;
+  skinName: SkinClass;
   isEmbedded: boolean;
   partnerId: number;
   referrer: string;
@@ -31,7 +32,13 @@ export type TAmberdataInitParams = {
   sid: string | null;
 };
 
-const createStatUrl = (skinName: TSkinClass) => {
+export type CrashEventPayload = {
+  partnerId: number | null;
+  trackId: number | null;
+  videosessionId: string;
+};
+
+const createStatUrl = (skinName: SkinClass) => {
   const code = AMBERDATA_CODE_BY_SKIN_NAME[skinName] || AMBERDATA_CODE_BY_SKIN_NAME.DEFAULT;
   return `https://dmg.digitaltarget.ru/1/${code}/i/i?i={random}&c=`;
 };
@@ -110,7 +117,7 @@ const AmberdataService = () => {
   let loaded = false;
   let baseLink = '';
 
-  const sendAmberdataInitStat = (skin: TSkinClass, config: TAdConfigByCategory) => {
+  const sendAmberdataInitStat = (skin: SkinClass, config: TAdConfigByCategory) => {
     const isContainAdvertisement = Object.keys(config).length;
     const resultedParams: { [key in PARAMS]?: Nullable<string | number> } = {
       [PARAMS.ADFOX_PARTNER]: null,
@@ -149,11 +156,19 @@ const AmberdataService = () => {
     const statPayload = URL_PAYLOAD_TEMPLATE.replace('{payload}', queryString);
     const statUrl = `${statUrlBase}${encodeURIComponent(statPayload)}`;
 
-    console.log(`<<<<<---SEND AMBERDATA INIT STAT: QUERY STRING - ${queryString}`);
-    console.log(`<<<<<---SEND AMBERDATA INIT STAT: STAT PAYLOAD - ${statPayload}`);
-    console.log(`<<<<<---SEND AMBERDATA INIT STAT: STAT URL - ${statUrl}`);
+    logger.log('[AmberdataService]', `<<<<<---SEND AMBERDATA INIT STAT: QUERY STRING - ${queryString}`);
+    logger.log('[AmberdataService]', `<<<<<---SEND AMBERDATA INIT STAT: STAT PAYLOAD - ${statPayload}`);
+    logger.log('[AmberdataService]', `<<<<<---SEND AMBERDATA INIT STAT: STAT URL - ${statUrl}`);
 
     sendStat(statUrl);
+  };
+
+  const sendAmberdataStat = () => {
+    return;
+  };
+
+  const sendAmberdataCrashEvent = (payload: CrashEventPayload) => {
+    sendAmberdataStat();
   };
 
   const createBaseLink = (options: TAmberdataInitParams) => {
@@ -181,7 +196,7 @@ const AmberdataService = () => {
     partnerId,
     referrer,
   }: {
-    skinName: TSkinClass;
+    skinName: SkinClass;
     isEmbedded: boolean;
     partnerId: number;
     referrer: string;
@@ -208,7 +223,7 @@ const AmberdataService = () => {
     document.head.appendChild(amberdata);
   };
 
-  return { init };
+  return { init, sendAmberdataCrashEvent };
 };
 
 const instance = AmberdataService();

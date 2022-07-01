@@ -1,5 +1,6 @@
 import express from 'express';
-import { TConfigSource, TEnvConfig } from '../types';
+
+import { TConfigSource, TEnvConfig } from '../../types';
 
 const base64RegExp = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
 export const isValidBase64 = (str: string): boolean => base64RegExp.test(str);
@@ -26,6 +27,7 @@ export type TParams = {
   sign?: string;
   pf?: string;
   pt?: string;
+  p2p?: string;
 };
 
 export const buildRequstByConfigSource = (configSource: TConfigSource, params: TParams): TRequestConfig => {
@@ -65,7 +67,7 @@ export const buildRequstByConfigSource = (configSource: TConfigSource, params: T
   }[configSource]?.();
 };
 
-export const DATA_REQUEST_TIMEOUT = 2000;
+export const DATA_REQUEST_TIMEOUT = 5000;
 
 export const toNumber = (value: string | number | undefined) => {
   if (value === null || value === undefined) return null;

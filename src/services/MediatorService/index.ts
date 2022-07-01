@@ -38,4 +38,4 @@ const MediatorService: TMediator = () => {
 };
 
 const instance = MediatorService();
-export { instance as MediatorService, MediatorService as Mediator };
+export { MediatorService as Mediator,instance as MediatorService };

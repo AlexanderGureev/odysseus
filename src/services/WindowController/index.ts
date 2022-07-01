@@ -1,9 +1,10 @@
+import { logger } from 'utils/logger';
 import { v4 as uuidv4 } from 'uuid';
-import { IDBService } from '../../services/IDBService';
+
 import { ChannelService } from '../../services/ChannelService';
 import { ChannelEvent } from '../../services/ChannelService/types';
+import { IDBService } from '../../services/IDBService';
 import { CollectionName } from '../IDBService/types';
-import { getCurrentTime } from 'utils';
 
 /* USAGE EXAMPLE
 WindowController.init();
@@ -15,9 +16,6 @@ type TWindowRecord = {
   key: string;
   timestamp: number;
 };
-
-const getLogInfo = () => `[WindowController]:${getCurrentTime()}:`;
-const Logger = console;
 
 const WINDOW_ID = uuidv4();
 const KEY = 'master';
@@ -39,9 +37,9 @@ const WindowController = () => {
 
       isInitialized = true;
 
-      Logger.log(getLogInfo(), `isInitialized`);
+      logger.log('[WindowController]', `isInitialized`);
     } catch (e) {
-      Logger.log(getLogInfo(), `init error: ${e}`);
+      logger.log('[WindowController]', `init error: ${e}`);
     }
   };
 
@@ -103,11 +101,11 @@ const WindowController = () => {
         }
       );
 
-      Logger.log(getLogInfo(), 'check master window success: ', { status, window_id: WINDOW_ID });
+      logger.log('[WindowController]', 'check master window success: ', { status, window_id: WINDOW_ID });
 
       return status;
     } catch (e) {
-      Logger.log(getLogInfo(), `check master window error: ${e}`);
+      logger.log('[WindowController]', `check master window error: ${e}`);
       return false;
     }
   };

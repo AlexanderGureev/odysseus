@@ -1,19 +1,16 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-ignore
-import * as MPDParser from 'mpd-parser';
+import { DOMParser, XMLSerializer } from '@xmldom/xmldom';
+import { Base64 } from 'js-base64';
 // @ts-ignore
 import { Parser } from 'm3u8-parser';
-
-import { Base64 } from 'js-base64';
-import { DOMParser, XMLSerializer } from '@xmldom/xmldom';
-import { getCurrentTime } from 'utils';
+// @ts-ignore
+import * as MPDParser from 'mpd-parser';
+import { VIDEO_EXTENSION } from 'services/StreamService';
 import { StreamProtocol, TStreamItem } from 'services/StreamService/types';
 import { Nullable } from 'types';
 import { ERROR_CODES, ERROR_ITEM_MAP } from 'types/errors';
-import { VIDEO_EXTENSION } from 'services/StreamService';
-
-const getLogInfo = () => `[ManifestParser]:${getCurrentTime()}:`;
-const Logger = console;
+import { logger } from 'utils/logger';
 
 export type Playlist = {
   uri: string;
@@ -191,7 +188,7 @@ const ManifestParser = () => {
 
       return manifestData;
     } catch (e) {
-      Logger.error('[ManifestParser]: fetchManifest error:', e?.message);
+      logger.error('[ManifestParser]', 'fetchManifest error:', e?.message);
       throw {
         ...ERROR_ITEM_MAP[ERROR_CODES.CDN_INVALID_DATA],
         details: e?.message,

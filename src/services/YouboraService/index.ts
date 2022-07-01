@@ -2,24 +2,26 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 // @ts-ignore
-import youbora from 'youboralib';
+import { uniqueId } from 'lodash';
 // @ts-ignore
 import platform from 'platform';
 import detector from 'react-device-detect';
-
-import { VideoJsPlayer } from 'video.js';
-import { TOptions, TYouboraEvent, TYouboraService, YEvent } from './types';
-import { uniqueId } from 'lodash';
-import { TMediator, MediatorService, Mediator } from 'services/MediatorService';
+import { Mediator, MediatorService, TMediator } from 'services/MediatorService';
 import { QUALITY_MARKS } from 'services/VigoService';
 import { store } from 'store';
 import { Nullable } from 'types';
 import { ERROR_TYPE } from 'types/errors';
 import { getCurrentTime } from 'utils';
+import { logger } from 'utils/logger';
+import { VideoJsPlayer } from 'video.js';
+// @ts-ignore
+import youbora from 'youboralib';
+
 import { AdsAdapter, VideoAdapter } from './adapters';
 import { TAdsAdapter } from './adapters/AdsAdapter/types';
 import { TVideoAdapter } from './adapters/VideoAdapter/types';
 import { getTrackMetaSelector, getViewEventParamsSelector } from './selectors';
+import { TOptions, TYouboraEvent, TYouboraService, YEvent } from './types';
 import { filterOptions } from './utils';
 
 const IS_DEV = window?.ENV?.NODE_ENV === 'development';
@@ -123,7 +125,7 @@ const YouboraService = (): TYouboraService => {
   const emit = <T extends any[]>(event: TYouboraEvent, ...payload: T) => {
     if (!isInitialized) return;
 
-    console.log(`[YouboraService]:[${event}]:${getCurrentTime()}, payload -`, payload);
+    logger.log('[YouboraService]', `[${event}], payload - ${payload}`);
     // _mediator.emit(event, ...payload);
   };
 

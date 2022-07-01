@@ -1,9 +1,13 @@
 import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import express from 'express';
-import { buildRequstByConfigSource, DATA_REQUEST_TIMEOUT, TParams } from '.';
+import { MediascopeCounterResponse } from 'types/MediascopeCounter';
+import { TrackInfoData } from 'types/TrackInfo';
+import { UserSubscription } from 'types/UserSubscription';
+
+import { ApiResponse, SkinClass, TBaseConfig, TConfigSource, THydraResponse } from '../../types';
 import { SubscriptionTariffs } from '../../types/SubscriptionTariffs';
 import { IS_DEV } from '../server';
-import { THydraResponse, TConfigSource, TConfigResponse } from '../types';
+import { buildRequstByConfigSource, DATA_REQUEST_TIMEOUT, TParams } from '.';
 
 type TOptions = AxiosRequestConfig;
 
@@ -49,7 +53,7 @@ export const configRequest = async (
       ...options.headers,
     } as AxiosRequestHeaders;
 
-    const { data } = await axios.get<TConfigResponse>(config.url, {
+    const { data } = await axios.get<ApiResponse<TBaseConfig>>(config.url, {
       params: config.params,
       ...options,
       headers,
@@ -61,21 +65,105 @@ export const configRequest = async (
   }
 };
 
+const TARRIFS_ENDPOINT_BY_THEME: { [key in SkinClass]?: string } = {
+  [SkinClass.CTC]: `${process.env.CTC_BE_ENDPOINT}/api/subscription/v2/offers`,
+  [SkinClass.MORE_TV]: `${process.env.BE_ENDPOINT}/web/Subscriptions/ServiceTariffs`,
+};
+
 export const serviceTariffsRequest = async (
-  partnerId: string,
   userToken: string | undefined,
+  theme: SkinClass,
   options: TOptions = {}
 ) => {
   try {
-    if (![1728, 1677, 1788].includes(Number(partnerId))) return null;
+    const endpoint = TARRIFS_ENDPOINT_BY_THEME[theme];
+    if (!endpoint) return null;
 
     const headers = options.headers || {};
-    if (userToken) headers.Authorization = `Bearer ${userToken}`;
+    if (userToken) headers.Authorization = `${theme === SkinClass.CTC ? '' : 'Bearer'} ${userToken}`;
 
-    const { data } = await axios.get<SubscriptionTariffs>(
-      `${process.env.BE_ENDPOINT}/web/Subscriptions/ServiceTariffs`,
+    const { data } = await axios.get<ApiResponse<SubscriptionTariffs>>(endpoint, {
+      ...options,
+      timeout: DATA_REQUEST_TIMEOUT,
+      headers,
+    });
+
+    return data;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+const TRACK_INFO_ENDPOINT_BY_THEME: { [key in SkinClass]?: string } = {
+  [SkinClass.MORE_TV]: `${process.env.BE_ENDPOINT}/web/trackInfo`,
+};
+
+export const trackInfoRequest = async (trackId: string, theme: SkinClass, options: TOptions = {}) => {
+  try {
+    const endpoint = TRACK_INFO_ENDPOINT_BY_THEME[theme];
+    if (!endpoint) return null;
+
+    const headers = options.headers || {};
+
+    const { data } = await axios.get<ApiResponse<TrackInfoData>>(endpoint, {
+      ...options,
+      timeout: DATA_REQUEST_TIMEOUT,
+      params: {
+        hubId: trackId,
+      },
+      headers,
+    });
+
+    return data;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+const SUBSCRIPTION_ENDPOINT_BY_THEME: { [key in SkinClass]?: string } = {
+  [SkinClass.MORE_TV]: `${process.env.BE_ENDPOINT}/v2/web/Subscriptions`,
+};
+
+export const userSubscriptionRequest = async (
+  userToken: string | undefined,
+  theme: SkinClass,
+  options: TOptions = {}
+) => {
+  try {
+    const endpoint = SUBSCRIPTION_ENDPOINT_BY_THEME[theme];
+    if (!endpoint || !userToken) return null;
+
+    const headers = options.headers || {};
+    headers.Authorization = `Bearer ${userToken}`;
+
+    const { data } = await axios.get<ApiResponse<UserSubscription[]>>(endpoint, {
+      ...options,
+      timeout: DATA_REQUEST_TIMEOUT,
+      headers,
+    });
+
+    return data;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const mediascopeCounterRequest = async (serviceId: number | undefined, options: TOptions = {}) => {
+  try {
+    if (!serviceId) return null;
+
+    const headers = options.headers || {};
+
+    const { data } = await axios.get<MediascopeCounterResponse>(
+      `${process.env.TURMS_ENDPOINT}/mediascope/counter/web/watching`,
       {
         ...options,
+        params: {
+          service_group_id: serviceId,
+        },
         timeout: DATA_REQUEST_TIMEOUT,
         headers,
       }

@@ -1,31 +1,12 @@
-import { TSkinClass } from 'server/types';
 import md5 from 'md5';
 import { randomHash32 } from 'utils/randomHash';
-import { Nullable } from 'types';
+
 import { LocalStorageService, STORAGE_SETTINGS } from '../LocalStorageService';
+import { TVigoParams, TVigoService, TVigoState } from './types';
 
 export const SERVICE_ID = {
   MORE_TV: 1,
   CTC: 2,
-};
-
-export type TVigoParams = {
-  referrer: string;
-  ssid: string;
-  skinName: TSkinClass;
-};
-
-type TVigoService = {
-  init: (params: TVigoParams) => void;
-};
-
-type TVigoState = {
-  svcid: Nullable<string>;
-  cid: Nullable<string>;
-  wid: Nullable<string>;
-  quality: Nullable<number>;
-  player: string;
-  host?: string;
 };
 
 // Constants API.VIGO.RU

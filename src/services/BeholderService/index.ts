@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios';
-import { TScrobbling } from 'server/types';
+import { TScrobbling } from 'types';
 import { Nullable } from 'types';
+import { logger } from 'utils/logger';
 
 type TBeholderParams = {
   userToken?: string;
@@ -111,8 +112,8 @@ const BeholderService = () => {
 
     const progress = Math.round((currentTime / state.duration) * 100);
 
-    console.log('[beholder] progress: ', progress);
-    console.log('[beholder] points: ', points);
+    logger.log('[BeholderService]', `progress: ${progress}`);
+    logger.log('[BeholderService]', `points: ${points}`);
 
     if (points[progress] === false) {
       points[progress] = true;
@@ -127,7 +128,7 @@ const BeholderService = () => {
       const host = state.scrobbling?.hostname;
       if (!host) return null;
 
-      console.log(`[beholder] fetchToken`);
+      logger.log('[BeholderService]', 'fetchToken');
 
       const { data } = await axios.get<TBeholderTokenResponse>(`${host}/token`, {
         params: { service_id: state?.scrobbling?.serviceId || 1 },
@@ -166,7 +167,7 @@ const BeholderService = () => {
       views: [data],
     };
 
-    console.log(`[beholder] save time: ${currentTime}`, payload);
+    logger.log('[BeholderService]', `save time: ${currentTime}`, payload);
 
     try {
       const host = state.scrobbling?.hostname;
@@ -200,7 +201,8 @@ const BeholderService = () => {
 
     const { viewTime } = viewedTimeContainer.getState();
 
-    console.log('[beholder] tick', viewTime, state.scrobbling.period);
+    logger.log('[BeholderService]', 'tick', viewTime, state.scrobbling.period);
+
     if (viewTime > state.scrobbling.period) {
       saveTime(currentTime);
       viewedTimeContainer.reset();

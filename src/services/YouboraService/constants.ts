@@ -1,4 +1,4 @@
-import { AdCategory } from 'server/types';
+import { AdCategory } from 'types';
 
 export const AD_CATEGORY_MAP: { [key in AdCategory]?: string } = {
   [AdCategory.PRE_ROLL]: 'pre',

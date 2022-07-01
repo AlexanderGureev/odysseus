@@ -1,11 +1,12 @@
-import path from 'path';
-import webpack from 'webpack';
+import CopyPlugin from 'copy-webpack-plugin';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import CopyPlugin from 'copy-webpack-plugin';
+import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
+import webpack from 'webpack';
+
 import { ModifySrcPlugin } from './plugins/ModifySrcPlugin';
 
 const config: webpack.Configuration = {

@@ -34,7 +34,7 @@ controller.runTransaction<TEvent>('events', 'readonly', async (store, done, { ge
 */
 
 import { Nullable } from '../../../types';
-import { TStoresConfig, TQuery, TTransactionApi, TDoneFunction } from './types';
+import { TDoneFunction,TQuery, TStoresConfig, TTransactionApi } from './types';
 
 const IDBService = () => {
   let db: Nullable<IDBDatabase> = null;

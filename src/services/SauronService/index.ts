@@ -1,16 +1,12 @@
 import { Nullable } from 'types';
 import { getCookie } from 'utils/cookie';
 
+import { TSauronSubscriber } from './types';
+
 const SAURON_ID_KEY = 'sauron_id';
 const SAURON_API_URL = window.ENV.SAURON_API_URL ? window.ENV.SAURON_API_URL + '/identify' : null;
 
-type TSauronSubscriber = (sauronId: string | null) => void;
-type TSauronService = {
-  init: () => void;
-  subscribe: (callback: TSauronSubscriber) => void;
-};
-
-const SauronServiceProvider = (): TSauronService => {
+const SauronServiceProvider = () => {
   let callbacks: TSauronSubscriber[] = [];
   let sauronIdGlobal: Nullable<string> = null;
   let storage: Nullable<Storage> = null;

@@ -1,8 +1,10 @@
 import { VIDEO_TYPE } from 'components/Player/types';
 import { ViewedTimeContainer } from 'services/BeholderService';
 import { TPlayerService } from 'services/PlayerService';
-import { OUTPUT_PLAYER_POST_MESSAGE, PostMessageService } from 'services/PostMessageService';
+import { PostMessageService } from 'services/PostMessageService';
+import { OUTPUT_PLAYER_POST_MESSAGE } from 'services/PostMessageService/types';
 import { SauronService } from 'services/SauronService';
+import { logger } from 'utils/logger';
 
 export enum AnalyticsEvent {
   PLAY = 'PLAY',
@@ -96,17 +98,17 @@ const AnalyticsEventManagerService = () => {
 
   const SEND_HANDLER_EVENT_MAP: TSendMap = {
     [AnalyticsEvent.PLAY]: () => {
-      console.log('[AnalyticsEventManagerService] PLAY EVENT');
+      logger.log('[AnalyticsEventManagerService]', 'PLAY EVENT');
       PostMessageService.emit(OUTPUT_PLAYER_POST_MESSAGE.PLAY, { payload: createPayload(0) });
     },
     [AnalyticsEvent.VIEW]: ({ currentTime }) => {
-      console.log('[AnalyticsEventManagerService] VIEW EVENT', state.viewPoint);
+      logger.log('[AnalyticsEventManagerService]', 'VIEW EVENT', state.viewPoint);
       PostMessageService.emit(OUTPUT_PLAYER_POST_MESSAGE.VIEW, {
         payload: { ...createPayload(currentTime), value: state.viewPoint },
       });
     },
     [AnalyticsEvent.WATCH_POINT]: ({ currentTime, value }) => {
-      console.log('[AnalyticsEventManagerService] WATCH_POINT EVENT', value);
+      logger.log('[AnalyticsEventManagerService]', 'WATCH_POINT EVENT', value);
       PostMessageService.emit(OUTPUT_PLAYER_POST_MESSAGE.WATCH_POINT, {
         payload: { ...createPayload(currentTime), value },
       });

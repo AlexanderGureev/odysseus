@@ -1,6 +1,7 @@
 import path from 'path';
 import webpack from 'webpack';
 import nodeExternals from 'webpack-node-externals';
+
 import pkg from './package.json';
 
 const IS_DEV = process.env.NODE_ENV !== 'production';

@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
 // @ts-ignore
-import youbora from 'youboralib';
 import 'youbora-adapter-videojs';
-import { VideoJsPlayer } from 'video.js';
+
 import { fakeVideoSrc } from 'components/Player/fakeVideo';
 import { ManifestParser } from 'services/ManifestParser';
 import { TMediatorHandlers } from 'services/MediatorService';
@@ -13,6 +12,10 @@ import { filterOptions } from 'services/YouboraService/utils';
 import { store } from 'store';
 import { Nullable } from 'types';
 import { ERROR_TYPE } from 'types/errors';
+import { VideoJsPlayer } from 'video.js';
+//@ts-ignore
+import youbora from 'youboralib';
+
 import { TVideoAdapter, VideoAdapterEvent } from './types';
 
 const CustomAdapter = youbora.adapters.Videojs.extend({

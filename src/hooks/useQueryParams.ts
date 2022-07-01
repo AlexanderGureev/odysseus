@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { toNum, isNil } from '../utils';
+
+import { isNil,toNum } from '../utils';
 import { useFeatures } from './useFeatures';
 
 export type TAutoplay = 'never' | 'always' | 'on' | 'off' | '1' | '0';

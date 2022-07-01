@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { StreamContext } from '../context';
 
 export const useCurrentStream = () => {

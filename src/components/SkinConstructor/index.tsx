@@ -1,5 +1,5 @@
-import React from 'react';
 import { useTheme } from 'hooks';
+import React from 'react';
 
 const DEFAULT_SKIN_CONTROLS = 'skin-controls';
 

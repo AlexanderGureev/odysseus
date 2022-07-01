@@ -1,5 +1,6 @@
+import { isMobile,isSafari } from 'react-device-detect';
+import { logger } from 'utils/logger';
 import { v4 } from 'uuid';
-import { isSafari, isMobile } from 'react-device-detect';
 
 const AD_FOX_OWNER_ID = window.ENV.AD_FOX_OWNER_ID;
 export const ADV_DESKTOP_PLID = 229103;
@@ -73,7 +74,7 @@ const getAdFoxParameters = (link: string): TAdFoxConfig => {
 
   const adFoxParams = getQueryParams(formattedUrl);
 
-  console.log(adFoxParams);
+  logger.log('[getAdFoxParameters]', adFoxParams);
   return {
     ownerId: AD_FOX_OWNER_ID,
     params: { ...adFoxParams },

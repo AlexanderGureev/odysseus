@@ -1,7 +1,8 @@
 import { toNumber } from 'lodash';
-import { TConfig } from 'server/types';
-import { store, AppState } from 'store';
-import { TOptions, TAdBreakConfig } from '../types';
+import { AppState,store } from 'store';
+import { TConfig } from 'types';
+
+import { TAdBreakConfig,TOptions } from '../types';
 
 const CUSTOM_DIMENSION_KEYS = [
   'project_id', // id проекта

@@ -1,5 +1,3 @@
-import { StreamProtocol, DRM_TYPE } from '../../../../server/types';
-import { StreamService } from '../index';
 // import { drm as drm_streams, nodrm as nodrm_streams } from './mock.json';
 
 describe('StreamService', () => {

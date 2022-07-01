@@ -6,7 +6,9 @@ export interface IProcessEnv {
   PAK_HOST: string;
   HYDRA_HOST: string;
   BE_ENDPOINT: string;
+  CTC_BE_ENDPOINT: string;
   HORUS_SRC: string;
+  TURMS_ENDPOINT?: string;
 
   SIREN_HOST: string;
   SIREN_CTC_HOST: string;
@@ -15,7 +17,7 @@ export interface IProcessEnv {
   WHATISMYBROWSER_LINK?: string;
   AD_FOX_OWNER_ID: string;
   INDEXED_DB_LIMIT?: string;
-  LOG_LEVEL?: string;
+  LOG_LEVEL?: import('utils/logger').LogLevel;
   HORUS_ENABLED?: string;
   HORUS_BLACKLIST?: string;
 

@@ -1,7 +1,8 @@
 import { Nullable } from 'types';
+
 import { fakeVideoSrc } from './fake-video';
-import { DRM_TYPE, StreamProtocol, TStreamItem, TKeySystemExt, TSource } from './types';
-import { handleWidevineSource, handleFairplaySource, handlePlayreadySource } from './utils';
+import { DRM_TYPE, StreamProtocol, TKeySystemExt, TSource, TStreamItem } from './types';
+import { handleFairplaySource, handlePlayreadySource, handleWidevineSource } from './utils';
 
 export const VIDEO_EXTENSION: Record<StreamProtocol, string> = {
   [StreamProtocol.HLS]: 'application/x-mpegURL',
@@ -27,17 +28,28 @@ export const LS_KEY_STREAM = '@stream_service';
 export const isEncryptedStream = (s: TStreamItem) => Boolean(s.drm_type && s.ls_url);
 
 export type TStreamService = {
-  getStream: () => Nullable<TStreamItem>;
-  createKey: (stream: TStreamItem) => string;
+  init: (
+    sources: TStreamItem[],
+    capabilities: string[],
+    historyKeys: string[]
+  ) => { getStream: () => Nullable<TStreamItem>; createKey: (stream: TStreamItem) => string };
 };
 
-export const StreamService = (
-  sources: TStreamItem[],
-  capabilities: string[],
-  streamHistoryKeys: string[] = []
-): TStreamService => {
-  const streams = createSupportedStreamsList(sources, capabilities);
-  const streamIterator = streamGenerator();
+const StreamServiceFactory = (): TStreamService => {
+  let streams: Record<string, TStreamItem>;
+  let streamIterator: Generator<TStreamItem, void, unknown>;
+  let streamHistoryKeys: string[] = [];
+
+  function init(sources: TStreamItem[], capabilities: string[], historyKeys: string[] = []) {
+    streams = createSupportedStreamsList(sources, capabilities);
+    streamIterator = streamGenerator();
+    streamHistoryKeys = historyKeys;
+
+    return {
+      getStream: () => streamIterator.next().value || null,
+      createKey,
+    };
+  }
 
   function createKey({ drm_type, protocol }: TStreamItem) {
     return drm_type ? `${protocol}:${drm_type}` : `${protocol}`;
@@ -73,8 +85,7 @@ export const StreamService = (
   }
 
   return {
-    getStream: () => streamIterator.next().value || null,
-    createKey,
+    init,
   };
 };
 
@@ -110,3 +121,6 @@ export const FAKE_STREAM = {
 };
 
 export const createFakeSource = () => createSource(FAKE_STREAM);
+
+const instance = StreamServiceFactory();
+export { instance as StreamService };

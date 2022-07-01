@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import videojs from 'video.js';
-import { getQueryParams } from 'components/Advertisement/utils';
-import { TeleportInstance } from './types';
-
 import './index.css';
+
+import { getQueryParams } from 'components/Advertisement/utils';
+import { logger } from 'utils/logger';
+import videojs from 'video.js';
+
+import { TeleportInstance } from './types';
 
 const API_KEY = '857a5bde7fd44740';
 const DEV_TOOLS_CONTAINER_ID = 'teleport-devtools';
@@ -46,12 +48,12 @@ const P2PManager = () => {
       script.async = true;
       script.src = src;
       script.onload = () => {
-        console.log(`[P2PManager] script - ${src} load success`);
+        logger.log('[P2PManager]', `script - ${src} load success`);
         resolve(true);
       };
 
       script.onerror = () => {
-        console.log(`[P2PManager] script - ${src} load failure`);
+        logger.log('[P2PManager]', `script - ${src} load failure`);
         reject(false);
       };
 
@@ -170,7 +172,7 @@ const P2PManager = () => {
             // @ts-ignore
             tlprt[event] = (...args: unknown[]) => {
               subscribers[event]?.(...args);
-              console.log(`[P2PManager] ${event}`, ...args);
+              logger.log('[P2PManager]', `${event}`, ...args);
             };
           });
         })();
@@ -179,19 +181,19 @@ const P2PManager = () => {
       window.tlprt = tlprt;
       window.addEventListener('unload', dispose);
 
-      console.log('[P2PManager] initialized', {
+      logger.log('[P2PManager]', 'initialized', {
         version: tlprt.version,
         connected: tlprt.connected,
         connectionId: tlprt.connectionId,
         peeringMode: teleport.PeeringMode[tlprt.peeringMode],
       });
     } catch (e) {
-      console.error('[P2PManager] initialize error', e?.message);
+      logger.error('[P2PManager]', 'initialize error', e?.message);
     }
   };
 
   const dispose = () => {
-    console.log('[P2PManager] dispose');
+    logger.log('[P2PManager]', 'dispose');
 
     if (tlprt) {
       window.removeEventListener('unload', dispose);

@@ -1,5 +1,7 @@
 import { getCurrentTime } from 'utils';
-import { TChannelEvents, ChannelEvent } from './types';
+import { logger } from 'utils/logger';
+
+import { ChannelEvent,TChannelEvents } from './types';
 
 const getLogInfo = () => `[ChannelService]:${getCurrentTime()}:`;
 
@@ -34,7 +36,7 @@ const ChannelService = () => {
 
     if (!Boolean(channelKeys[key])) return;
 
-    console.log(getLogInfo(), 'handleStorageEvent', { key: e.key, value: e.newValue });
+    logger.log('[ChannelService]', 'handleStorageEvent', { key: e.key, value: e.newValue });
 
     channelKeys[key]?.forEach((subscriber) => {
       subscriber?.(e.newValue);

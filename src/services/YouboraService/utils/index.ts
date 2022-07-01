@@ -1,4 +1,5 @@
 import { isNil } from 'lodash';
+
 import { TOptions } from '..';
 
 export const filterOptions = (options: TOptions, nullable = true): TOptions =>

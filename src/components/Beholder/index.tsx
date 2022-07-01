@@ -1,5 +1,5 @@
+import { useFeatures, usePlayerApi,usePlayerConfig } from 'hooks';
 import React from 'react';
-import { usePlayerConfig, useFeatures, usePlayerApi } from 'hooks';
 import { BeholderService } from 'services/BeholderService';
 
 export const Beholder = ({ children }: React.PropsWithChildren) => {

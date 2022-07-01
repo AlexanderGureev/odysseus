@@ -1,7 +1,7 @@
+import { Application,NextFunction } from 'express';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
-import { NextFunction, Application } from 'express';
 
 export const createDevServer = async (app: Application) => {
   let isBuilding = true;

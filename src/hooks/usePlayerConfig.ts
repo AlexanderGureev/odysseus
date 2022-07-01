@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { PlayerConfigContext } from '../context';
 
 export const usePlayerConfig = () => {

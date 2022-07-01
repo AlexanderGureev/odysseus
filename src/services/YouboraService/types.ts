@@ -1,5 +1,6 @@
-import { AdCategory } from 'server/types';
+import { AdCategory } from 'types';
 import { VideoJsPlayer } from 'video.js';
+
 import { AdsAdapterEvent } from './adapters/AdsAdapter/types';
 import { VideoAdapterEvent } from './adapters/VideoAdapter/types';
 

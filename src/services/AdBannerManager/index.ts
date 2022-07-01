@@ -1,3 +1,5 @@
+import { logger } from 'utils/logger';
+
 type TOptions = {
   bannerStates: Array<'desktop' | 'tablet' | 'phone'>;
   adaptiveOptions: Partial<{
@@ -32,12 +34,12 @@ const AdBannerManager = () => {
       script.async = true;
       script.src = 'https://yandex.ru/ads/system/context.js';
       script.onload = () => {
-        console.log('[AdBannerManager] loadCode success');
+        logger.log('[AdBannerManager]', 'loadCode success');
         resolve(true);
       };
 
       script.onerror = () => {
-        console.log('[AdBannerManager] loadCode failure');
+        logger.log('[AdBannerManager]', 'loadCode failure');
         reject(false);
       };
 
@@ -95,7 +97,7 @@ const AdBannerManager = () => {
         const params = parse(bannerParamsJSON);
         if (!params) return;
 
-        console.log('[AdBannerManager] params', params);
+        logger.log('[AdBannerManager] params', params);
 
         window.yaContextCb.push(() => {
           banners[key] = window.Ya.adfoxCode.createAdaptive(
@@ -104,18 +106,18 @@ const AdBannerManager = () => {
               containerId,
               params,
               onLoad: function (data: any) {
-                console.log('[AdBannerManager] onLoad: ', data);
+                logger.log('[AdBannerManager]', 'onLoad: ', data);
               },
               onRender: function () {
-                console.log('[AdBannerManager] onRender');
+                logger.log('[AdBannerManager]', 'onRender');
                 resolve(true);
               },
               onError: function (error: any) {
-                console.error('[AdBannerManager] onError', error);
+                logger.error('[AdBannerManager]', 'onError', error);
                 resolve(false);
               },
               onStub: function () {
-                console.log('[AdBannerManager] onStub');
+                logger.log('[AdBannerManager]', 'onStub');
                 resolve(false);
               },
             },

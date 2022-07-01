@@ -1,5 +1,7 @@
+import { INPUT_PLAYER_POST_MESSAGE, OUTPUT_PLAYER_POST_MESSAGE } from 'services/PostMessageService/types';
 import { Nullable } from 'types';
-import { INPUT_PLAYER_POST_MESSAGE, OUTPUT_PLAYER_POST_MESSAGE, PostMessageService } from '../PostMessageService';
+
+import { PostMessageService } from '../PostMessageService';
 
 type TState = {
   location: Nullable<string>;

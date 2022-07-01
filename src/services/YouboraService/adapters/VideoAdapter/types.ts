@@ -1,4 +1,5 @@
 import { VideoJsPlayer } from 'video.js';
+
 import { TMediatorHandlers } from '../../../MediatorService';
 
 export type TVideoAdapter = {

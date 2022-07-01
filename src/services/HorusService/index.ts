@@ -1,24 +1,23 @@
+import { isNil } from 'lodash';
+import { Mediator, TMediator, TMediatorHandlers } from 'services/MediatorService';
+import { Nullable } from 'types';
+import { logger } from 'utils/logger';
+import { retry, runInterval, sleep } from 'utils/retryUtils';
+
 import { IDBService } from '../../services/IDBService';
+import { CollectionName, Indexes } from '../IDBService/types';
 import { WindowController } from '../WindowController';
 import { PARAMS_SELECTOR } from './selectors';
 import {
-  THorusConfig,
-  TDBEvent,
-  THorusEvent,
+  EventStatus,
+  HORUS_EVENT,
   HorusEventName,
   ParamsByEventName,
-  EventStatus,
+  TDBEvent,
   TEventParams,
-  HORUS_EVENT,
+  THorusConfig,
+  THorusEvent,
 } from './types';
-import { CollectionName, Indexes } from '../IDBService/types';
-import { Mediator, TMediator, TMediatorHandlers } from 'services/MediatorService';
-import { retry, runInterval, sleep } from 'utils/retryUtils';
-import { getCurrentTime, isNil } from 'utils';
-import { Nullable } from 'types';
-
-const getLogInfo = () => `[HorusService]:${getCurrentTime()}:`;
-const Logger = console;
 
 const DEFAULT_CONFIG = { heartbeat_period: 30, max_event_list_items: 20, flush_buffer_period: 60 };
 const CONFIG_FETCH_TIMEOUT = 600_000; // 10 минут
@@ -46,7 +45,7 @@ const HorusService = () => {
     if (isInitialized) return;
 
     if (!HORUS_SRC || !HORUS_ENABLED) {
-      Logger.error('[HorusService] horus endpoint is undefined or horus disabled');
+      logger.error('[HorusService]', 'horus endpoint is undefined or horus disabled');
       return;
     }
 
@@ -64,14 +63,18 @@ const HorusService = () => {
     //   });
     // });
 
-    Logger.log(getLogInfo(), 'init', JSON.stringify({ HORUS_SRC, HORUS_ENABLED, DEFAULT_CONFIG, blacklist }, null, 2));
+    logger.log(
+      '[HorusService]',
+      'init',
+      JSON.stringify({ HORUS_SRC, HORUS_ENABLED, DEFAULT_CONFIG, blacklist }, null, 2)
+    );
 
     // запрос конфига из хоруса
     runInterval(async () => {
       const data = await fetchConfig();
 
       if (data) {
-        Logger.log(getLogInfo(), 'update config', JSON.stringify(data, null, 2));
+        logger.log('[HorusService]', 'update config', JSON.stringify(data, null, 2));
         config = data;
       }
     }, CONFIG_FETCH_TIMEOUT);
@@ -126,7 +129,7 @@ const HorusService = () => {
 
   const fetchConfig = async (): Promise<Nullable<THorusConfig>> => {
     try {
-      Logger.log(getLogInfo(), 'fetchConfig');
+      logger.log('[HorusService]', 'fetchConfig');
 
       const response = await fetch(CONFIG_PATH);
       if (!response.ok) throw new Error('Failed to fetch horus config');
@@ -137,7 +140,7 @@ const HorusService = () => {
         ...parseConfig(data),
       };
     } catch (e) {
-      Logger.error('[HorusService] fetchConfig error: ', e?.message);
+      logger.error('[HorusService] fetchConfig error: ', e?.message);
       return null;
     }
   };
@@ -220,7 +223,7 @@ const HorusService = () => {
   };
 
   const deletePendingEvents = async (events: TDBEvent[]) => {
-    Logger.log(getLogInfo(), 'deletePendingEvents', JSON.stringify({ count: events.length }, null, 2));
+    logger.log('[HorusService]', 'deletePendingEvents', JSON.stringify({ count: events.length }, null, 2));
 
     await IDBService.runTransaction(
       CollectionName.EVENTS,
@@ -273,7 +276,7 @@ const HorusService = () => {
 
       const payload = createPayload(eventName);
 
-      Logger.log(getLogInfo(), `routeEvent >>> ${eventName}, ${payload}`);
+      logger.log('[HorusService]', `routeEvent >>> ${eventName}, ${payload}`);
 
       if (!isStopSending && (await WindowController.isMaster()) && (await isNeedToSend())) {
         await sendEvents();
@@ -281,7 +284,7 @@ const HorusService = () => {
         await pushToBuffer(payload);
       }
     } catch (e) {
-      Logger.error(getLogInfo(), `routeEvent error >>> ${eventName} `, e?.message);
+      logger.error('[HorusService]', `routeEvent error >>> ${eventName} `, e?.message);
     }
   };
 
@@ -325,7 +328,7 @@ const HorusService = () => {
 
       return isSuccess(response);
     } catch (e) {
-      Logger.error('[HorusService] sendEvents failed', e?.message);
+      logger.error('[HorusService] sendEvents failed', e?.message);
       return false;
     }
   };
@@ -341,8 +344,8 @@ const HorusService = () => {
       const events = await selectAndUpdateEvents(EventStatus.IDLE, { status: EventStatus.PENDING });
       if (!events?.length) return;
 
-      Logger.log(
-        getLogInfo(),
+      logger.log(
+        '[HorusService]',
         'sendEvents',
         JSON.stringify({ events: events.map((p) => p.payload.event_name), count: events.length }, null, 2)
       );
@@ -353,7 +356,7 @@ const HorusService = () => {
         await setEventsStatus(events, EventStatus.IDLE);
       }
     } catch (e) {
-      Logger.error(getLogInfo(), 'sendEvents error: ', e?.message);
+      logger.error('[HorusService]', 'sendEvents error: ', e?.message);
     }
   };
 

@@ -2,12 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
 import 'videojs-contrib-eme';
 
-import { Mediator, TSubscriber } from '../MediatorService';
-import { Nullable } from 'types';
 import { VIDEO_TYPE } from 'components/Player/types';
+import { Nullable } from 'types';
+import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
+
+import { Mediator, TSubscriber } from '../MediatorService';
 
 export type TPlayerService = {
   init: (playerId: string, options?: VideoJsPlayerOptions) => Promise<void>;

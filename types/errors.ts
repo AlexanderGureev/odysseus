@@ -72,13 +72,13 @@ export const ERROR_CODES: Record<ERROR_TYPE, number> = {
   [ERROR_TYPE.UNKNOWN]: -1,
 };
 
-export type Error = {
+export type PlayerError = {
   code: number;
   details?: string;
   title: ERROR_TYPE;
 };
 
-export const ERROR_ITEM_MAP: Record<string, Error> = {
+export const ERROR_ITEM_MAP: Record<string, PlayerError> = {
   // Native error codes ------------------------------ >>
 
   0: {

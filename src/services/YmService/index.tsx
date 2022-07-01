@@ -1,6 +1,8 @@
 import React from 'react';
 import { YMInitializer } from 'react-yandex-metrika';
-import { YMQueryParams, YMService } from './service';
+
+import { YMService } from './service';
+import { YMQueryParams } from './types';
 
 const YMID = 46840146;
 const YMOptions = {

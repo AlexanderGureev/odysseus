@@ -1,7 +1,7 @@
 import { VIDEO_TYPE } from 'components/Player/types';
 import { isNil } from 'lodash';
 import md5 from 'md5';
-import { TSkinClass } from 'server/types';
+import { SkinClass } from 'types';
 import { getCurrentTime } from 'utils';
 
 const MEDIASCOPE_EVENT = {
@@ -187,7 +187,7 @@ const MediascopeCounter = () => {
     //   },
     //   player: { video_position = 0, ad_position = 0 },
     // } = store.getState();
-    // const trackId = THEME_CLASS === TSkinClass.MORE_TV ? track_info?.track?.morpheusId : videoId;
+    // const trackId = THEME_CLASS === SkinClass.MORE_TV ? track_info?.track?.morpheusId : videoId;
     // const params = {
     //   hid: () => (authorizedUserId ? md5(`${authorizedUserId}`) : null),
     //   idlc: () => (videoType === VIDEO_TYPE.PLAIN ? trackId : AD_CONTENT_ID),

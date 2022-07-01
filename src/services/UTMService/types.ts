@@ -16,3 +16,9 @@ export enum UTM_PARAMS {
   UTM_CONTENT = 'utm_content',
   UTM_TERM = 'utm_term',
 }
+
+export type Params = {
+  term: UTM_TERMS;
+  skinId: number;
+  videoId: number;
+};

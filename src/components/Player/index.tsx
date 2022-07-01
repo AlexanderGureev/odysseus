@@ -1,21 +1,19 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { PlayerApiContext } from 'context';
+import { usePlayerConfig } from 'hooks';
 import React from 'react';
 import { isIOS } from 'react-device-detect';
+import { AnalyticsEventManagerService } from 'services/AnalyticsEventManagerService';
+import { MediatorService } from 'services/MediatorService';
+import { PlayerService, TPlayerService } from 'services/PlayerService';
+import { Nullable } from 'types';
+import { logger } from 'utils/logger';
 
 import { AdController } from '../Advertisement';
+import { Beholder } from '../Beholder';
 import { SkinConstructor } from '../SkinConstructor';
 import { fakeVideoSrc } from './fakeVideo';
-import { PlayerApiContext } from 'context';
-import { PlayerService, TPlayerService, TState } from 'services/PlayerService';
-import { TSource } from 'services/StreamService/types';
-import { Nullable } from 'types';
-import { MediatorService } from 'services/MediatorService';
-import { Beholder } from '../Beholder';
-import { AnalyticsEventManagerService } from 'services/AnalyticsEventManagerService';
-import { usePlayerConfig } from 'hooks';
-
-import { TProps, TPlayerState, VIDEO_TYPE, DEFAULT_PLAYER_ID, TPlayerApi, PLAYER_ERROR } from './types';
-// import { StreamQualityManager } from 'services/ManifestParser';
+import { DEFAULT_PLAYER_ID, PLAYER_ERROR, TPlayerApi, TPlayerState, TProps, VIDEO_TYPE } from './types';
 
 const Player: React.FC<TProps> = ({ source }) => {
   const { config } = usePlayerConfig();
@@ -29,9 +27,6 @@ const Player: React.FC<TProps> = ({ source }) => {
   });
 
   const currentSource = React.useRef(source);
-
-  const [qualityList, setQualityList] = React.useState<Nullable<any[]>>(null);
-  const [activeQualityId, setActive] = React.useState(-1);
 
   const updateState = React.useCallback(
     (newState: Partial<TPlayerState> = {}) => {
@@ -83,28 +78,6 @@ const Player: React.FC<TProps> = ({ source }) => {
     await player.setSource({ src: fakeVideoSrc, type: 'video/mp4' }, VIDEO_TYPE.AD);
   }, [player]);
 
-  // React.useEffect(() => {
-  //   if (!stream) return;
-
-  //   ManifestParser.fetchManifest(stream)
-  //     .then(({ url, responseUrl, manifest }) => {
-  //       const data = ManifestParser.parse(stream, manifest);
-
-  //       // todo убрать в PlayerManager
-  //       StreamQualityManager.init({
-  //         protocol: stream.protocol,
-  //         playlist: data.playlists,
-  //         manifestUrl: responseUrl
-  //       });
-
-  //       const list = StreamQualityManager.buildQualityList();
-  //       setQualityList(list);
-
-  //       console.log("[RES]", { data, responseUrl, list });
-  //     })
-  //     .catch(console.error);
-  // }, [stream]);
-
   React.useEffect(() => {
     player.init(DEFAULT_PLAYER_ID).then(() => {
       setInitialized(true);
@@ -112,16 +85,16 @@ const Player: React.FC<TProps> = ({ source }) => {
   }, [player]);
 
   React.useEffect(() => {
-    AnalyticsEventManagerService.init(player, {
-      trackId: config.playlist.items[0].track_id,
-      userId: config.config.user_id,
-      videosession_id: config.session.videosession_id,
-    });
+    // AnalyticsEventManagerService.init(player, {
+    //   trackId: config.playlist.items[0].track_id,
+    //   userId: config.config.user_id,
+    //   videosession_id: config.session.videosession_id,
+    // });
   }, [config, player]);
 
   React.useEffect(() => {
     player.on('play', () => {
-      console.log('play');
+      return;
     });
 
     player.one('timeupdate', () => {
@@ -129,7 +102,7 @@ const Player: React.FC<TProps> = ({ source }) => {
     });
 
     player.on('sourceset', (e) => {
-      // console.log('[EVENT] sourceset', e);
+      return;
     });
 
     player.on('timeupdate', updateState);
@@ -143,7 +116,7 @@ const Player: React.FC<TProps> = ({ source }) => {
   React.useEffect(() => {
     player.onError((error) => {
       if (state.videoType === VIDEO_TYPE.AD) {
-        console.log('[PLAYER] AD ERR', error);
+        logger.log('[PLAYER]', 'onError', error);
         return;
       }
 
@@ -157,9 +130,6 @@ const Player: React.FC<TProps> = ({ source }) => {
     () => ({ ...player, resumePlainVideo, initializeAdvertisement, isInitialized }),
     [player, resumePlainVideo, initializeAdvertisement, isInitialized]
   );
-
-  const style = { position: 'absolute', left: '20px', top: '20px' };
-  const style1 = { position: 'absolute', left: '250px', top: '20px' };
 
   return (
     <PlayerApiContext.Provider value={value}>
@@ -225,30 +195,6 @@ const Player: React.FC<TProps> = ({ source }) => {
           }}>
           -20 VOLUME
         </button>
-
-        {/* {qualityList && (
-          <div style={style1}>
-            <button
-              className={activeQualityId === -1 ? 'active' : ''}
-              onClick={() => {
-                StreamQualityManager.setQuality();
-                setActive(-1);
-              }}>
-              auto
-            </button>
-            {Object.keys(qualityList).map((key, i) => (
-              <button
-                className={i === activeQualityId ? 'active' : ''}
-                key={qualityList[key].qualityMark}
-                onClick={() => {
-                  StreamQualityManager.setQuality(qualityList[key]);
-                  setActive(i);
-                }}>
-                {qualityList[key].qualityMark}
-              </button>
-            ))}
-          </div>
-        )} */}
 
         <SkinConstructor>
           <Beholder>
