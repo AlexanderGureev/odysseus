@@ -1,7 +1,8 @@
 import { TParams } from 'server/utils';
 import { LogLevel } from 'utils/logger';
 
-import { PlayerError } from './errors';
+import { TContentRollsConfig, TMiddleRollsConfig, TPreRollsConfig, TRawAdConfig } from './ad';
+import { RawPlayerError } from './errors';
 import { MediascopeCounterResponse } from './MediascopeCounter';
 import { SubscriptionTariffs } from './SubscriptionTariffs';
 import { TrackInfoData } from './TrackInfo';
@@ -32,12 +33,14 @@ export const SERVICE_GROUP_ID: { [key in SkinClass]?: number } = {
   [SkinClass.CTC]: 2,
 };
 
+export type SubscriptionPreviewType = 'HUB' | 'PAK' | 'FALSE';
+
 export type TFeatureConfig = {
   NEXT_EPISODE: 'POSTMESSAGE' | 'LINK' | false;
   PREV_EPISODE: 'POSTMESSAGE' | 'LINK' | false;
   SPLASH_SCREEN_VARIATION: 'MORE_TV' | null;
   SUBSCRIPTION_TITLE: string;
-  SUBSCRIPTION_PREVIEW: 'HUB' | 'PAK' | 'FALSE';
+  SUBSCRIPTION_PREVIEW: SubscriptionPreviewType;
   AUTOPLAY: 'ALWAYS' | 'NEVER' | 'ON' | 'OFF';
 
   ADV_CACHE_LOOKAHEAD: string;
@@ -67,6 +70,9 @@ export type TFeatureConfig = {
   FORCE_PUID_4: boolean;
   SHOW_AD_NUMBER: boolean;
   SENTRY_ENABLED: boolean;
+
+  LIMIT_QUALITY: boolean;
+  TOKEN_UPDATE: boolean;
 };
 
 export type TEnvConfig = {
@@ -90,6 +96,7 @@ export type TEnvConfig = {
   FAIRPLAY_CERT_ENDPOINT: string;
   YOUBORA_ACCOUNT_CODE?: string;
   YOUBORA_SERVICE_ENABLED: boolean;
+  YMID: number | null;
 };
 
 export type THydraResponse = {
@@ -101,35 +108,6 @@ export type THydraResponse = {
   id: string;
 };
 
-export enum AdCategory {
-  PRE_ROLL = 'pre_roll',
-  CONTENT_ROLL = 'content_roll',
-  MID_ROLL = 'mid_roll',
-  PAUSE_ROLL = 'pause_roll',
-  POST_ROLL = 'post_roll',
-  PRE_PAUSE_ROLL = 'pre_pause_roll',
-  POST_PAUSE_ROLL = 'post_pause_roll',
-}
-
-export type TRawPoint = {
-  point: number;
-};
-export type TAdItem = {
-  item: string;
-  type?: string;
-};
-export type TAdParams = {
-  limiter: number;
-  type: string;
-};
-export type TRawAdRollData = {
-  items: TAdItem[];
-  params: TAdParams;
-};
-export type TRawAdConfig = {
-  [key in AdCategory]?: TRawAdRollData;
-};
-
 export type TScrobbling = {
   hostname: string;
   mandatory_points: number[];
@@ -138,7 +116,7 @@ export type TScrobbling = {
 };
 
 export type TRawConfig = {
-  ad: TRawAdConfig;
+  ad?: TRawAdConfig;
   post_image: string;
   pre_image: string;
   project_id: number;
@@ -147,7 +125,7 @@ export type TRawConfig = {
     embed: number;
   };
   ref: string;
-  scrobbling: TScrobbling;
+  scrobbling?: TScrobbling;
   sid: string;
   skin_id: number;
   stat_url: string;
@@ -201,37 +179,10 @@ export type TAutoSwitchConfig = {
   project_poster: Nullable<string>;
 };
 
-export type TPlaceholder = { id: number; sponsorship: string };
-export type TContentRollPoint = {
-  point: number;
-  placeholders?: TPlaceholder;
-};
-export type TContentUrlConfig = {
-  item: string;
-  type: string;
-};
-export type TContentRollsConfig = {
-  points: TContentRollPoint[];
-  url: TContentUrlConfig[];
-};
-export type TPreRollsConfig = {
-  points: {
-    point: number;
-  };
-};
-export type TMiddleRollsConfig = {
-  freq_points: number;
-  freq_time: number;
-  max_midrolls: number;
-  points: TRawPoint[];
-  skip_adv: number;
-  start_time: number;
-  url: TAdItem[];
-};
-
+export type HeartBeatTnsParams = Array<{ key: string; value: string | number }>;
 export type THeartBeatTnsCounterConfig = {
   link: string;
-  params: Array<{ key: string; value: string | number }>;
+  params: HeartBeatTnsParams;
 };
 
 export type TnsCounter = {
@@ -240,14 +191,14 @@ export type TnsCounter = {
   video_start: string;
 };
 
-export type ConfigErrors = PlayerError[];
+export type ConfigErrors = RawPlayerError[];
 
 export type PreviewDurationOpts = {
   from: number;
   to: number;
 };
 
-export type TPlaylistItem = Partial<{
+export type TPlaylistItem = {
   error: string;
   errors: ConfigErrors | null;
   auto_switch: TAutoSwitchConfig;
@@ -281,7 +232,9 @@ export type TPlaylistItem = Partial<{
   tns_counter: TnsCounter;
   track_id: number;
   views: number;
-}>;
+  adfox_season_id?: number;
+  num_in_project?: number;
+};
 
 export type TRawPlaylist = {
   items: TPlaylistItem[];
@@ -302,25 +255,31 @@ export type TConfig = {
   mediascopeCounter: MediascopeCounterResponse | null;
 };
 
+export type Override<T, O> = Omit<T, keyof O> & O;
+
 export type TParsedFeatures = Partial<
-  TFeatureConfig & {
-    ADV_CACHE_LOOKAHEAD: number;
-    ADV_CACHE_TIMEOUT: number;
-    ADV_MAX_TIMELINE_OFFSET: number;
-    ADV_PLAY_WAIT_TIMEOUT: number;
-    ADV_INTERSECTION_TIMEOUT: number;
-    ADV_PAUSE_ROLL_ACTIVATE_TIMEOUT: number;
-  }
+  Override<
+    TFeatureConfig,
+    {
+      ADV_CACHE_LOOKAHEAD: number;
+      ADV_CACHE_TIMEOUT: number;
+      ADV_MAX_TIMELINE_OFFSET: number;
+      ADV_PLAY_WAIT_TIMEOUT: number;
+      ADV_INTERSECTION_TIMEOUT: number;
+      ADV_PAUSE_ROLL_ACTIVATE_TIMEOUT: number;
+    }
+  >
 >;
 
 export type TExtendedConfig = TConfig & {
-  context: TParams;
+  context: TParams | null;
 };
 
 export enum ERROR {
   SIREN_UNAVAILABLE = 'SIREN_UNAVAILABLE',
   HYDRA_UNAVAILABLE = 'HYDRA_UNAVAILABLE',
   INVALID_PARTNER_ID = 'INVALID_PARTNER_ID',
+  INVALID_CONFIG_SOURCE = 'INVALID_CONFIG_SOURCE',
   INVALID_TRACK_ID = 'INVALID_TRACK_ID',
   INVALID_BODY = 'INVALID_BODY',
   NOT_FOUND = 'NOT_FOUND',

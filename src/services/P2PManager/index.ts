@@ -181,7 +181,7 @@ const P2PManager = () => {
       window.tlprt = tlprt;
       window.addEventListener('unload', dispose);
 
-      logger.log('[P2PManager]', 'initialized', {
+      logger.log('[P2PManager]', 'init', {
         version: tlprt.version,
         connected: tlprt.connected,
         connectionId: tlprt.connectionId,

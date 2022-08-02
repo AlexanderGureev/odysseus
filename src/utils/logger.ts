@@ -36,5 +36,5 @@ const Logger = ({ logLevel = 'info' }: Opts = {}) => {
 };
 
 export const logger = Logger({
-  logLevel: window.ENV.LOG_LEVEL,
+  logLevel: process?.env?.LOG_LEVEL || window?.ENV?.LOG_LEVEL || 'info',
 });

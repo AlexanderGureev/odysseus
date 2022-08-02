@@ -1,4 +1,6 @@
-import { Mediator, TSubscriber } from '../MediatorService';
+import { logger } from 'utils/logger';
+
+import { Mediator } from '../MediatorService';
 import {
   INPUT_PLAYER_POST_MESSAGE,
   OUTPUT_PLAYER_POST_MESSAGE,
@@ -7,11 +9,13 @@ import {
   TPostMessageService,
 } from './types';
 
+const DEFAULT_PARAMS = { app_version: window?.ENV?.APP_VERSION || '' };
+
 const PostMessageService = (): TPostMessageService => {
-  const mediator = Mediator();
+  const mediator = Mediator<INPUT_PLAYER_POST_MESSAGE>();
 
   const emit = (event: OUTPUT_PLAYER_POST_MESSAGE, data: TOutputMessage = {}) => {
-    window.parent.postMessage({ event, ...data }, '*');
+    window.parent.postMessage({ event, ...data, ...DEFAULT_PARAMS }, '*');
   };
 
   const eventHandler = (event: MessageEvent<TInputMessage>) => {
@@ -19,21 +23,17 @@ const PostMessageService = (): TPostMessageService => {
     const { event: eventName, method = '', cmd: command, callback, ...rest } = event?.data ?? {};
 
     const name = eventName || method;
-    if (name) mediator.emit(name, rest);
+    if (name) {
+      mediator.emit(name, rest);
+    }
   };
 
   const init = () => {
+    logger.log('[PostMessageService]', 'init');
     window.addEventListener('message', eventHandler);
   };
 
-  const on = (event: INPUT_PLAYER_POST_MESSAGE, callback: TSubscriber) => {
-    mediator.on(event, callback);
-    return () => mediator.off(event, callback);
-  };
-
-  const one = (event: INPUT_PLAYER_POST_MESSAGE, callback: TSubscriber) => mediator.one(event, callback);
-
-  return { init, emit, on, one };
+  return { init, emit, on: mediator.on, one: mediator.one, off: mediator.off };
 };
 
 const instance = PostMessageService();

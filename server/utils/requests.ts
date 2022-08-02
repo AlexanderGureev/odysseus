@@ -1,24 +1,27 @@
-import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import express from 'express';
 import { MediascopeCounterResponse } from 'types/MediascopeCounter';
 import { TrackInfoData } from 'types/TrackInfo';
 import { UserSubscription } from 'types/UserSubscription';
 
+import { logger } from '../../src/utils/logger';
+import { ReqInit, request } from '../../src/utils/request';
 import { ApiResponse, SkinClass, TBaseConfig, TConfigSource, THydraResponse } from '../../types';
 import { SubscriptionTariffs } from '../../types/SubscriptionTariffs';
 import { IS_DEV } from '../server';
 import { buildRequstByConfigSource, DATA_REQUEST_TIMEOUT, TParams } from '.';
 
-type TOptions = AxiosRequestConfig;
+type TOptions = ReqInit;
 
 export const hydraRequest = async (partnerId: string, options: TOptions = {}) => {
   try {
-    const { data } = await axios.get<THydraResponse>(`${process.env.HYDRA_HOST}/features/player/${partnerId}`, {
+    const response = await request.get(`${process.env.HYDRA_HOST}/features/player/${partnerId}`, {
       ...options,
     });
+
+    const data: THydraResponse = await response.json();
     return data;
   } catch (err) {
-    console.error(err);
+    logger.error('[hydraRequest]', err);
     return null;
   }
 };
@@ -42,7 +45,7 @@ export const configRequest = async (
     const finallyRef = xRef ?? ref ?? origin ?? host;
     const userAgent = req.get('User-Agent');
 
-    if (reqIp) axios.defaults.headers.common.CLIENT_IP = reqIp;
+    // if (reqIp) axios.defaults.headers.common.CLIENT_IP = reqIp;
 
     const headers = {
       'X-Real-Ip': reqIp,
@@ -51,16 +54,18 @@ export const configRequest = async (
       'X-Referer': finallyRef,
       Referer: finallyRef,
       ...options.headers,
-    } as AxiosRequestHeaders;
+    };
 
-    const { data } = await axios.get<ApiResponse<TBaseConfig>>(config.url, {
+    const response = await request.get(config.url, {
       params: config.params,
       ...options,
       headers,
     });
+
+    const { data }: ApiResponse<TBaseConfig> = await response.json();
     return data;
   } catch (err) {
-    console.error(err);
+    logger.error('[configRequest]', err);
     return null;
   }
 };
@@ -82,15 +87,16 @@ export const serviceTariffsRequest = async (
     const headers = options.headers || {};
     if (userToken) headers.Authorization = `${theme === SkinClass.CTC ? '' : 'Bearer'} ${userToken}`;
 
-    const { data } = await axios.get<ApiResponse<SubscriptionTariffs>>(endpoint, {
+    const response = await request.get(endpoint, {
       ...options,
       timeout: DATA_REQUEST_TIMEOUT,
       headers,
     });
 
+    const { data }: ApiResponse<SubscriptionTariffs> = await response.json();
     return data;
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    logger.error('[serviceTariffsRequest]', err);
     return null;
   }
 };
@@ -106,7 +112,7 @@ export const trackInfoRequest = async (trackId: string, theme: SkinClass, option
 
     const headers = options.headers || {};
 
-    const { data } = await axios.get<ApiResponse<TrackInfoData>>(endpoint, {
+    const response = await request.get(endpoint, {
       ...options,
       timeout: DATA_REQUEST_TIMEOUT,
       params: {
@@ -115,9 +121,10 @@ export const trackInfoRequest = async (trackId: string, theme: SkinClass, option
       headers,
     });
 
+    const { data }: ApiResponse<TrackInfoData> = await response.json();
     return data;
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    logger.error('[trackInfoRequest]', err);
     return null;
   }
 };
@@ -138,15 +145,16 @@ export const userSubscriptionRequest = async (
     const headers = options.headers || {};
     headers.Authorization = `Bearer ${userToken}`;
 
-    const { data } = await axios.get<ApiResponse<UserSubscription[]>>(endpoint, {
+    const response = await request.get(endpoint, {
       ...options,
       timeout: DATA_REQUEST_TIMEOUT,
       headers,
     });
 
+    const { data }: ApiResponse<UserSubscription[]> = await response.json();
     return data;
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    logger.error('[userSubscriptionRequest]', err);
     return null;
   }
 };
@@ -157,21 +165,19 @@ export const mediascopeCounterRequest = async (serviceId: number | undefined, op
 
     const headers = options.headers || {};
 
-    const { data } = await axios.get<MediascopeCounterResponse>(
-      `${process.env.TURMS_ENDPOINT}/mediascope/counter/web/watching`,
-      {
-        ...options,
-        params: {
-          service_group_id: serviceId,
-        },
-        timeout: DATA_REQUEST_TIMEOUT,
-        headers,
-      }
-    );
+    const response = await request.get(`${process.env.TURMS_ENDPOINT}/mediascope/counter/web/watching`, {
+      ...options,
+      params: {
+        service_group_id: serviceId,
+      },
+      timeout: DATA_REQUEST_TIMEOUT,
+      headers,
+    });
 
+    const data: MediascopeCounterResponse = await response.json();
     return data;
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    logger.error('[mediascopeCounterRequest]', err);
     return null;
   }
 };

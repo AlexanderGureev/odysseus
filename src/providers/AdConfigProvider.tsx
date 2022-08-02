@@ -1,17 +1,14 @@
-import { TAdConfigByCategory } from 'components/Advertisement';
-import { usePlayerConfig } from 'hooks';
 import React from 'react';
+import { TRawPlaylist } from 'types';
 import {
   AdCategory,
+  TAdConfigByCategory,
   TContentRollsConfig,
   TMiddleRollsConfig,
   TPlaceholder,
   TPreRollsConfig,
   TRawAdConfig,
-  TRawPlaylist,
-} from 'types';
-
-import { AdConfigContext } from '../context';
+} from 'types/ad';
 
 export type TAdPointConfig = {
   point: number;
@@ -81,14 +78,14 @@ const createAdConfig = (ad: TRawAdConfig, playlist: TRawPlaylist) => {
   return { adConfig, adPoints };
 };
 
-export const AdConfigProvider = ({ children }: React.PropsWithChildren) => {
-  const {
-    config: {
-      config: { ad = {} },
-      playlist,
-    },
-  } = usePlayerConfig();
-  const [config] = React.useState(createAdConfig(ad, playlist));
+// export const AdConfigProvider = ({ children }: React.PropsWithChildren) => {
+//   const {
+//     config: {
+//       config: { ad = {} },
+//       playlist,
+//     },
+//   } = usePlayerConfig();
+//   const [config] = React.useState(createAdConfig(ad, playlist));
 
-  return <AdConfigContext.Provider value={config}>{children}</AdConfigContext.Provider>;
-};
+//   return <AdConfigContext.Provider value={config}>{children}</AdConfigContext.Provider>;
+// };

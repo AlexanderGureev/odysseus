@@ -6,11 +6,9 @@ import { useCurrentStream } from 'hooks/useCurrentStream';
 import React from 'react';
 import { AmberdataService } from 'services/AmberdataService';
 import { EmbeddedCheckService } from 'services/EmbeddedCheckService';
-import { GAContainer } from 'services/GaService';
 import { PostMessageService } from 'services/PostMessageService';
 import { OUTPUT_PLAYER_POST_MESSAGE } from 'services/PostMessageService/types';
 import { SauronService } from 'services/SauronService';
-import { YMContainer } from 'services/YmService';
 import { logger } from 'utils/logger';
 
 export const App = () => {
@@ -48,7 +46,7 @@ export const App = () => {
 
   React.useEffect(() => {
     const adv = Object.keys(adConfig).length > 0;
-    PostMessageService.emit(OUTPUT_PLAYER_POST_MESSAGE.INITED, { payload: { adv } }); // TODO LOAD YA SDK
+    PostMessageService.emit('inited', { payload: { adv } }); // TODO LOAD YA SDK
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -61,10 +59,6 @@ export const App = () => {
 
   return (
     <>
-      <GAContainer />
-      {/* <YMContainer
-        params={{ user_id: config?.config?.user_id || -1, videosession_id: config?.session.videosession_id }}
-      /> */}
       <ThemeContext.Provider value={THEME.MORETV}>
         <AgeConfirmationPopup>
           <Player source={source} />

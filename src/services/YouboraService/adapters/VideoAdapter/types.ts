@@ -1,9 +1,7 @@
 import { VideoJsPlayer } from 'video.js';
 
-import { TMediatorHandlers } from '../../../MediatorService';
-
 export type TVideoAdapter = {
-  init: (mediator: TMediatorHandlers, player: VideoJsPlayer) => any;
+  init: (mediator: any, player: VideoJsPlayer) => any;
 };
 
 export enum VideoAdapterEvent {

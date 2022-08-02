@@ -5,9 +5,10 @@ import https from 'https';
 import path from 'path';
 import requestIp from 'request-ip';
 
+import { logger } from '../src/utils/logger';
 import { ERROR, SERVICE_GROUP_ID, TConfigSource } from '../types';
 import { createDevServer } from './devServer';
-import { createEnv, createHeaders,isNumber, isValidBase64, TParams, URL_MAP_BY_SOURCE } from './utils';
+import { createEnv, createHeaders, isNumber, isValidBase64, TParams, URL_MAP_BY_SOURCE } from './utils';
 import { createError, RequestError } from './utils/error';
 import {
   configRequest,
@@ -63,6 +64,27 @@ const bootstrap = async () => {
     else next();
   });
 
+  app.get('/manifest/:partner_id/:track_id/:user_token?', async (req, res) => {
+    try {
+      const params = { ...req.params, ...req.query } as TParams & { config_source: TConfigSource };
+
+      if (!params.config_source) throw new RequestError(ERROR.INVALID_CONFIG_SOURCE);
+      if (!isNumber(params.partner_id)) throw new RequestError(ERROR.INVALID_PARTNER_ID);
+      if (!isNumber(params.track_id)) throw new RequestError(ERROR.INVALID_TRACK_ID);
+
+      const [config] = await Promise.all([configRequest(req, params.config_source, params, options)]);
+      if (!config) throw new RequestError(ERROR.SIREN_UNAVAILABLE, 'config is undefined');
+
+      res.status(200).json({
+        ...config,
+      });
+    } catch (err) {
+      logger.error('GET /manifest', err);
+      const { status, errors } = createError(err);
+      res.status(status).json(errors);
+    }
+  });
+
   app.get('/player/:partner_id/:track_id/:user_token?', async (req, res) => {
     const params = { ...req.params, ...req.query } as TParams;
 
@@ -83,23 +105,28 @@ const bootstrap = async () => {
         mediascopeCounterRequest(SERVICE_GROUP_ID[features.skin_theme_class], options),
       ]);
 
+      if (!config) throw new RequestError(ERROR.SIREN_UNAVAILABLE);
+
       res.status(200).render('index', {
         isProduction: !IS_DEV,
         env: createEnv(req),
         config: {
-          config: config?.data?.config || null,
-          playlist: config?.data?.playlist || null,
+          config: config?.config || null,
+          playlist: config?.playlist || null,
           features,
-          serviceTariffs: serviceTariffs?.data || null,
-          trackInfo: trackInfo?.data || null,
-          subscription: subscription?.data || null,
+          serviceTariffs: serviceTariffs || null,
+          trackInfo: trackInfo || null,
+          subscription: subscription || null,
           mediascopeCounter,
         },
         context: {
           ...params,
         },
       });
-    } catch (e) {
+    } catch (err) {
+      logger.error('GET /player', err);
+      const { errors } = createError(err);
+
       res.status(200).render('index', {
         isProduction: !IS_DEV,
         env: createEnv(req),
@@ -108,7 +135,7 @@ const bootstrap = async () => {
           playlist: {
             items: [
               {
-                errors: createError(e),
+                errors,
               },
             ],
           },
@@ -137,7 +164,7 @@ const bootstrap = async () => {
       const { hostname, searchParams, pathname } = new URL(url);
 
       const params: Record<string, any> = {};
-      searchParams.forEach((key, value) => {
+      searchParams.forEach((value, key) => {
         params[key] = value;
       });
 
@@ -178,14 +205,27 @@ const bootstrap = async () => {
         },
       }[features.config_source]?.());
 
-      const config = await configRequest(req, features.config_source, params as TParams, options);
+      const [config, serviceTariffs, trackInfo, subscription] = await Promise.all([
+        configRequest(req, features.config_source, params as TParams, options),
+        serviceTariffsRequest(params.user_token, features.skin_theme_class, options),
+        trackInfoRequest(params.track_id, features.skin_theme_class, options),
+        userSubscriptionRequest(params.user_token, features.skin_theme_class, options),
+      ]);
+
+      if (!config) throw new RequestError(ERROR.SIREN_UNAVAILABLE);
+
       res.status(200).json({
-        ...config?.data,
+        config: config?.config || null,
+        playlist: config?.playlist || null,
         features,
+        serviceTariffs: serviceTariffs || null,
+        trackInfo: trackInfo || null,
+        subscription: subscription || null,
       });
-    } catch (e) {
-      const response = createError(e);
-      res.status(500).json(response);
+    } catch (err) {
+      logger.error('GET /config', err);
+      const { status, errors } = createError(err);
+      res.status(status).json(errors);
     }
   });
 

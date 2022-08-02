@@ -1,44 +1,39 @@
-import { INPUT_PLAYER_POST_MESSAGE, OUTPUT_PLAYER_POST_MESSAGE } from 'services/PostMessageService/types';
-import { Nullable } from 'types';
-
 import { PostMessageService } from '../PostMessageService';
-
-type TState = {
-  location: Nullable<string>;
-  isEmbedded: boolean;
-};
+import { LocationState } from './types';
 
 const EmbeddedCheckService = () => {
   const TIMEOUT = 200;
-  const state: TState = { location: null, isEmbedded: true };
+  const state: LocationState = { location: null, hostname: null, isEmbedded: true };
 
-  PostMessageService.on(INPUT_PLAYER_POST_MESSAGE.SET_PAGE_LOCATION, ({ location }) => {
+  PostMessageService.on('setPageLocation', ({ location }) => {
     if (location) state.location = location;
   });
 
   const getEmbededStatus = async (sharingUrl?: string) => {
     if (!sharingUrl) return true;
 
-    const outerHost = await getIframeLocation();
+    const { hostname: outerHost } = await getIframeLocation();
     if (!outerHost) return true;
 
-    const iframeHostname = new URL(outerHost).hostname;
     const sharingUrlHostname = new URL(sharingUrl).hostname;
-
-    return iframeHostname !== sharingUrlHostname;
+    return outerHost !== sharingUrlHostname;
   };
 
-  const getIframeLocation = (): Promise<string> =>
+  const getIframeLocation = (): Promise<LocationState> =>
     new Promise((resolve) => {
       const callback = ({ location }: { location?: string }) => {
-        if (location) resolve(location);
+        if (location) {
+          state.location = location;
+          state.hostname = new URL(location).hostname;
+          resolve({ ...state });
+        }
       };
 
-      PostMessageService.one(INPUT_PLAYER_POST_MESSAGE.SET_PAGE_LOCATION, callback);
-      PostMessageService.emit(OUTPUT_PLAYER_POST_MESSAGE.GET_PAGE_LOCATION);
+      PostMessageService.one('setPageLocation', callback);
+      PostMessageService.emit('getPageLocation');
 
       setTimeout(() => {
-        resolve(document.referrer);
+        callback({ location: document.referrer });
       }, TIMEOUT);
     });
 

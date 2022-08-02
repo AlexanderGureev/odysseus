@@ -1,44 +1,27 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import { TAdConfigByCategory } from 'components/Advertisement';
-import { AdCategory, SkinClass } from 'types';
-import { Nullable } from 'types';
+import { Nullable, SkinClass } from 'types';
 import { isNil } from 'utils';
 import { createCounter } from 'utils/counter';
 import { logger } from 'utils/logger';
 import { randomUnit32 } from 'utils/randomHash';
 import { sendStat } from 'utils/statistics';
 
+import {
+  AmberdataEvent,
+  AmberdataEventPayload,
+  CrashEventPayload,
+  PARAMS,
+  TAmberdataInitParams,
+  TAmberdataParams,
+} from './types';
+
 export const AMBERDATA_CODE_BY_SKIN_NAME: { [key in SkinClass]?: number } = {
   MORE_TV: 6334,
   DEFAULT: 7267,
 };
 
-export type TAmberdataParams = {
-  skinName: SkinClass;
-  isEmbedded: boolean;
-  partnerId: number;
-  referrer: string;
-  adConfig: TAdConfigByCategory;
-  params: TAmberdataInitParams;
-};
-
-export type TAmberdataInitParams = {
-  projectId: number;
-  videoId: number;
-  skinId: number;
-  partnerId: number;
-  videosessionId: string;
-  sid: string | null;
-};
-
-export type CrashEventPayload = {
-  partnerId: number | null;
-  trackId: number | null;
-  videosessionId: string;
-};
-
-const createStatUrl = (skinName: SkinClass) => {
+const getBaseStatURL = (skinName: SkinClass) => {
   const code = AMBERDATA_CODE_BY_SKIN_NAME[skinName] || AMBERDATA_CODE_BY_SKIN_NAME.DEFAULT;
   return `https://dmg.digitaltarget.ru/1/${code}/i/i?i={random}&c=`;
 };
@@ -46,21 +29,6 @@ const createStatUrl = (skinName: SkinClass) => {
 const URL_PAYLOAD_TEMPLATE = 'tg:{payload}';
 
 export const AMBERDATA_BUFFERING_THRESHOLD = 2000;
-
-export const AMBERDATA_EVENT_TYPES = {
-  OPEN: 'open',
-  PLAY: 'play',
-  PAUSE: 'pause',
-  CLOSE: 'close',
-  STOP: 'stop',
-  ADSTART: 'adstart',
-  BUFFERING: 'buffering',
-  TIMEUPDATE: 'ping',
-  CRASH: 'crash',
-  MOVE: 'move',
-  PREV: 'prev',
-  NEXT: 'next',
-};
 
 const QUERY_PARAMS = {
   PROJECT_ID: 'project_id',
@@ -90,15 +58,8 @@ const PARAMS_MAP: Record<string, string> = {
   eventOrigin: QUERY_PARAMS.EVENT_ORIGIN,
   eventValue: QUERY_PARAMS.EVENT_VALUE,
   videosessionId: QUERY_PARAMS.VIDEO_SESSION_ID,
-  authorizedUserId: QUERY_PARAMS.USER_ID,
+  userId: QUERY_PARAMS.USER_ID,
 };
-
-enum PARAMS {
-  SEASON = 'SEASON',
-  ADFOX_PARTNER = 'ADFOX_PARTNER',
-  EVENT_TYPE = 'EVENT_TYPE',
-  PAID_CONTENT = 'PAID_CONTENT',
-}
 
 const initQueryParams: Record<string, string> = {
   [PARAMS.SEASON]: 'season_id',
@@ -107,68 +68,53 @@ const initQueryParams: Record<string, string> = {
   [PARAMS.PAID_CONTENT]: 'by_subscription',
 };
 
-const mappedRegex = {
-  [PARAMS.ADFOX_PARTNER]: /puid12=(\d+?)&/i,
-  [PARAMS.SEASON]: /puid6=(\d+?)&/i,
-};
-
 const AmberdataService = () => {
   const tick = createCounter();
   let loaded = false;
   let baseLink = '';
+  let statURL = '';
 
-  const sendAmberdataInitStat = (skin: SkinClass, config: TAdConfigByCategory) => {
-    const isContainAdvertisement = Object.keys(config).length;
+  const createStatURL = (baseStr: string) => {
+    baseStr += ` ${baseLink}`;
+    baseStr = `${baseStr} ${QUERY_PARAMS.EVENT_NUMBER}__${tick()}`;
+
+    const statUrlBase = statURL.replace('{random}', `${randomUnit32()}`);
+    const statPayload = URL_PAYLOAD_TEMPLATE.replace('{payload}', baseStr);
+    const statUrl = `${statUrlBase}${encodeURIComponent(statPayload)}`;
+    return statUrl;
+  };
+
+  const sendAmberdataInitStat = (paid: boolean, adFoxPartner: number | undefined, adFoxSeason: number | undefined) => {
     const resultedParams: { [key in PARAMS]?: Nullable<string | number> } = {
-      [PARAMS.ADFOX_PARTNER]: null,
-      [PARAMS.SEASON]: null,
-      [PARAMS.EVENT_TYPE]: AMBERDATA_EVENT_TYPES.OPEN,
+      [PARAMS.ADFOX_PARTNER]: adFoxPartner || null,
+      [PARAMS.SEASON]: adFoxSeason || null,
+      [PARAMS.EVENT_TYPE]: AmberdataEvent.OPEN,
+      [PARAMS.PAID_CONTENT]: paid ? 1 : 0,
     };
 
-    if (!isContainAdvertisement) resultedParams[PARAMS.PAID_CONTENT] = 1;
-
     let queryString = '';
-
-    const links = Object.keys(config).reduce((acc: string[], category: string) => {
-      const key = category as AdCategory;
-      const data = config[key]?.links || [];
-      return [...acc, ...data];
-    }, []);
-
-    for (let i = 0; i < links.length; i++) {
-      Object.entries(mappedRegex).forEach(([key, regex]) => {
-        const [, matchedValue = null] = links[i].match(regex) || [];
-        resultedParams[key as PARAMS] = matchedValue;
-      });
-
-      const isAllParamsReceived = Object.values(resultedParams).every(Boolean);
-      if (isAllParamsReceived) break;
-    }
 
     Object.entries(resultedParams).forEach(([key, value]) => {
       queryString += queryString === '' ? `${initQueryParams[key]}__${value}` : ` ${initQueryParams[key]}__${value}`;
     });
 
-    queryString += ` ${baseLink}`;
-    queryString = `${queryString} ${QUERY_PARAMS.EVENT_NUMBER}__${tick()}`;
-
-    const statUrlBase = createStatUrl(skin).replace('{random}', `${randomUnit32()}`);
-    const statPayload = URL_PAYLOAD_TEMPLATE.replace('{payload}', queryString);
-    const statUrl = `${statUrlBase}${encodeURIComponent(statPayload)}`;
-
-    logger.log('[AmberdataService]', `<<<<<---SEND AMBERDATA INIT STAT: QUERY STRING - ${queryString}`);
-    logger.log('[AmberdataService]', `<<<<<---SEND AMBERDATA INIT STAT: STAT PAYLOAD - ${statPayload}`);
-    logger.log('[AmberdataService]', `<<<<<---SEND AMBERDATA INIT STAT: STAT URL - ${statUrl}`);
-
-    sendStat(statUrl);
+    const url = createStatURL(queryString);
+    sendStat(url);
   };
 
-  const sendAmberdataStat = () => {
-    return;
+  const sendAmberdataStat = ({ eventType, saveOrigin = false, ...opts }: AmberdataEventPayload) => {
+    let queryString = '';
+
+    Object.entries(opts).forEach(([key, value]) => {
+      queryString += queryString === '' ? `${PARAMS_MAP[key]}__${value}` : ` ${PARAMS_MAP[key]}__${value}`;
+    });
+
+    const url = createStatURL(queryString);
+    sendStat(url);
   };
 
   const sendAmberdataCrashEvent = (payload: CrashEventPayload) => {
-    sendAmberdataStat();
+    // sendAmberdataStat();
   };
 
   const createBaseLink = (options: TAmberdataInitParams) => {
@@ -180,14 +126,17 @@ const AmberdataService = () => {
     }, '');
   };
 
-  const init = ({ isEmbedded, skinName, adConfig, params, ...rest }: TAmberdataParams) => {
+  const init = ({ isEmbedded, skinName, paid, adFoxPartner, adFoxSeason, params, ...rest }: TAmberdataParams) => {
+    logger.log('[AmberdataService]', 'init');
+
     if (!loaded) {
       loaded = true;
       createAdcm({ isEmbedded, skinName, ...rest });
     }
 
+    statURL = getBaseStatURL(skinName);
     baseLink = createBaseLink(params);
-    sendAmberdataInitStat(skinName, adConfig);
+    sendAmberdataInitStat(paid, adFoxPartner, adFoxSeason);
   };
 
   const createAdcm = ({
@@ -216,14 +165,13 @@ const AmberdataService = () => {
     amberdata.src = 'https://tag.digitaltarget.ru/adcm.js';
     amberdata.async = true;
     amberdata.onload = () => {
-      // @ts-ignore
-      window?.adcm?.configure(config, () => window.adcm.call());
+      window.adcm?.configure(config, () => window.adcm?.call());
     };
 
     document.head.appendChild(amberdata);
   };
 
-  return { init, sendAmberdataCrashEvent };
+  return { init, sendAmberdataCrashEvent, sendAmberdataStat };
 };
 
 const instance = AmberdataService();

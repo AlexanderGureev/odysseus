@@ -1,5 +1,5 @@
 interface Window {
-  ya?: any;
+  ya?: import('../../types/yasdk').Ya;
   ENV: import('../../types').TEnvConfig;
   ODYSSEUS_PLAYER_CONFIG: import('../../types').TConfig;
   CONTEXT: import('../../server/utils').TParams;
@@ -13,6 +13,21 @@ interface Window {
   DevTools?: import('../services/P2PManager/types').TeleportDevTools;
   yaContextCb: any[];
   Ya?: any;
+
+  ym?: (counterId: number, ...rest: any[]) => void;
+  dataLayer?: any[];
+
+  initVigo: (
+    videoTag: HTMLElement,
+    opts: import('../services/VigoService/types').VigoInitOpts
+  ) => import('../services/VigoService/types').VigoSDK;
+  _vigo: import('../services/VigoService/types').VigoSDK | null;
+  V_VIGO_SCRIPT_LOADED: boolean;
+
+  adcm?: {
+    configure: (cfg: any, cb: () => void) => void;
+    call: () => void;
+  };
 }
 
 declare interface HTMLVideoElement {

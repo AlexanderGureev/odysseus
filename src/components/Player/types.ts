@@ -1,7 +1,8 @@
-import { TPlayerService, TState } from 'services/PlayerService';
+import { TPlayerService, TState } from 'services/PlayerService/types';
 import { TSource } from 'services/StreamService/types';
 
 export const DEFAULT_PLAYER_ID = 'video-player';
+export const PLAYER_ID = `${DEFAULT_PLAYER_ID}_html5_api`;
 
 export enum PLAYER_ERROR {
   MEDIA_ERR_CUSTOM,
@@ -15,6 +16,7 @@ export enum PLAYER_ERROR {
 export enum VIDEO_TYPE {
   PLAIN = 'PLAIN',
   AD = 'AD',
+  FAKE_VIDEO = 'FAKE_VIDEO',
 }
 
 export type TPlayerApi = TPlayerService & {

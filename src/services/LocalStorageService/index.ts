@@ -1,4 +1,7 @@
 import { Nullable } from 'types';
+import { logger } from 'utils/logger';
+
+import { TLocalStorageService } from './types';
 
 const MockStorage = (): Storage => {
   let state: Record<string, any> = {};
@@ -28,48 +31,75 @@ const MockStorage = (): Storage => {
   };
 };
 
-type TLocalStorageService = {
-  getItemByDomain: <T>(domain: string, key: string) => Nullable<T>;
-  setItemByDomain: <T>(domain: string, key: string, value: T) => void;
-  getItem: <T>(key: string) => Nullable<T>;
-  setItem: <T>(key: string, value: T) => void;
+type ProjectData<T> = {
+  [key in string]?: Record<string, T>;
 };
-
-export enum STORAGE_SETTINGS {
-  LOCAL_QUALITY = 'LOCAL_QUALITY',
-}
 
 const LocalStorageService = (): TLocalStorageService => {
   const storage = window?.localStorage || MockStorage();
+  let parentHost = 'odysseus';
 
-  const getDomainData = (domain: string): Record<string, any> => {
+  const init = (host: string | null) => {
+    if (host) parentHost = host;
+  };
+
+  const getDomainData = <T extends Record<string, any>>(): T => {
     try {
-      const data = storage.getItem(domain);
+      const data = storage.getItem(parentHost);
       const payload = data ? JSON.parse(data) : {};
       return payload;
     } catch (e) {
-      console.error(e);
-      return {};
+      logger.error('[getDomainData]', e);
+      return {} as T;
     }
   };
 
-  const getItemByDomain = <T>(domain: string, key: string): Nullable<T> => {
+  const getItemByDomain = <T>(key: string): Nullable<T> => {
     try {
-      const payload = getDomainData(domain);
+      const payload = getDomainData();
       return payload[key] ?? null;
     } catch (e) {
-      console.error(e);
+      logger.error('[getItemByDomain]', e);
       return null;
     }
   };
 
-  const setItemByDomain = <T>(domain: string, key: string, value: T) => {
+  const setItemByDomain = <T>(key: string, value: T) => {
     try {
-      const payload = getDomainData(domain);
+      const payload = getDomainData();
       payload[key] = value;
-      storage.setItem(domain, JSON.stringify(payload));
+      storage.setItem(parentHost, JSON.stringify(payload));
     } catch (e) {
-      console.error(e);
+      logger.error('[setItemByDomain]', e);
+    }
+  };
+
+  const setItemByProject = <T>(projectId: number, key: string, value: T) => {
+    try {
+      const payload = getDomainData();
+      const projectData = payload[projectId] || {};
+      const newProjectData = {
+        ...payload,
+        [projectId]: {
+          ...projectData,
+          [key]: value,
+        },
+      };
+
+      storage.setItem(parentHost, JSON.stringify(newProjectData));
+    } catch (e) {
+      logger.error('[setItemByProject]', e);
+    }
+  };
+
+  const getItemByProject = <T>(projectId: number, key: string): T | null => {
+    try {
+      const payload = getDomainData<ProjectData<T>>();
+      const value = payload[projectId]?.[key];
+      return value ?? null;
+    } catch (e) {
+      logger.error('[getItemByProject]', e);
+      return null;
     }
   };
 
@@ -78,7 +108,7 @@ const LocalStorageService = (): TLocalStorageService => {
       const payload = storage.getItem(key);
       return payload ? JSON.parse(payload) : null;
     } catch (e) {
-      console.error(e);
+      logger.error('[getItem]', e);
       return null;
     }
   };
@@ -87,11 +117,11 @@ const LocalStorageService = (): TLocalStorageService => {
     try {
       storage.setItem(key, JSON.stringify(value));
     } catch (e) {
-      console.error(e);
+      logger.error('[setItem]', e);
     }
   };
 
-  return { getItemByDomain, setItemByDomain, getItem, setItem };
+  return { init, getItemByDomain, setItemByDomain, setItemByProject, getItemByProject, getItem, setItem };
 };
 
 const instance = LocalStorageService();

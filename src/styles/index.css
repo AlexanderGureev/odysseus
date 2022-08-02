@@ -5,3 +5,35 @@
 .vjs-modal-dialog {
   display: none;
 }
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+#root,
+.player-manager,
+#video-player,
+#video-player_html5_api {
+  width: 100%;
+  height: 100%;
+}
+
+.controls {
+  position: absolute;
+  left: 25px;
+  top: 25px;
+  z-index: 15;
+}
+
+.ad-notify {
+  position: absolute;
+  right: 25px;
+  top: 25px;
+}

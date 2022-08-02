@@ -1,9 +1,7 @@
 import { VIDEO_TYPE } from 'components/Player/types';
 import { ViewedTimeContainer } from 'services/BeholderService';
-import { TPlayerService } from 'services/PlayerService';
+import { TPlayerService } from 'services/PlayerService/types';
 import { PostMessageService } from 'services/PostMessageService';
-import { OUTPUT_PLAYER_POST_MESSAGE } from 'services/PostMessageService/types';
-import { SauronService } from 'services/SauronService';
 import { logger } from 'utils/logger';
 
 export enum AnalyticsEvent {
@@ -99,17 +97,17 @@ const AnalyticsEventManagerService = () => {
   const SEND_HANDLER_EVENT_MAP: TSendMap = {
     [AnalyticsEvent.PLAY]: () => {
       logger.log('[AnalyticsEventManagerService]', 'PLAY EVENT');
-      PostMessageService.emit(OUTPUT_PLAYER_POST_MESSAGE.PLAY, { payload: createPayload(0) });
+      PostMessageService.emit('play', { payload: createPayload(0) });
     },
     [AnalyticsEvent.VIEW]: ({ currentTime }) => {
       logger.log('[AnalyticsEventManagerService]', 'VIEW EVENT', state.viewPoint);
-      PostMessageService.emit(OUTPUT_PLAYER_POST_MESSAGE.VIEW, {
+      PostMessageService.emit('view', {
         payload: { ...createPayload(currentTime), value: state.viewPoint },
       });
     },
     [AnalyticsEvent.WATCH_POINT]: ({ currentTime, value }) => {
       logger.log('[AnalyticsEventManagerService]', 'WATCH_POINT EVENT', value);
-      PostMessageService.emit(OUTPUT_PLAYER_POST_MESSAGE.WATCH_POINT, {
+      PostMessageService.emit('watchpoint', {
         payload: { ...createPayload(currentTime), value },
       });
     },
@@ -117,7 +115,7 @@ const AnalyticsEventManagerService = () => {
 
   const HANDLER_BY_EVENT_MAP: Record<AnalyticsEvent, () => void> = {
     [AnalyticsEvent.PLAY]: () => {
-      player.one('play', SEND_HANDLER_EVENT_MAP[AnalyticsEvent.PLAY]);
+      // player.one('play', SEND_HANDLER_EVENT_MAP[AnalyticsEvent.PLAY]);
     },
     [AnalyticsEvent.VIEW]: () => {
       const unsubscribe = player.on('timeupdate', () => {
@@ -130,7 +128,7 @@ const AnalyticsEventManagerService = () => {
         const { viewTime } = viewedTimeContainer.getState();
 
         if (viewTime >= state.viewPoint) {
-          unsubscribe();
+          // unsubscribe();
           viewedTimeContainer.reset();
           SEND_HANDLER_EVENT_MAP[AnalyticsEvent.VIEW]({ currentTime });
         }
@@ -168,12 +166,14 @@ const AnalyticsEventManagerService = () => {
     playerService: TPlayerService,
     { watchPoints = DEFAULT_WATCH_POINTS, viewPoint = DEFAULT_VIEW_POINT, ...rest }: TAnalyticsOptions
   ) => {
+    logger.log('[AnalyticsEventManagerService]', 'init');
+
     state = { ...state, ...rest, watchPoints, viewPoint };
     player = playerService;
 
-    SauronService.subscribe((sid) => {
-      state.sid = sid;
-    });
+    // SauronService.subscribe((sid) => {
+    //   state.sid = sid;
+    // });
 
     Object.entries(HANDLER_BY_EVENT_MAP).forEach(([event, callback]) => callback());
   };

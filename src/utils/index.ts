@@ -14,3 +14,20 @@ export const getCurrentTime = () => {
   const mmm = ('00' + d.getMilliseconds()).slice(-3);
   return '[' + hh + ':' + mm + ':' + ss + '.' + mmm + ']';
 };
+
+const pad = (num: number | string) => `0${num}`.slice(-2);
+
+export const secToHumanReadeable = (sec: number, padHours = true): string => {
+  let secs = String(Math.floor(sec));
+  let minutes = String(Math.floor(+secs / 60));
+  secs = `${pad(+secs % 60)}`;
+
+  let hours = String(Math.floor(+minutes / 60));
+  minutes = `${pad(+minutes % 60)}:`;
+
+  hours = +hours > 0 ? `${padHours ? pad(hours) : hours}:` : '';
+
+  return `${hours}${minutes}${secs}`;
+};
+
+export const toFixed = (num: number, fractionDigits = 3) => Number(num.toFixed(fractionDigits));

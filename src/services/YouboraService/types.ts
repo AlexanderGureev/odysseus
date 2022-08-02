@@ -1,4 +1,4 @@
-import { AdCategory } from 'types';
+import { AdCategory } from 'types/ad';
 import { VideoJsPlayer } from 'video.js';
 
 import { AdsAdapterEvent } from './adapters/AdsAdapter/types';

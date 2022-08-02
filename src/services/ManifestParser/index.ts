@@ -9,7 +9,8 @@ import * as MPDParser from 'mpd-parser';
 import { VIDEO_EXTENSION } from 'services/StreamService';
 import { StreamProtocol, TStreamItem } from 'services/StreamService/types';
 import { Nullable } from 'types';
-import { ERROR_CODES, ERROR_ITEM_MAP } from 'types/errors';
+import { ERROR_CODES } from 'types/errors';
+import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
 
 export type Playlist = {
@@ -157,10 +158,7 @@ const ManifestParser = () => {
       const response = await fetch(url);
       return response;
     } catch (e) {
-      throw {
-        ...ERROR_ITEM_MAP[ERROR_CODES.BALANCER_UNAVAILABLE],
-        details: e?.message,
-      };
+      throw new PlayerError(ERROR_CODES.BALANCER_UNAVAILABLE, e?.message);
     }
   };
 
@@ -169,11 +167,11 @@ const ManifestParser = () => {
     if (!response.ok) {
       const { origin } = new URL(source.url);
       const balancerUnavailable = response.url.includes(origin);
-      throw ERROR_ITEM_MAP[balancerUnavailable ? ERROR_CODES.BALANCER_REQUEST_FAILED : ERROR_CODES.CDN_REQUEST_FAILED];
+      throw new PlayerError(balancerUnavailable ? ERROR_CODES.BALANCER_REQUEST_FAILED : ERROR_CODES.CDN_REQUEST_FAILED);
     }
 
     const text = await response.text();
-    if (!text) throw ERROR_ITEM_MAP[ERROR_CODES.BALANCER_NO_DATA];
+    if (!text) throw new PlayerError(ERROR_CODES.BALANCER_NO_DATA);
 
     try {
       const manifestText = modifyManifest(response.url, text, source.protocol);
@@ -189,10 +187,7 @@ const ManifestParser = () => {
       return manifestData;
     } catch (e) {
       logger.error('[ManifestParser]', 'fetchManifest error:', e?.message);
-      throw {
-        ...ERROR_ITEM_MAP[ERROR_CODES.CDN_INVALID_DATA],
-        details: e?.message,
-      };
+      throw new PlayerError(ERROR_CODES.CDN_INVALID_DATA, e?.message);
     }
   };
 
@@ -200,7 +195,7 @@ const ManifestParser = () => {
 
   const parse = (protocol: StreamProtocol, text: string): TParsedManifest => {
     const parser = ParserByProtocol[protocol];
-    if (!parser) throw new Error(`no parser found for protocol: ${protocol}`);
+    if (!parser) throw new PlayerError(ERROR_CODES.UNKNOWN, `no parser found for protocol: ${protocol}`);
     return parser.parse(text);
   };
 

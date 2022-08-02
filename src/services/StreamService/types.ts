@@ -2,6 +2,10 @@
 
 import { Nullable } from 'types';
 
+export const LS_KEY_STREAM = '@stream_service';
+
+export type THistoryStreams = string[];
+
 export type TStreamItem = {
   drm_type: Nullable<DRM_TYPE>;
   ls_url: Nullable<string>;

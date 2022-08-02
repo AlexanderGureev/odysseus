@@ -1,46 +1,33 @@
 import { Nullable } from 'types';
 import { getCookie } from 'utils/cookie';
-
-import { TSauronSubscriber } from './types';
+import { logger } from 'utils/logger';
 
 const SAURON_ID_KEY = 'sauron_id';
 const SAURON_API_URL = window.ENV.SAURON_API_URL ? window.ENV.SAURON_API_URL + '/identify' : null;
 
 const SauronServiceProvider = () => {
-  let callbacks: TSauronSubscriber[] = [];
   let sauronIdGlobal: Nullable<string> = null;
   let storage: Nullable<Storage> = null;
-  let initialized = false;
 
   if (window && localStorage) storage = localStorage;
 
-  const subscribe = (callback: TSauronSubscriber) => {
-    if (initialized) callback(sauronIdGlobal);
-    else callbacks.push(callback);
-  };
-
-  const broadcast = () => {
-    callbacks.forEach((cb) => {
-      cb(sauronIdGlobal);
-    });
-
-    callbacks = [];
-  };
+  const getSauronId = () => sauronIdGlobal;
 
   const persist = (guid?: string) => {
     if (guid) {
       storage?.setItem(SAURON_ID_KEY, guid);
       sauronIdGlobal = guid;
     }
-
-    initialized = true;
-    broadcast();
   };
 
-  const init = () => {
+  const init = async () => {
+    logger.log('[SauronService]', 'init');
+
     const cookieSauronId = getCookie('Sauron-ID');
     if (cookieSauronId) persist(cookieSauronId);
-    else connect();
+    else {
+      await connect();
+    }
   };
 
   const connect = async () => {
@@ -65,7 +52,7 @@ const SauronServiceProvider = () => {
     persist(sid);
   };
 
-  return { init, subscribe };
+  return { init, getSauronId };
 };
 
 const instance = SauronServiceProvider();

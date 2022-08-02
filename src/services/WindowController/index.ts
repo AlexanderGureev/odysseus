@@ -29,6 +29,8 @@ const WindowController = () => {
     try {
       if (isInitialized) return;
 
+      logger.log('[WindowController]', 'init');
+
       await runUpdater();
 
       ChannelService.init();
@@ -36,8 +38,6 @@ const WindowController = () => {
       window.addEventListener('beforeunload', dispose);
 
       isInitialized = true;
-
-      logger.log('[WindowController]', `isInitialized`);
     } catch (e) {
       logger.log('[WindowController]', `init error: ${e}`);
     }

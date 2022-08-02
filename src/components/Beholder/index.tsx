@@ -1,4 +1,4 @@
-import { useFeatures, usePlayerApi,usePlayerConfig } from 'hooks';
+import { useFeatures, usePlayerApi, usePlayerConfig } from 'hooks';
 import React from 'react';
 import { BeholderService } from 'services/BeholderService';
 
@@ -15,7 +15,7 @@ export const Beholder = ({ children }: React.PropsWithChildren) => {
       projectId: config.config.project_id,
       scrobbling: config.config.scrobbling,
       userId: config.config.user_id,
-      userToken: config.context.user_token,
+      userToken: '',
       serviceDisabled: DISABLE_BEHOLDER,
     });
   }, [DISABLE_BEHOLDER, config]);
@@ -28,9 +28,9 @@ export const Beholder = ({ children }: React.PropsWithChildren) => {
       BeholderService.onTimeUpdate(currentTime, seeking);
     });
 
-    player.on('pause', () => {
-      BeholderService.saveTime(player.getCurrentTime());
-    });
+    // player.on('pause', () => {
+    //   BeholderService.saveTime(player.getCurrentTime());
+    // });
   }, [player]);
 
   return <>{children}</>;

@@ -5,7 +5,6 @@ import 'youbora-adapter-videojs';
 
 import { fakeVideoSrc } from 'components/Player/fakeVideo';
 import { ManifestParser } from 'services/ManifestParser';
-import { TMediatorHandlers } from 'services/MediatorService';
 import { getPlaybackOptions } from 'services/YouboraService/selectors';
 import { YEvent } from 'services/YouboraService/types';
 import { filterOptions } from 'services/YouboraService/utils';
@@ -186,7 +185,7 @@ const CustomAdapter = youbora.adapters.Videojs.extend({
 
 const VideoAdapter = (): TVideoAdapter => {
   let adapter: any = null;
-  let mediator: Nullable<TMediatorHandlers> = null;
+  let mediator: Nullable<any> = null;
 
   const init = (serviceMediator: any, player: VideoJsPlayer) => {
     adapter = new CustomAdapter(player);

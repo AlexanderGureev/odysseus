@@ -1,50 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios';
-import { TScrobbling } from 'types';
 import { Nullable } from 'types';
 import { logger } from 'utils/logger';
 
-type TBeholderParams = {
-  userToken?: string;
-  userId: Nullable<number>;
-  projectId: number;
-  duration?: number;
-  trackId?: number;
-  seasonName?: string;
-  scrobbling: TScrobbling;
-  serviceDisabled: boolean;
-};
-
-type TBeholderState = {
-  userToken: string;
-  userId: number;
-  projectId?: number;
-  duration?: number;
-  trackId: number | null;
-  seasonNum?: number;
-  scrobbling?: TScrobbling;
-  disabled: boolean;
-  token: Nullable<string>;
-};
-
-type TBeholderTokenResponse = {
-  data: {
-    type: string;
-    attributes: {
-      player_token: string;
-    };
-  };
-};
-
-type TBeholderPayload = {
-  user_id: number;
-  track_id: number;
-  stop_time: number;
-  total_time: number;
-  project_id?: number;
-  season?: number;
-  datetime: string;
-};
+import { TBeholderParams, TBeholderPayload, TBeholderState, TBeholderTokenResponse } from './types';
 
 const CONTAIN_NUMBER_REGEX = /\d+/gi;
 
@@ -85,6 +44,8 @@ const BeholderService = () => {
   const viewedTimeContainer = ViewedTimeContainer();
 
   const init = async ({ serviceDisabled, seasonName, userId, ...params }: TBeholderParams) => {
+    logger.log('[BeholderService]', 'init');
+
     if (!params.userToken || serviceDisabled) {
       state = initalState;
       return;

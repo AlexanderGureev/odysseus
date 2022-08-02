@@ -1,17 +1,18 @@
-import { getCurrentTime } from 'utils';
+import { ILocalStorageService } from 'interfaces';
+import { LocalStorageService } from 'services/LocalStorageService';
 import { logger } from 'utils/logger';
 
-import { ChannelEvent,TChannelEvents } from './types';
+import { ChannelEvent, TChannelEvents } from './types';
 
-const getLogInfo = () => `[ChannelService]:${getCurrentTime()}:`;
-
-const ChannelService = () => {
+const ChannelService = (localStorageService: ILocalStorageService) => {
   let channelKeys: TChannelEvents = {};
   let isInitialized = false;
 
   const init = () => {
     if (!window?.localStorage) throw new Error('localStorage is undefined');
     if (isInitialized) return;
+
+    logger.log('[ChannelService]', 'init');
 
     window.addEventListener('storage', handleStorageEvent);
     isInitialized = true;
@@ -23,7 +24,7 @@ const ChannelService = () => {
   };
 
   const emit = (channelKey: ChannelEvent) => {
-    window.localStorage.setItem(channelKey, `${Date.now()}`);
+    localStorageService.setItem(channelKey, `${Date.now()}`);
   };
 
   const destroy = () => {
@@ -51,5 +52,5 @@ const ChannelService = () => {
   };
 };
 
-const instance = ChannelService();
+const instance = ChannelService(LocalStorageService);
 export { instance as ChannelService };

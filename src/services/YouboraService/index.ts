@@ -6,7 +6,6 @@ import { uniqueId } from 'lodash';
 // @ts-ignore
 import platform from 'platform';
 import detector from 'react-device-detect';
-import { Mediator, MediatorService, TMediator } from 'services/MediatorService';
 import { QUALITY_MARKS } from 'services/VigoService';
 import { store } from 'store';
 import { Nullable } from 'types';

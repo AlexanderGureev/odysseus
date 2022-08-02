@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
+import { TParsedFeatures } from 'types';
 
-import { isNil,toNum } from '../utils';
+import { isNil, toNum } from '../utils';
 import { useFeatures } from './useFeatures';
 
 export type TAutoplay = 'never' | 'always' | 'on' | 'off' | '1' | '0';
@@ -78,6 +79,24 @@ const PARSE_MAP: Record<string, (value?: string) => string | number | boolean | 
   autoplay: (value?: string) => value?.toLowerCase(),
   trial_available: (value?: string) => ['1', 'true'].includes(value || ''),
   startAt: (value?: string) => toNum(value) ?? null,
+};
+
+export const parseQueryParams = (features: TParsedFeatures): TQueryParams => {
+  const queryParams = new URLSearchParams(window?.location?.search || '');
+
+  const params: Record<string, any> = {};
+  queryParams.forEach((value, key) => {
+    const v = PARSE_MAP[key]?.(value.toLowerCase());
+    if (!isNil(v)) params[key] = v;
+  });
+
+  const __ref = queryParams.get('__ref');
+  if (__ref) params.isVkApp = VK_APP_REFS.some((ref) => ref === __ref);
+
+  const value: TAutoplay = params.autoplay || EMPTY_QUERY_VALUE;
+  const autoplay = AUTOPLAY_MATRIX[features.AUTOPLAY || 'ALWAYS']?.[value];
+  params.autoplay = autoplay;
+  return params;
 };
 
 export const useQueryParams = (): TQueryParams => {

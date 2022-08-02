@@ -1,35 +1,32 @@
-export type TSubscriber<T = any> = (...params: T[]) => void;
+const MediatorService = <
+  E extends {
+    [key in string]: (...args: any[]) => void;
+  }
+>() => {
+  const state: {
+    [key in keyof E]?: Array<E[key]>;
+  } = {};
 
-export type TMediatorHandlers = {
-  on: (event: string, callback: TSubscriber) => { on: TMediatorHandlers['on'] };
-  off: (event: string, callback: TSubscriber) => void;
-  emit: (event: string, ...payload: any[]) => void;
-  one: (event: string, callback: TSubscriber) => void;
-};
-
-export type TMediator = () => TMediatorHandlers;
-
-const MediatorService: TMediator = () => {
-  const state: Record<string, TSubscriber[]> = {};
-
-  const on = (event: string, callback: TSubscriber) => {
-    state[event] = state[event] ? [...state[event], callback] : [callback];
-    return { on };
+  const on = <Event extends keyof E, C extends E[Event]>(event: Event, callback: C) => {
+    const subscribers = state[event] as C[] | undefined;
+    state[event] = [...(subscribers || []), callback];
+    const unsubscribe = () => off(event, callback);
+    return { on, unsubscribe };
   };
 
-  const off = (event: string, callback: TSubscriber) => {
-    state[event] = state[event].filter((f) => f !== callback);
+  const off = <Event extends keyof E, C extends E[Event]>(event: Event, callback: C) => {
+    state[event] = state[event]?.filter((f) => f !== callback);
   };
 
-  const emit = (event: string, ...payload: any[]) => {
-    state[event]?.forEach((cb) => cb(...payload));
+  const emit = <Event extends keyof E, C extends E[Event]>(event: Event, ...args: Parameters<C>) => {
+    state[event]?.forEach((cb) => cb(...args));
   };
 
-  const one = (event: string, callback: TSubscriber) => {
-    const cb = (...args: any[]) => {
+  const one = <Event extends keyof E, C extends E[Event]>(event: Event, callback: C) => {
+    const cb = ((...args: Parameters<C>) => {
       off(event, cb);
       callback(...args);
-    };
+    }) as C;
 
     on(event, cb);
   };
@@ -37,5 +34,4 @@ const MediatorService: TMediator = () => {
   return { on, off, emit, one };
 };
 
-const instance = MediatorService();
-export { MediatorService as Mediator,instance as MediatorService };
+export { MediatorService as Mediator };

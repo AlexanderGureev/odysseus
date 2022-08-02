@@ -1,8 +1,10 @@
-import { BaseError } from 'server/utils/error';
+import fetch from 'isomorphic-fetch';
 
+import { BaseError } from '../../server/utils/error';
+import { isNil } from '../utils';
 import { logger } from './logger';
 
-class HTTPResponseError extends BaseError {
+export class HTTPResponseError extends BaseError {
   response: Response;
 
   constructor(response: Response) {
@@ -17,8 +19,11 @@ type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export type RawHeaders = { [k: string]: string[] | undefined };
 
-type ReqInit = RequestInit & {
+export type ReqInit = Omit<RequestInit, 'headers'> & {
   json?: unknown;
+  params?: Record<string, any>;
+  headers?: Record<string, string | undefined>;
+  timeout?: number;
 };
 
 const request = () => {
@@ -32,15 +37,27 @@ const request = () => {
 
   const createRequest =
     (method: HTTPMethod) =>
-    async (url: string, { json, ...opts }: ReqInit = {}) => {
+    async (url: string, { json, params = {}, headers = {}, ...opts }: ReqInit = {}) => {
       try {
-        logger.log('[http request]', 'before request', { method, url });
+        logger.log('[http request]', 'before request', { method, url, params, headers });
+
+        const s = new URLSearchParams();
+        Object.keys(params).forEach((key) => {
+          if (!isNil(params[key])) s.set(key, params[key]);
+        });
+
+        const query = s.toString();
+        const target = url + (query ? `?${query}` : '');
+
+        const parsedHeaders = Object.keys(headers).reduce((acc, key) => {
+          return isNil(headers[key]) ? acc : { ...acc, [key]: headers[key] };
+        }, {});
 
         const extendedOpts = json
-          ? { ...opts, headers: { 'Content-Type': 'application/json', ...opts?.headers }, body: JSON.stringify(json) }
+          ? { ...opts, headers: { 'Content-Type': 'application/json', ...parsedHeaders }, body: JSON.stringify(json) }
           : opts;
 
-        const response = await fetch(url, { method, ...extendedOpts });
+        const response = await fetch(target, { method, ...extendedOpts });
         checkStatus(response);
 
         logger.log('[http request]', 'before response', { method, url, status: response.status });

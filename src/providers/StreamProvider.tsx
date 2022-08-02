@@ -1,7 +1,7 @@
 import { StreamContext } from 'context';
 import { usePlayerConfig } from 'hooks';
 import React from 'react';
-import { createSource, StreamService, TStreamService } from 'services/StreamService';
+import { TStreamService } from 'services/StreamService';
 import { TSource } from 'services/StreamService/types';
 import { getCapabilities } from 'services/StreamService/utils/supports';
 import { Nullable } from 'types';

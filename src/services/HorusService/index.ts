@@ -1,5 +1,4 @@
 import { isNil } from 'lodash';
-import { Mediator, TMediator, TMediatorHandlers } from 'services/MediatorService';
 import { Nullable } from 'types';
 import { logger } from 'utils/logger';
 import { retry, runInterval, sleep } from 'utils/retryUtils';
@@ -63,6 +62,8 @@ const HorusService = () => {
     //   });
     // });
 
+    isInitialized = true;
+
     logger.log(
       '[HorusService]',
       'init',
@@ -95,8 +96,6 @@ const HorusService = () => {
         await setEventsStatus(pendingEvents, EventStatus.IDLE);
       }
     }, config.flush_buffer_period * 1000 * 2);
-
-    isInitialized = true;
   };
 
   const isServerError = (response: Response) => response.status === 503;

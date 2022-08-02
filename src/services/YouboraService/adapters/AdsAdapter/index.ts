@@ -3,7 +3,6 @@
 import youbora from 'youboralib';
 
 import { Nullable } from '../../../../../types';
-import { TMediatorHandlers } from '../../../MediatorService';
 import { TAdBreakConfig } from '../..';
 import { AD_CATEGORY_MAP } from '../../constants';
 import { AdsAdapterEvent, TAdsAdapter } from './types';
@@ -85,7 +84,7 @@ const CustomAdsAdapter = youbora.Adapter.extend({
 
 const AdsAdapter = (): TAdsAdapter => {
   let adapter: any = null;
-  let mediator: Nullable<TMediatorHandlers> = null;
+  let mediator: Nullable<any> = null;
 
   const init = (serviceMediator: any, player: any) => {
     adapter = new CustomAdsAdapter(player);

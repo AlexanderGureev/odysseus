@@ -1,0 +1,14 @@
+.ad_controls {
+  cursor: pointer;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+  display: none;
+}
+
+.active {
+  display: block;
+}

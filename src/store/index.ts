@@ -1,13 +1,89 @@
-import { combineReducers,configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import { toXSTATE } from 'utils/toXSTATE';
 
 import { listenerMiddleware } from './middleware';
-import ad from './slices/ad/reducer';
-import player from './slices/player/reducer';
+import adBlock from './slices/adBlock/reducer';
+import adController from './slices/adController/reducer';
+import adTimeNotify from './slices/adTimeNotify/reducer';
+import autoSwitch from './slices/autoSwitch/reducer';
+import buffering from './slices/buffering/reducer';
+import changeTrack from './slices/changeTrack/reducer';
+import error from './slices/error/reducer';
+import network from './slices/network/reducer';
+import playback from './slices/playback/reducer';
+import playbackSpeed from './slices/playbackSpeed/reducer';
+import quality from './slices/quality/reducer';
+import resumeVideo from './slices/resumeVideo/reducer';
+import rewind from './slices/rewind/reducer';
+import root from './slices/root/reducer';
+import switcher from './slices/switcher/reducer';
+import updater from './slices/updater/reducer';
+import volume from './slices/volume/reducer';
+import watchpoint from './slices/watchpoint/reducer';
+/*
+Ограничения для системы:
+1) плоский конфиг fsm
+2) асинхронный переход должен содержать в идеале 1 асинхронную операцию
+
+createReducer(
+  1) initializer (idle...)
+  2) player (idle...)
+  3) switcher (idle...)
+  4) updater (idle...)
+  5) adController (idle...)
+  6) adBlock (idle...)
+)
+
+sendEvent(type: "DO_INIT", payload: {}, meta: {}) 
+*/
 
 const rootReducer = combineReducers({
-  player: player.reducer,
-  ad: ad.reducer,
+  root: root.reducer,
+  resumeVideo: resumeVideo.reducer,
+  adController: adController.reducer,
+  adBlock: adBlock.reducer,
+  updater: updater.reducer,
+  switcher: switcher.reducer,
+  playback: playback.reducer,
+  watchpoint: watchpoint.reducer,
+  rewind: rewind.reducer,
+  buffering: buffering.reducer,
+  adTimeNotify: adTimeNotify.reducer,
+  quality: quality.reducer,
+  network: network.reducer,
+  changeTrack: changeTrack.reducer,
+  autoSwitch: autoSwitch.reducer,
+  playbackSpeed: playbackSpeed.reducer,
+  volume: volume.reducer,
+  error: error.reducer,
 });
+
+root.addMiddleware();
+resumeVideo.addMiddleware();
+adController.addMiddleware();
+adBlock.addMiddleware();
+updater.addMiddleware();
+switcher.addMiddleware();
+playback.addMiddleware();
+watchpoint.addMiddleware();
+rewind.addMiddleware();
+buffering.addMiddleware();
+adTimeNotify.addMiddleware();
+quality.addMiddleware();
+network.addMiddleware();
+changeTrack.addMiddleware();
+autoSwitch.addMiddleware();
+playbackSpeed.addMiddleware();
+volume.addMiddleware();
+error.addMiddleware();
+
+// console.log(
+//   [root, adController, adBlock, updater, switcher, playback, rewind, adTimeNotify, error].reduce((acc, m) => {
+//     return (
+//       acc + `const ${m.name} = createMachine(${JSON.stringify(toXSTATE(m.name, m.getInitialState().step, m.config))}); `
+//     );
+//   }, '')
+// );
 
 export const store = configureStore({
   reducer: rootReducer,

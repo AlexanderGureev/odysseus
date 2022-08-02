@@ -3,17 +3,27 @@ import { addListener, createListenerMiddleware } from '@reduxjs/toolkit';
 import { IServices } from 'interfaces';
 import {
   AmberdataService,
+  BeholderService,
+  DemonService,
   EmbeddedCheckService,
+  GAService,
+  HorusService,
   IDBService,
+  LocalStorageService,
+  ManifestParser,
+  PlayerService,
   PostMessageService,
   SauronService,
+  StreamQualityManager,
   StreamService,
+  TNSCounter,
   UTMService,
   VigoService,
   WindowController,
+  YMService,
   YouboraService,
 } from 'services';
-import { YMService } from 'services/YmService/service';
+import { AdService } from 'services/AdService/controller';
 
 import type { AppDispatch, AppState } from '.';
 
@@ -29,7 +39,17 @@ const opts: CreateListenerMiddlewareOptions<IServices> = {
     utmService: UTMService,
     vigoService: VigoService,
     ymService: YMService,
+    gaService: GAService,
     youboraService: YouboraService,
+    beholderService: BeholderService,
+    horusService: HorusService,
+    playerService: PlayerService,
+    localStorageService: LocalStorageService,
+    adService: AdService,
+    tnsCounter: TNSCounter,
+    manifestService: ManifestParser,
+    qualityService: StreamQualityManager,
+    demonService: DemonService,
   },
 };
 

@@ -34,6 +34,7 @@ export interface IProcessEnv {
   FAIRPLAY_CERT_ENDPOINT?: string;
   YOUBORA_ACCOUNT_CODE?: string;
   YOUBORA_SERVICE_ENABLED?: string;
+  YMID?: string;
 }
 
 declare global {

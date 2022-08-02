@@ -4,14 +4,16 @@ import useMediaQuery from 'hooks/useMedia';
 import React, { useEffect } from 'react';
 import { sendEvent } from 'store';
 import { SkinClass } from 'types';
-import { ERROR_CODES, ERROR_TYPE } from 'types/errors';
+import { ERROR_CODES } from 'types/errors';
 
 import Styles from './index.module.css';
 import { ERROR_TEXT_BY_TYPE } from './templates';
 
 const ErrorManager = ({ children }: React.PropsWithChildren) => {
   const dispatch = useAppDispatch();
-  const error = useAppSelector((state) => state.player.error);
+  const { error } = useAppSelector((state) => state.error);
+  const { session } = useAppSelector((state) => state.root);
+
   const match = useMediaQuery('(max-width: 375px)');
 
   useEffect(() => {
@@ -53,7 +55,7 @@ const ErrorManager = ({ children }: React.PropsWithChildren) => {
         </div>
         <div className={Styles.error_code}>Код ошибки: {ERROR_CODES[error.title]}</div>
         <div className={Styles.meta_container}>
-          <div className={Styles.videosession_id}>ssid: 000-001</div>
+          <div className={Styles.videosession_id}>ssid: {session.sid}</div>
           <div>app version: 2.53.0</div>
         </div>
       </div>
