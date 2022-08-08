@@ -6,12 +6,13 @@ type Opts = { currentTime: number };
 
 export const checkTimePoint = ({ currentTime }: Opts, { getState, dispatch, services: { adService } }: EffectOpts) => {
   const {
+    autoSwitch: { step },
     root: { adPoints, adConfig },
   } = getState();
 
   adService.updatePreloadedBlocks(currentTime);
 
-  if (!adService.canPlayAd()) {
+  if (!adService.canPlayAd() || step === 'AUTOSWITCH_NOTIFY') {
     return dispatch(
       sendEvent({
         type: 'CHECK_TIME_POINT_RESOLVE',

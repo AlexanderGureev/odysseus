@@ -56,11 +56,12 @@ const quality = createSlice({
       const { type, payload } = action.payload;
 
       const next = config[state.step]?.[type];
+      const step = next || state.step;
+
+      if (type === 'CHANGE_TRACK') return { ...state, step: 'IDLE' };
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'quality', `${state.step} -> ${type} -> ${next}`);
-
-      const step = next || state.step;
 
       switch (type) {
         case 'TIME_UPDATE':
@@ -87,7 +88,15 @@ const addMiddleware = () =>
   startListening({
     predicate: (action, currentState, prevState) => currentState.quality.step !== prevState.quality.step,
     effect: (action, api) => {
-      const { dispatch, getState, extra: services } = api;
+      const {
+        getState,
+        extra: { services, createDispatch },
+      } = api;
+
+      const dispatch = createDispatch({
+        getState,
+        dispatch: api.dispatch,
+      });
 
       const { step } = getState().quality;
 

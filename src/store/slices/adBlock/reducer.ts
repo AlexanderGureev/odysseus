@@ -21,6 +21,7 @@ const initialState: FSMState = {
   isExclusive: false,
   isPromo: false,
   skippable: false,
+  isVolumeAvailable: false,
 
   currentTime: null,
   duration: null,
@@ -46,6 +47,7 @@ const config: FSMConfig<State, AppEvent> = {
   },
   PLAYING: {
     DO_PAUSE_AD_BLOCK: 'PAUSE_AD_BLOCK_PENDING',
+    GO_TO_HIDDEN: 'PAUSE_AD_BLOCK_PENDING',
     DO_SKIP_AD_BLOCK: 'SKIP_AD_BLOCK_PENDING',
     AD_BLOCK_END: 'NEXT_BLOCK_PENDING',
     AD_BLOCK_TIME_UPDATE: null,
@@ -55,6 +57,7 @@ const config: FSMConfig<State, AppEvent> = {
     DO_PLAY_AD_BLOCK: 'PLAY_AD_BLOCK_PENDING',
     AD_BLOCK_END: 'NEXT_BLOCK_PENDING',
     DO_SKIP_AD_BLOCK: 'SKIP_AD_BLOCK_PENDING',
+    GO_TO_VISIBLE: 'PLAY_AD_BLOCK_PENDING',
   },
   NEXT_BLOCK_PENDING: {
     PLAY_NEXT_BLOCK: 'START_BLOCK_PENDING',
@@ -94,7 +97,15 @@ const addMiddleware = () =>
   startListening({
     predicate: (action, currentState, prevState) => currentState.adBlock.step !== prevState.adBlock.step,
     effect: (action, api) => {
-      const { dispatch, getState, extra: services } = api;
+      const {
+        getState,
+        extra: { services, createDispatch },
+      } = api;
+
+      const dispatch = createDispatch({
+        getState,
+        dispatch: api.dispatch,
+      });
 
       const { step } = getState().adBlock;
 

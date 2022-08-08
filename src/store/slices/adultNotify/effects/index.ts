@@ -1,0 +1,1 @@
+export { checkAdult } from './checkAdult';

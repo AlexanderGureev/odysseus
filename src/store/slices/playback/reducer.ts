@@ -1,10 +1,12 @@
-import { createAction, createSlice } from '@reduxjs/toolkit';
+import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { startListening } from 'store/middleware';
-import type { AppEvent, FSMConfig } from 'store/types';
+import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
-import { ActionPayload, FSMState, State } from './types';
+import { checkManifest, checkToken } from '../updater/effects';
+import { FSMState, State } from './types';
 
 const initialState: FSMState = {
   step: 'IDLE',
@@ -24,10 +26,12 @@ const config: FSMConfig<State, AppEvent> = {
     PLAYBACK_INIT_RESOLVE: 'READY',
   },
   READY: {
+    AD_BREAK_STARTED: 'AD_BREAK',
     START_PLAYBACK: 'PLAY_PENDING',
+    META_LOADED: null,
   },
   AD_BREAK: {
-    START_PLAYBACK: 'PLAY_PENDING',
+    RESUME_VIDEO: 'READY',
   },
   CHECK_TOKEN_PENDING: {
     CHECK_TOKEN_RESOLVE: 'CHECK_MANIFEST_PENDING',
@@ -42,14 +46,18 @@ const config: FSMConfig<State, AppEvent> = {
     DO_PAUSE: 'PAUSED',
   },
   PLAYING: {
+    SET_PAUSED: 'PAUSED',
     DO_PAUSE: 'PAUSED',
     AD_BREAK_STARTED: 'AD_BREAK',
     TIME_UPDATE: null,
-    VIDEO_END: 'END',
+    SEEK: null,
   },
   PAUSED: {
+    SET_PLAYING: 'PLAYING',
     DO_PLAY: 'CHECK_TOKEN_PENDING',
+    ENDED: 'END',
     TIME_UPDATE: null,
+    SEEK: null,
   },
   END: {
     CHECK_POST_ROLL_RESOLVE: 'RESET',
@@ -65,17 +73,25 @@ const playback = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(createAction<ActionPayload>(FSM_EVENT), (state, action) => {
-      const { type, payload } = action.payload;
+    builder.addCase(createAction<EventPayload>(FSM_EVENT), (state, action) => {
+      const { type, payload, meta } = action.payload;
 
       const next = config[state.step]?.[type];
+      const step = next || state.step;
+
+      if (type === 'CHANGE_TRACK') return { ...initialState, step: 'READY' };
+      if (['GO_TO_NEXT_TRACK', 'GO_TO_PREV_TRACK'].includes(type)) return { ...state, step: 'PAUSED' };
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'playback', `${state.step} -> ${type} -> ${next}`);
 
-      const step = next || state.step;
-
       switch (type) {
+        case 'SEEK':
+          const duration = state.duration || 0;
+          state.currentTime = meta.to < 0 ? 0 : meta.to > duration ? duration : meta.to;
+          break;
+        case 'TIME_UPDATE':
+          return { ...state, step, ...payload };
         case 'START_PLAYBACK':
         case 'RESET_RESOLVE':
           return { ...state, step, ...payload, pausedAt: null };
@@ -88,11 +104,19 @@ const playback = createSlice({
   },
 });
 
-const addMiddleware = () =>
+const addMiddleware = () => {
   startListening({
     predicate: (action, currentState, prevState) => currentState.playback.step !== prevState.playback.step,
     effect: (action, api) => {
-      const { dispatch, getState, extra: services } = api;
+      const {
+        getState,
+        extra: { services, createDispatch },
+      } = api;
+
+      const dispatch = createDispatch({
+        getState,
+        dispatch: api.dispatch,
+      });
 
       const { step } = getState().playback;
 
@@ -104,19 +128,65 @@ const addMiddleware = () =>
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         PLAYBACK_INIT: () => {
-          opts.services.playerService.on('timeupdate', (payload) => {
+          services.playerService.on('play', () => {
             dispatch(
               sendEvent({
-                type: 'TIME_UPDATE',
+                type: 'SET_PLAYING',
+              })
+            );
+          });
+          services.playerService.on('pause', () => {
+            dispatch(
+              sendEvent({
+                type: 'SET_PAUSED',
+              })
+            );
+          });
+          services.playerService.on('loadedmetadata', (payload) => {
+            dispatch(
+              sendEvent({
+                type: 'META_LOADED',
                 payload,
               })
             );
           });
+          services.playerService.on('timeupdate', (payload) => {
+            const {
+              playback: { step },
+              root: {
+                meta: { trackId },
+                previewDuration,
+              },
+            } = getState();
 
-          opts.services.playerService.on('ended', () => {
+            const next = config[step]?.['TIME_UPDATE'];
+            if (next === undefined) return;
+
+            if (trackId) {
+              services.localStorageService.setItemByProject(
+                trackId,
+                STORAGE_SETTINGS.CURRENT_TIME,
+                payload.currentTime
+              );
+            }
+
+            const data = {
+              ...payload,
+              duration: previewDuration ?? payload.duration,
+            };
+
             dispatch(
               sendEvent({
-                type: 'VIDEO_END',
+                type: 'TIME_UPDATE',
+                payload: data,
+              })
+            );
+          });
+
+          services.playerService.on('ended', () => {
+            dispatch(
+              sendEvent({
+                type: 'ENDED',
               })
             );
           });
@@ -127,20 +197,8 @@ const addMiddleware = () =>
             })
           );
         },
-        CHECK_TOKEN_PENDING: () => {
-          dispatch(
-            sendEvent({
-              type: 'CHECK_TOKEN',
-            })
-          );
-        },
-        CHECK_MANIFEST_PENDING: () => {
-          dispatch(
-            sendEvent({
-              type: 'CHECK_MANIFEST',
-            })
-          );
-        },
+        CHECK_TOKEN_PENDING: () => checkToken(opts),
+        CHECK_MANIFEST_PENDING: () => checkManifest(opts),
         PLAY_PENDING: async () => {
           await opts.services.playerService.play();
           dispatch(
@@ -160,6 +218,23 @@ const addMiddleware = () =>
             })
           );
         },
+        END: () => {
+          const {
+            root: {
+              meta: { trackId },
+            },
+          } = getState();
+
+          if (trackId) {
+            services.localStorageService.setItemByProject(trackId, STORAGE_SETTINGS.CURRENT_TIME, 0);
+          }
+
+          dispatch(
+            sendEvent({
+              type: 'VIDEO_END',
+            })
+          );
+        },
       };
 
       const effect = handler[step];
@@ -169,6 +244,7 @@ const addMiddleware = () =>
       }
     },
   });
+};
 
 export default {
   ...playback,

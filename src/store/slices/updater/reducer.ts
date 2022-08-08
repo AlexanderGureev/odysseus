@@ -12,20 +12,7 @@ const initialState: FSMState = {
 };
 
 const config: FSMConfig<State, AppEvent> = {
-  IDLE: {
-    CHECK_TOKEN: 'CHECK_TOKEN_PENDING',
-    CHECK_MANIFEST: 'CHECK_MANIFEST_PENDING',
-  },
-  CHECK_TOKEN_PENDING: {
-    UPDATE_TOKEN: 'IDLE',
-    CHECK_TOKEN_RESOLVE: 'IDLE',
-    CHECK_TOKEN_REJECT: 'IDLE',
-  },
-  CHECK_MANIFEST_PENDING: {
-    UPDATE_MANIFEST: 'IDLE',
-    CHECK_MANIFEST_RESOLVE: 'IDLE',
-    CHECK_MANIFEST_REJECT: 'IDLE',
-  },
+  IDLE: {},
 };
 
 const updater = createSlice({
@@ -52,7 +39,15 @@ const addMiddleware = () =>
       return !['IDLE', prevState.updater.step].includes(currentState.updater.step);
     },
     effect: (action, api) => {
-      const { dispatch, getState, extra: services } = api;
+      const {
+        getState,
+        extra: { services, createDispatch },
+      } = api;
+
+      const dispatch = createDispatch({
+        getState,
+        dispatch: api.dispatch,
+      });
 
       const { step } = getState().updater;
 
@@ -62,10 +57,7 @@ const addMiddleware = () =>
         services,
       };
 
-      const handler: { [key in State]?: () => Promise<void> | void } = {
-        CHECK_TOKEN_PENDING: () => checkToken(opts),
-        CHECK_MANIFEST_PENDING: () => checkManifest(opts),
-      };
+      const handler: { [key in State]?: () => Promise<void> | void } = {};
 
       const effect = handler[step];
       if (effect) {

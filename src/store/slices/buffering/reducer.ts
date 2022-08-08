@@ -13,6 +13,8 @@ const initialState: FSMState = {
   startAt: null,
   bufferingTime: 0,
   initialBufferTime: null,
+  bufferedEnd: 0,
+  loadedPercent: 0,
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -25,6 +27,7 @@ const config: FSMConfig<State, AppEvent> = {
   READY: {
     BUFFERING_START: 'BUFFERING',
     AD_BREAK_STARTED: 'DISABLED',
+    BUFFER_UPDATE: null,
   },
   BUFFERING: {
     BUFFERING_END: 'READY',
@@ -74,7 +77,15 @@ const addMiddleware = () =>
   startListening({
     predicate: (action, currentState, prevState) => currentState.buffering.step !== prevState.buffering.step,
     effect: (action, api) => {
-      const { dispatch, getState, extra: services } = api;
+      const {
+        getState,
+        extra: { services, createDispatch },
+      } = api;
+
+      const dispatch = createDispatch({
+        getState,
+        dispatch: api.dispatch,
+      });
 
       const { step } = getState().buffering;
 
@@ -86,10 +97,16 @@ const addMiddleware = () =>
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         REBUFFERING_INIT: () => {
-          opts.services.playerService.on('waiting', () => {
-            // const { step } = getState().playback;
-            // if (step === 'AD_BREAK') return;
+          services.playerService.on('progress', (payload) => {
+            dispatch(
+              sendEvent({
+                type: 'BUFFER_UPDATE',
+                payload,
+              })
+            );
+          });
 
+          services.playerService.on('waiting', () => {
             dispatch(
               sendEvent({
                 type: 'BUFFERING_START',
@@ -97,10 +114,7 @@ const addMiddleware = () =>
             );
           });
 
-          opts.services.playerService.on('canplay', () => {
-            // const { step } = getState().playback;
-            // if (step === 'AD_BREAK') return;
-
+          services.playerService.on('canplay', () => {
             dispatch(
               sendEvent({
                 type: 'BUFFERING_END',

@@ -10,15 +10,7 @@ export type TokenUpdateResponse = {
 };
 
 export type EventsWithPayload =
-  | WithoutPayload<
-      | 'DO_INIT'
-      | 'CHECK_TOKEN'
-      | 'CHECK_MANIFEST'
-      | 'CHECK_TOKEN_RESOLVE'
-      | 'CHECK_MANIFEST_RESOLVE'
-      | 'CHECK_TOKEN_REJECT'
-      | 'CHECK_MANIFEST_REJECT'
-    >
+  | WithoutPayload<'CHECK_TOKEN_RESOLVE' | 'CHECK_MANIFEST_RESOLVE' | 'CHECK_TOKEN_REJECT' | 'CHECK_MANIFEST_REJECT'>
   | {
       type: 'UPDATE_MANIFEST';
       payload: {

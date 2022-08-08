@@ -93,7 +93,8 @@ export const parseCreativeXML = (xml: string): BlockMeta => {
     const id = Ad?.id || null;
     const obj = Ad?.InLine || Ad?.Wrapper;
     const ext = (obj?.Extensions?.Extension || []) as ExtensionItem[];
-    const type = Ad?.Wrapper?.VASTAdTagURI ? 'VPAID' : 'VAST';
+    const vpaidURL = Ad?.Wrapper?.VASTAdTagURI || null;
+    const type = vpaidURL ? 'VPAID' : 'VAST';
 
     const extensions = ext.reduce((acc: Extensions, item: ExtensionItem) => {
       return {
@@ -106,9 +107,10 @@ export const parseCreativeXML = (xml: string): BlockMeta => {
       id,
       extensions,
       type,
+      vpaidURL,
     };
   } catch (err) {
     logger.error('[getExtensions]', err?.message);
-    return { id: null, extensions: {}, type: null };
+    return { id: null, extensions: {}, type: null, vpaidURL: null };
   }
 };

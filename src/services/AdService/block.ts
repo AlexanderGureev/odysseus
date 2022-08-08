@@ -28,10 +28,12 @@ export const AdBlock = ({
   let adPlaybackController: Nullable<AdPlaybackController> = null;
   let isYaCreative = false;
   let isDisposed = false;
+  let isImpression = false;
   let meta: BlockMeta = {
     id: null,
     extensions: {},
     type: null,
+    vpaidURL: null,
   };
 
   const filterLinks = (links: TAdLinkItem[]) => {
@@ -127,9 +129,16 @@ export const AdBlock = ({
         mediator.emit('AdStarted');
       });
       adPlaybackController.subscribe('AdPodImpression', () => {
+        isImpression = true;
         mediator.emit('AdPodImpression');
       });
       adPlaybackController.subscribe('AdPodVideoFirstQuartile', () => {
+        if (adPlaybackController) {
+          console.log('[TEST] AdPodVideoFirstQuartile', {
+            allowVolume: adPlaybackController.getAdVolumeAvailabilityState(),
+          });
+        }
+
         mediator.emit('AdPodVideoQuartile', 1);
       });
       adPlaybackController.subscribe('AdPodVideoMidpoint', () => {
@@ -165,7 +174,9 @@ export const AdBlock = ({
         mediator.emit('AdSkippableStateChange', { skippable: data.skippableState });
       });
       adPlaybackController.subscribe('AdVolumeAvailabilityStateChange', () => {
-        mediator.emit('AdVolumeAvailabilityStateChange');
+        if (adPlaybackController) {
+          mediator.emit('AdVolumeAvailabilityStateChange', adPlaybackController.getAdVolumeAvailabilityState());
+        }
       });
       adPlaybackController.subscribe('AdVolumeChange', () => {
         if (!adPlaybackController?.getAdVolumeAvailabilityState()) return;
@@ -276,6 +287,12 @@ export const AdBlock = ({
     adPlaybackController?.skipAd();
   };
 
+  const getAdVolumeAvailability = () => Boolean(adPlaybackController?.getAdVolumeAvailabilityState());
+  const setVolume = (value: number) => {
+    adPlaybackController?.setAdVolume(value);
+  };
+  const getVolume = () => adPlaybackController?.getAdVolume();
+
   return {
     resumeAd,
     pauseAd,
@@ -293,5 +310,8 @@ export const AdBlock = ({
     isPromo,
     isExclusive: () => Boolean(meta.extensions?.exclusive),
     isDisposed: () => isDisposed,
+    getAdVolumeAvailability,
+    setVolume,
+    getVolume,
   };
 };

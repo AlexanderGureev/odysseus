@@ -28,6 +28,8 @@ interface Window {
     configure: (cfg: any, cb: () => void) => void;
     call: () => void;
   };
+
+  _player: import('video.js').VideoJsPlayer;
 }
 
 declare interface HTMLVideoElement {

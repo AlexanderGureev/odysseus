@@ -1,10 +1,12 @@
 import { Meta, TrackParams } from 'store/slices/root';
-import { ConfigErrors, TBaseConfig, TConfig, TConfigSource } from 'types';
+import { ConfigErrors, TBaseConfig, TConfigSource } from 'types';
 import { ERROR_CODES } from 'types/errors';
 import { isNil } from 'utils';
 import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
 import { request } from 'utils/request';
+
+import { NextTrackConfig } from './types';
 
 export const fetchBaseConfig = async (params: TrackParams, meta: Meta, source: TConfigSource) => {
   const { sign, pf, pt } = params;
@@ -49,7 +51,7 @@ export const fetchConfig = async (sirenURL: string, outerHost: string | null) =>
       throw new PlayerError(error.code, error.details);
     }
 
-    const data: Omit<TConfig, 'mediascopeCounter'> = await response.json();
+    const data: NextTrackConfig = await response.json();
     if (!data) throw new Error('config is undefined');
 
     if (data.playlist?.items[0]?.errors?.length) {

@@ -1,18 +1,18 @@
-import { PLAYER_ID } from 'components/Player/types';
+import { DEFAULT_PLAYER_ID } from 'components/Player/types';
 import { EffectOpts } from 'interfaces';
 import { sendEvent } from 'store/actions';
 import { ERROR_CODES } from 'types/errors';
 import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
 
-export const initPlayer = async (playerId: string, opts: EffectOpts) => {
+export const initPlayer = async (opts: EffectOpts) => {
   const {
     dispatch,
     services: { playerService },
   } = opts;
 
   try {
-    await playerService.init(playerId, {});
+    await playerService.init(DEFAULT_PLAYER_ID, {});
 
     dispatch(
       sendEvent({

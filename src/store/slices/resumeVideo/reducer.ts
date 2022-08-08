@@ -1,9 +1,11 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { startListening } from 'store/middleware';
+import { getSavedProgressTime, isOldSafari } from 'store/selectors';
 import type { AppEvent, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
+import { checkManifest, checkToken } from '../updater/effects';
 import { loadMeta } from './effects';
 import { ActionPayload, FSMState, State } from './types';
 
@@ -58,7 +60,15 @@ const addMiddleware = () =>
       return !['IDLE', prevState.resumeVideo.step].includes(currentState.resumeVideo.step);
     },
     effect: (action, api) => {
-      const { dispatch, getState, extra: services } = api;
+      const {
+        getState,
+        extra: { services, createDispatch },
+      } = api;
+
+      const dispatch = createDispatch({
+        getState,
+        dispatch: api.dispatch,
+      });
 
       const { step } = getState().resumeVideo;
 
@@ -72,12 +82,36 @@ const addMiddleware = () =>
         LOADING_META_PENDING: () => loadMeta(opts),
         LAUNCH_SETUP: () => {
           const {
+            resumeVideoNotify: { isResetStartTime },
             playback: { currentTime },
             playbackSpeed: { currentSpeed },
+            volume: { volume, muted },
+            root: {
+              previews,
+              params: { startAt },
+            },
           } = getState();
 
-          opts.services.playerService.setCurrentTime(currentTime || 0);
-          opts.services.playerService.setPlaybackRate(currentSpeed);
+          const savedTime = getSavedProgressTime(getState(), services.localStorageService);
+
+          console.log('[TEST] launch setup', {
+            time: isResetStartTime || previews ? 0 : startAt ?? savedTime ?? currentTime ?? 0,
+            savedTime,
+          });
+
+          services.playerService.setMute(muted);
+          services.playerService.setVolume(volume);
+          services.playerService.setPlaybackRate(currentSpeed);
+
+          const startPosition = isResetStartTime || previews ? 0 : startAt ?? savedTime ?? currentTime ?? 0;
+
+          if (isOldSafari(getState())) {
+            services.playerService.one('timeupdate', () => {
+              services.playerService.setCurrentTime(startPosition);
+            });
+          } else {
+            services.playerService.setCurrentTime(startPosition);
+          }
 
           dispatch(
             sendEvent({
@@ -85,20 +119,8 @@ const addMiddleware = () =>
             })
           );
         },
-        CHECK_TOKEN_PENDING: () => {
-          dispatch(
-            sendEvent({
-              type: 'CHECK_TOKEN',
-            })
-          );
-        },
-        CHECK_MANIFEST_PENDING: () => {
-          dispatch(
-            sendEvent({
-              type: 'CHECK_MANIFEST',
-            })
-          );
-        },
+        CHECK_TOKEN_PENDING: () => checkToken(opts),
+        CHECK_MANIFEST_PENDING: () => checkManifest(opts),
       };
 
       const effect = handler[step];

@@ -45,11 +45,12 @@ const watchpoint = createSlice({
       const { type, payload } = action.payload;
 
       const next = config[state.step]?.[type];
+      const step = next || state.step;
+
+      if (type === 'CHANGE_TRACK') return initialState;
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'watchpoint', `${state.step} -> ${type} -> ${next}`);
-
-      const step = next || state.step;
 
       switch (type) {
         case 'TIME_UPDATE':
@@ -72,7 +73,15 @@ const addMiddleware = () =>
   startListening({
     predicate: (action, currentState, prevState) => currentState.watchpoint.step !== prevState.watchpoint.step,
     effect: (action, api) => {
-      const { dispatch, getState, extra: services } = api;
+      const {
+        getState,
+        extra: { services, createDispatch },
+      } = api;
+
+      const dispatch = createDispatch({
+        getState,
+        dispatch: api.dispatch,
+      });
 
       const { step, progress, previousTime } = getState().watchpoint;
 

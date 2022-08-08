@@ -4,15 +4,10 @@ import { startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
-import { accumulation } from './effects/accumulation';
-import { ActionPayload, FSMState, State } from './types';
+import { FSMState, State } from './types';
 
 const initialState: FSMState = {
   step: 'IDLE',
-
-  type: 'inc',
-  inc: 0,
-  dec: 0,
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -23,12 +18,6 @@ const config: FSMConfig<State, AppEvent> = {
     REWIND_INIT_RESOLVE: 'READY',
   },
   READY: {
-    SEEK: 'SEEK_START',
-    INC_SEEK: 'ACCUMULATION',
-    DEC_SEEK: 'ACCUMULATION',
-  },
-  ACCUMULATION: {
-    ACCUMULATION_RESOLVE: 'READY',
     SEEK: 'SEEK_START',
   },
   SEEK_START: {
@@ -56,12 +45,6 @@ const rewind = createSlice({
       const step = next || state.step;
 
       switch (type) {
-        case 'SEEK':
-          return { ...state, step, inc: 0, dec: 0 };
-        case 'INC_SEEK':
-          return { ...state, step, inc: state.inc + payload.value, dec: 0, type: 'inc' };
-        case 'DEC_SEEK':
-          return { ...state, step, dec: state.dec + payload.value, inc: 0, type: 'dec' };
         default:
           return { ...state, step, ...payload };
       }
@@ -73,7 +56,15 @@ const addMiddleware = () =>
   startListening({
     predicate: (action, currentState, prevState) => currentState.rewind.step !== prevState.rewind.step,
     effect: (action, api) => {
-      const { dispatch, getState, extra: services } = api;
+      const {
+        getState,
+        extra: { services, createDispatch },
+      } = api;
+
+      const dispatch = createDispatch({
+        getState,
+        dispatch: api.dispatch,
+      });
 
       const { step } = getState().rewind;
 
@@ -99,7 +90,6 @@ const addMiddleware = () =>
             })
           );
         },
-        ACCUMULATION: () => accumulation(opts),
         SEEK_START: () => {
           const {
             payload: { meta },

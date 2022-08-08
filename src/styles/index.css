@@ -32,8 +32,21 @@ body {
   z-index: 15;
 }
 
-.ad-notify {
+.ad-notify,
+.auto-switch {
   position: absolute;
   right: 25px;
   top: 25px;
+  z-index: 15;
+}
+
+.overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

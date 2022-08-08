@@ -40,7 +40,8 @@ export type OUTPUT_PLAYER_POST_MESSAGE =
   | 'player_refresh'
   | 'playerStarted'
   | 'notify'
-  | 'token_expired';
+  | 'token_expired'
+  | 'BI';
 
 // export enum NOTIFY_TYPES {
 //   PAYWALL_ON_START = 1,
@@ -133,6 +134,7 @@ export type TOutputMessage = {
     projectId?: number;
     adv?: boolean;
     value?: number | string | null;
+    answer?: string;
   };
 };
 

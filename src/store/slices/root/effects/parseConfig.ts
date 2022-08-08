@@ -1,5 +1,6 @@
 import { EffectOpts } from 'interfaces';
 import { TParams } from 'server/utils';
+import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { sendEvent } from 'store/actions';
 import { TConfig, THydraResponse, TParsedFeatures, TRawPlaylist } from 'types';
 import {
@@ -27,12 +28,12 @@ export const EMBEDED_SUBSCRIPTION_TITLE = 'Смотреть без реклам�
 type TAdKeys = 'midrolls' | 'contentrolls' | 'prerolls';
 
 const ParseMap = {
-  midrolls: ({ points }: TMiddleRollsConfig) =>
+  midrolls: ({ points = [] }: TMiddleRollsConfig) =>
     points.map(({ point }) => ({
       point,
       category: AdCategory.MID_ROLL,
     })),
-  contentrolls: ({ points }: TContentRollsConfig) =>
+  contentrolls: ({ points = [] }: TContentRollsConfig) =>
     points.map(({ point, placeholders }) => ({
       point,
       placeholders,
@@ -97,10 +98,14 @@ export const parseConfig = async (
   params: TrackParams | undefined,
   opts: EffectOpts
 ) => {
-  const { getState, dispatch } = opts;
+  const {
+    getState,
+    dispatch,
+    services: { localStorageService },
+  } = opts;
 
   try {
-    if (!rawConfig?.config) throw new Error('rawConfig is undefined');
+    if (!rawConfig) throw new Error('rawConfig is undefined');
 
     const { meta, session } = getState().root;
 
@@ -138,6 +143,9 @@ export const parseConfig = async (
         id: uuidv4(),
       },
     };
+
+    localStorageService.setItemByDomain(STORAGE_SETTINGS.USER_ID, config.config?.user_id || null);
+    localStorageService.setItemByDomain(STORAGE_SETTINGS.USER_TOKEN, config.context?.user_token || null);
 
     dispatch(
       sendEvent({

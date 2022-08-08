@@ -7,12 +7,10 @@ import { TConfig, TExtendedConfig } from 'types';
 import { logger } from 'utils/logger';
 
 import {
-  checkAdult,
   checkCapabilities,
   checkConfigError,
   checkPermissions,
   checkPreview,
-  checkResumeVideo,
   fetchManifest,
   initAnalytics,
   initialize,
@@ -22,7 +20,7 @@ import {
   selectSource,
   startPlayback,
 } from './effects';
-import { ActionPayload, FSMState, State, TrackParams } from './types';
+import { FSMState, State, TrackParams } from './types';
 
 /*
   Текущие проблемы:
@@ -96,24 +94,16 @@ const config: FSMConfig<State, AppEvent> = {
   },
   // проверка на 18+ контент
   CHECK_ADULT_CONTENT: {
-    SHOW_ADULT_NOTIFY: 'ADULT_NOTIFY',
+    ADULT_NOTIFY_RESOLVE: 'CHECK_RESUME_VIDEO',
     SKIP_ADULT_NOTIFY: 'CHECK_RESUME_VIDEO',
   },
   // проверка на необходимость показа экрана "продолжить просмотр"
   CHECK_RESUME_VIDEO: {
-    SHOW_RESUME_VIDEO_NOTIFY: 'RESUME_VIDEO_NOTIFY',
-    SKIP_RESUME_VIDEO_NOTIFY: 'CHECK_PERMISSIONS_PENDING',
-  },
-  // экран 18+
-  ADULT_NOTIFY: {
-    ADULT_NOTIFY_RESOLVE: 'CHECK_RESUME_VIDEO',
-    ADULT_NOTIFY_REJECT: null,
-  },
-  // экран "продолжить просмотр"
-  RESUME_VIDEO_NOTIFY: {
     RESUME_VIDEO_NOTIFY_RESOLVE: 'CHECK_PERMISSIONS_PENDING',
     RESUME_VIDEO_NOTIFY_REJECT: 'CHECK_PERMISSIONS_PENDING',
+    SKIP_RESUME_VIDEO_NOTIFY: 'CHECK_PERMISSIONS_PENDING',
   },
+
   // платный трек недоступен для просмотра
   PAYWALL: {},
   // // первый render приложения
@@ -137,7 +127,7 @@ const config: FSMConfig<State, AppEvent> = {
     SELECT_SOURCE_ERROR: 'ERROR',
   },
   INITIAL_FETCHING_MANIFEST: {
-    FETCHING_MANIFEST_RESOLVE: 'CHECK_AUTOPLAY',
+    FETCHING_MANIFEST_RESOLVE: 'SETUP_INITIAL_VOLUME',
     FETCHING_MANIFEST_REJECT: 'ERROR',
   },
   // выбор другого доступного потока в случае ошибок
@@ -149,7 +139,9 @@ const config: FSMConfig<State, AppEvent> = {
     FETCHING_MANIFEST_RESOLVE: 'RESUME_VIDEO_PENDING',
     FETCHING_MANIFEST_REJECT: 'ERROR',
   },
-
+  SETUP_INITIAL_VOLUME: {
+    SETUP_INITIAL_VOLUME_RESOLVE: 'CHECK_AUTOPLAY',
+  },
   CHECK_AUTOPLAY: {
     CHECK_AUTOPLAY_RESOLVE: 'AD_INIT_PENDING',
     SHOW_BIG_PLAY_BUTTON: 'BIG_PLAY_BUTTON',
@@ -174,7 +166,10 @@ const config: FSMConfig<State, AppEvent> = {
 
   // 3 PHASE вопроизведение
   READY: {
+    UPDATE_MANIFEST: null,
+    UPDATE_TOKEN: null,
     RESUME_VIDEO: 'RESUME_VIDEO_PENDING',
+    CHANGE_TRACK: 'PARSE_CONFIG_PENDING',
   },
 
   ERROR: {},
@@ -207,6 +202,7 @@ const initialState: FSMState = {
   manifestData: null,
 
   previews: null,
+  previewDuration: null,
   capabilities: [],
   permissions: {
     autoplay: true,
@@ -218,6 +214,7 @@ const initialState: FSMState = {
 
   deviceInfo: {
     isMobile: false,
+    isSafari: undefined,
     browser: undefined,
     browserDescription: undefined,
     deviceModel: undefined,
@@ -228,6 +225,7 @@ const initialState: FSMState = {
     name: undefined,
     engineName: undefined,
     engineVersion: undefined,
+    browserVersion: undefined,
   },
 };
 
@@ -247,6 +245,19 @@ const root = createSlice({
       const step = next || state.step;
 
       switch (type) {
+        case 'PARSE_CONFIG_RESOLVE':
+          return {
+            ...initialState,
+            isFirstRun: state.isFirstRun,
+            isShowPlayerUI: state.isShowPlayerUI,
+            capabilities: state.capabilities,
+            deviceInfo: state.deviceInfo,
+            step,
+            ...payload,
+          };
+        case 'SETUP_INITIAL_VOLUME_RESOLVE':
+          state.step = step;
+          break;
         case 'UPDATE_MANIFEST': {
           const { streams } = payload;
           const stream = streams.find((stream) => stream.protocol === state.currentStream?.protocol);
@@ -272,7 +283,15 @@ const addMiddleware = () =>
   startListening({
     predicate: (action, currentState, prevState) => currentState.root.step !== prevState.root.step,
     effect: (action, api) => {
-      const { dispatch, getState, extra: services } = api;
+      const {
+        getState,
+        extra: { services, createDispatch },
+      } = api;
+
+      const dispatch = createDispatch({
+        getState,
+        dispatch: api.dispatch,
+      });
 
       const { step } = getState().root;
 
@@ -309,34 +328,46 @@ const addMiddleware = () =>
         CHECK_ERROR_PENDING: () => checkConfigError(opts),
         CHECK_PREVIEW_PENDING: () => checkPreview(opts),
         INIT_SERVICES_PENDING: () => initServices(opts),
-        CHECK_ADULT_CONTENT: () => checkAdult(opts),
-        CHECK_RESUME_VIDEO: () => checkResumeVideo(opts),
-        RENDER: () => {
+        CHECK_ADULT_CONTENT: () => {
           dispatch(
             sendEvent({
-              type: 'SET_STATE',
-              payload: {
-                isShowPlayerUI: true,
-              },
+              type: 'CHECK_ADULT',
             })
           );
         },
-        PLAYER_INIT_PENDING: () => {
-          const {
-            payload: { meta },
-          } = action as PayloadAction<{
-            meta: { playerId: string };
-          }>;
-
-          initPlayer(meta.playerId, opts);
+        CHECK_RESUME_VIDEO: () => {
+          dispatch(
+            sendEvent({
+              type: 'CHECK_RESUME',
+            })
+          );
         },
+        RENDER: () => {
+          const { isShowPlayerUI } = getState().root;
+
+          if (isShowPlayerUI) {
+            dispatch(
+              sendEvent({
+                type: 'DO_PLAYER_INIT',
+              })
+            );
+          } else {
+            dispatch(
+              sendEvent({
+                type: 'SET_STATE',
+                payload: {
+                  isShowPlayerUI: true,
+                },
+              })
+            );
+          }
+        },
+        PLAYER_INIT_PENDING: () => initPlayer(opts),
         INITIAL_SELECT_SOURCE_PENDING: () => selectSource(opts),
         INITIAL_FETCHING_MANIFEST: () => fetchManifest(opts),
         SELECT_SOURCE_PENDING: () => selectSource(opts),
         FETCHING_MANIFEST: () => fetchManifest(opts),
-
         CHECK_PERMISSIONS_PENDING: () => checkPermissions(opts),
-
         AD_INIT_PENDING: () => {
           dispatch(
             sendEvent({
@@ -348,6 +379,13 @@ const addMiddleware = () =>
           dispatch(
             sendEvent({
               type: 'INIT_RESUME_VIDEO',
+            })
+          );
+        },
+        SETUP_INITIAL_VOLUME: () => {
+          dispatch(
+            sendEvent({
+              type: 'SET_INITIAL_VOLUME',
             })
           );
         },

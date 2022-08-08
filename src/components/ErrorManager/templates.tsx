@@ -1,5 +1,5 @@
 import React from 'react';
-import { isAndroid,isIOS } from 'react-device-detect';
+import { isAndroid, isIOS } from 'react-device-detect';
 import { Nullable, SkinClass } from 'types';
 import { ERROR_CODES, ERROR_TYPE } from 'types/errors';
 

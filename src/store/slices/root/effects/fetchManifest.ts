@@ -4,19 +4,14 @@ import { ERROR_CODES } from 'types/errors';
 import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
 
-export const fetchManifest = async (opts: EffectOpts) => {
-  const {
-    getState,
-    dispatch,
-    services: { manifestService },
-  } = opts;
-
+export const fetchManifest = async ({ getState, dispatch, services: { manifestService } }: EffectOpts) => {
   try {
     const {
       currentStream,
       features,
       deviceInfo: { isMobile },
     } = getState().root;
+
     if (!currentStream?.url) throw new PlayerError(ERROR_CODES.UNKNOWN, 'currentStream is undefined');
 
     const url = features.LIMIT_QUALITY && isMobile ? currentStream.url.replace(/hd40,/i, '') : currentStream.url;
@@ -37,7 +32,7 @@ export const fetchManifest = async (opts: EffectOpts) => {
       sendEvent({
         type: 'FETCHING_MANIFEST_REJECT',
         meta: {
-          error: err,
+          error: err.serialize(),
         },
       })
     );

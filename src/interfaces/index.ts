@@ -22,7 +22,8 @@ import { QUALITY_MARKS } from 'services/VigoService';
 import { TVigoParams, VigoEvent } from 'services/VigoService/types';
 import { YMQueryParams } from 'services/YmService/types';
 import { TOptions, TYouboraEvent } from 'services/YouboraService';
-import { AppDispatch, AppState } from 'store';
+import type { AppState } from 'store';
+import { SessionDispatch } from 'store/dispatch';
 import { DeviceInfo } from 'store/slices/root/types';
 import { Nullable, StreamProtocol, THeartBeatTnsCounterConfig, TnsCounter, TStreamItem } from 'types';
 import { TAdConfig, TAdPointConfig, TAdPointsConfig } from 'types/ad';
@@ -115,20 +116,24 @@ export interface IPlayerService {
   on: Subscribe<Events>;
   one: OnceSubscribe<Events>;
   off: Unsubscribe<Events>;
-  getPlayer: () => VideoJsPlayer | null;
+  getPlayer: () => VideoJsPlayer;
   getRepresentations: () => any;
   getTech: () => any;
   addHook: <T extends HookType, C extends Hooks[T]>(type: T, hook: C) => void;
   setPlaybackRate: (value: number) => void;
   getPlaybackRate: () => number;
+  setMute: (status: boolean) => void;
+  setVolume: (value: number) => void;
+  enterFullcreen: () => Promise<void>;
+  exitFullcreen: () => Promise<void>;
 }
 
 export interface ILocalStorageService {
   init: (host: string | null) => void;
   getItemByDomain: <T>(key: string) => Nullable<T>;
   setItemByDomain: <T>(key: string, value: T) => void;
-  getItemByProject: <T>(projectId: number, key: string) => T | null;
-  setItemByProject: <T>(projectId: number, key: string, value: T) => void;
+  getItemByProject: <T>(trackId: number, key: string) => T | null;
+  setItemByProject: <T>(trackId: number, key: string, value: T) => void;
   getItem: <T>(key: string) => Nullable<T>;
   setItem: <T>(key: string, value: T) => void;
 }
@@ -164,7 +169,6 @@ export interface ITNSCounter {
 export interface IManifestService {
   parse: (protocol: StreamProtocol, text: string) => TParsedManifest;
   fetchManifest: (source: TStreamItem) => Promise<TManifestData>;
-  getManifest: () => Nullable<TManifestData>;
 }
 
 export interface IQualityService {
@@ -217,7 +221,7 @@ export interface IServices {
 }
 
 export type EffectOpts = {
-  dispatch: AppDispatch;
+  dispatch: SessionDispatch;
   getState: () => AppState;
   services: IServices;
 };

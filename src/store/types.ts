@@ -3,19 +3,25 @@ import { RawPlayerError } from 'types/errors';
 import * as adBlock from './slices/adBlock';
 import * as adController from './slices/adController';
 import * as adTimeNotify from './slices/adTimeNotify';
+import * as adultNotify from './slices/adultNotify';
 import * as autoSwitch from './slices/autoSwitch';
 import * as buffering from './slices/buffering';
 import * as changeTrack from './slices/changeTrack';
 import * as error from './slices/error';
+import * as fullscreen from './slices/fullscreen';
+import * as hotkeys from './slices/hotkeys';
 import * as network from './slices/network';
 import * as playback from './slices/playback';
 import * as playbackSpeed from './slices/playbackSpeed';
 import * as quality from './slices/quality';
 import * as resumeVideo from './slices/resumeVideo';
+import * as resumeVideoNotify from './slices/resumeVideoNotify';
 import * as rewind from './slices/rewind';
+import * as rewindAcc from './slices/rewindAcc';
 import * as root from './slices/root';
 import * as switcher from './slices/switcher';
 import * as updater from './slices/updater';
+import * as visibility from './slices/visibility';
 import * as volume from './slices/volume';
 import * as watchpoint from './slices/watchpoint';
 
@@ -58,7 +64,13 @@ export type EventPayload =
   | changeTrack.ActionPayload
   | autoSwitch.ActionPayload
   | playbackSpeed.ActionPayload
-  | volume.ActionPayload;
+  | volume.ActionPayload
+  | visibility.ActionPayload
+  | fullscreen.ActionPayload
+  | adultNotify.ActionPayload
+  | resumeVideoNotify.ActionPayload
+  | hotkeys.ActionPayload
+  | rewindAcc.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -78,4 +90,10 @@ export type AppEvent =
   | changeTrack.Event
   | autoSwitch.Event
   | playbackSpeed.Event
-  | volume.Event;
+  | volume.Event
+  | visibility.Event
+  | fullscreen.Event
+  | adultNotify.Event
+  | resumeVideoNotify.Event
+  | hotkeys.Event
+  | rewindAcc.Event;

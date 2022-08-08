@@ -25,8 +25,8 @@ const EmbeddedCheckService = () => {
         if (location) {
           state.location = location;
           state.hostname = new URL(location).hostname;
-          resolve({ ...state });
         }
+        resolve({ ...state });
       };
 
       PostMessageService.one('setPageLocation', callback);

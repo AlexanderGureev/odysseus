@@ -12,9 +12,9 @@ const initialState: FSMState = {
 
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
-    CHANGE_TRACK: 'FETCH_CONFIG_PENDING',
+    // CHANGE_TRACK: 'FETCH_CONFIG_PENDING',
   },
-  FETCH_CONFIG_PENDING: {},
+  // FETCH_CONFIG_PENDING: {},
 };
 
 const switcher = createSlice({
@@ -39,7 +39,15 @@ const addMiddleware = () =>
   startListening({
     predicate: (action, currentState, prevState) => currentState.switcher.step !== prevState.switcher.step,
     effect: (action, api) => {
-      const { dispatch, getState, extra: services } = api;
+      const {
+        getState,
+        extra: { services, createDispatch },
+      } = api;
+
+      const dispatch = createDispatch({
+        getState,
+        dispatch: api.dispatch,
+      });
 
       const { step } = getState().switcher;
 

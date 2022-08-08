@@ -27,10 +27,17 @@ export type EventsWithPayload =
       | 'START_PLAYBACK'
       | 'RESET_RESOLVE'
       | 'PLAYBACK_INIT_RESOLVE'
+      | 'SET_PAUSED'
+      | 'SET_PLAYING'
+      | 'ENDED'
     >
   | {
       type: 'TIME_UPDATE';
       payload: { currentTime: number; duration: number; remainingTime: number };
+    }
+  | {
+      type: 'META_LOADED';
+      payload: { duration: number };
     }
   | {
       type: 'DO_PAUSE_RESOLVE';

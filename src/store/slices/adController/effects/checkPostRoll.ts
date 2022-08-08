@@ -5,12 +5,13 @@ import { AdCategory } from 'types/ad';
 
 export const checkPostRoll = ({ getState, dispatch, services: { adService } }: EffectOpts) => {
   const {
+    autoSwitch: { step },
     root: { adConfig },
   } = getState();
 
   const data = adConfig?.post_roll;
 
-  if (adService.canPlayAd() && data) {
+  if (step !== 'AUTOSWITCH_PENDING' && adService.canPlayAd() && data) {
     dispatch(
       sendEvent({
         type: 'INIT_AD_BREAK',

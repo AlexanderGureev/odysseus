@@ -15,7 +15,7 @@ const createSdkLoader = () => {
 
       script.onload = () => {
         if (!window.ya) {
-          reject('Yandex Video Ads SDK - scripts failed to load');
+          reject(new Error('Yandex Video Ads SDK - scripts failed to load'));
           return;
         }
 
@@ -23,7 +23,7 @@ const createSdkLoader = () => {
         resolve(sdk);
       };
 
-      script.onerror = () => reject('Yandex Video Ads SDK - scripts failed to load');
+      script.onerror = () => reject(new Error('Yandex Video Ads SDK - scripts failed to load'));
       document.head.appendChild(script);
     });
 };

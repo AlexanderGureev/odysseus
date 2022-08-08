@@ -29,25 +29,25 @@ type TMap = {
   prerolls: (p: TPreRollsConfig) => TAdPointsConfig;
 };
 
-const ParseMap: TMap = {
-  midrolls: ({ points }: TMiddleRollsConfig) =>
-    points.map(({ point }) => ({
-      point,
-      category: AdCategory.MID_ROLL,
-    })),
-  contentrolls: ({ points }: TContentRollsConfig) =>
-    points.map(({ point, placeholders }) => ({
-      point,
-      placeholders,
-      category: AdCategory.CONTENT_ROLL,
-    })),
-  prerolls: ({ points }: TPreRollsConfig) => [
-    {
-      point: points.point,
-      category: AdCategory.PRE_ROLL,
-    },
-  ],
-};
+// const ParseMap: TMap = {
+//   midrolls: ({ points }: TMiddleRollsConfig) =>
+//     points.map(({ point }) => ({
+//       point,
+//       category: AdCategory.MID_ROLL,
+//     })),
+//   contentrolls: ({ points }: TContentRollsConfig) =>
+//     points.map(({ point, placeholders }) => ({
+//       point,
+//       placeholders,
+//       category: AdCategory.CONTENT_ROLL,
+//     })),
+//   prerolls: ({ points }: TPreRollsConfig) => [
+//     {
+//       point: points.point,
+//       category: AdCategory.PRE_ROLL,
+//     },
+//   ],
+// };
 
 const createAdConfig = (ad: TRawAdConfig, playlist: TRawPlaylist) => {
   const adConfig = Object.keys(ad).reduce((acc: TAdConfigByCategory, category) => {
@@ -71,8 +71,10 @@ const createAdConfig = (ad: TRawAdConfig, playlist: TRawPlaylist) => {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const config = ParseMap[category](adConfig);
-    return config ? [...acc, ...config] : acc;
+    // const config = ParseMap[category](adConfig);
+    // return config ? [...acc, ...config] : acc;
+
+    return acc;
   }, []);
 
   return { adConfig, adPoints };

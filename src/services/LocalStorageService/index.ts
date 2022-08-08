@@ -74,13 +74,13 @@ const LocalStorageService = (): TLocalStorageService => {
     }
   };
 
-  const setItemByProject = <T>(projectId: number, key: string, value: T) => {
+  const setItemByProject = <T>(trackId: number, key: string, value: T) => {
     try {
       const payload = getDomainData();
-      const projectData = payload[projectId] || {};
+      const projectData = payload[trackId] || {};
       const newProjectData = {
         ...payload,
-        [projectId]: {
+        [trackId]: {
           ...projectData,
           [key]: value,
         },
@@ -92,10 +92,10 @@ const LocalStorageService = (): TLocalStorageService => {
     }
   };
 
-  const getItemByProject = <T>(projectId: number, key: string): T | null => {
+  const getItemByProject = <T>(trackId: number, key: string): T | null => {
     try {
       const payload = getDomainData<ProjectData<T>>();
-      const value = payload[projectId]?.[key];
+      const value = payload[trackId]?.[key];
       return value ?? null;
     } catch (e) {
       logger.error('[getItemByProject]', e);

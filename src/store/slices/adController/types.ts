@@ -47,7 +47,7 @@ export type EventsWithPayload =
     }
   | {
       type: 'PRELOAD_AD_BLOCK_RESOLVE';
-      meta: TAdPointConfig;
+      payload: { preloadedPoint: TAdPointConfig };
     }
   | {
       type: 'PRELOAD_AD_BLOCK_STARTED';

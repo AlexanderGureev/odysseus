@@ -1,6 +1,6 @@
 import { EffectOpts } from 'interfaces';
 import platform from 'platform';
-import { engineName, engineVersion, isMobile, osName, osVersion } from 'react-device-detect';
+import { browserVersion, engineName, engineVersion, isMobile, isSafari, osName, osVersion } from 'react-device-detect';
 import { APP_DB_NAME, CollectionName, Indexes } from 'services/IDBService/types';
 import { sendEvent } from 'store/actions';
 import { ERROR_CODES } from 'types/errors';
@@ -27,10 +27,12 @@ export const getDeviceInfo = (): DeviceInfo => {
     osVersion,
     deviceType: isMobile ? types[`${platform.os?.family}`] || DeviceType.MOBILE_UNKNOWN : DeviceType.WEB_DESKTOP,
     isMobile,
+    isSafari,
     brand: platform.manufacturer,
     name: platform.name,
     engineName,
     engineVersion,
+    browserVersion,
   };
 };
 
@@ -104,6 +106,7 @@ export const initialize = async (opts: EffectOpts) => {
       },
       deviceInfo: getDeviceInfo(),
     };
+    console.log('[TEST]', payload.deviceInfo);
 
     dispatch(
       sendEvent({

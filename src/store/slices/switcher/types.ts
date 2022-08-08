@@ -2,7 +2,7 @@ import { DefaultPayload, WithoutPayload } from 'store/types';
 
 export type State = 'IDLE' | 'FETCH_CONFIG_PENDING';
 
-export type EventsWithPayload = WithoutPayload<'CHANGE_TRACK'>;
+export type EventsWithPayload = WithoutPayload<'_TEST_2'>;
 
 export type Event = EventsWithPayload['type'];
 

@@ -8,7 +8,7 @@ export const getNext = ({ getState, dispatch, services: { adService } }: EffectO
   let currentLinks = links;
   const idx = index + 1;
 
-  if (idx < limit && !isPromo) {
+  if (idx < 1 && !isPromo) {
     const preloadedBlock = adService.getBlock(point, idx);
     if (preloadedBlock) currentLinks = preloadedBlock.getLinks();
     else {
@@ -28,6 +28,7 @@ export const getNext = ({ getState, dispatch, services: { adService } }: EffectO
           index: idx,
           links: currentLinks,
           skippable: false,
+          isVolumeAvailable: false,
         },
       })
     );

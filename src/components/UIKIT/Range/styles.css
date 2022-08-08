@@ -1,0 +1,122 @@
+.range-input {
+  position: relative;
+  cursor: pointer;
+  outline: none;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  touch-action: none;
+}
+
+.range-input-track {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.range-input-hover {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  display: none;
+}
+
+@media (hover: hover) {
+  .range-input-hover {
+    display: block;
+  }
+}
+
+.range-input-hover.active {
+  opacity: 1;
+}
+
+.range-input-label,
+.range-input-thumb-label {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px 12px;
+  font-size: 14px;
+  transform: translate(-50%, -50%);
+  bottom: 50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.range-input-label {
+  display: none;
+}
+
+@media (hover: hover) {
+  .range-input-label {
+    display: block;
+  }
+}
+
+.range-input.vertical .range-input-label,
+.range-input.vertical .range-input-thumb-label {
+  transform: translate(50%, 50%);
+}
+
+.range-input-label.active,
+.range-input-thumb-label.active {
+  opacity: 1;
+}
+
+.range-input-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 1);
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  transition: transform 0.2s ease;
+}
+
+.range-input:focus-visible .range-input-thumb {
+  outline: 2px solid white;
+}
+
+.range-input-thumb:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+.range-input-buffer,
+.range-input-progress {
+  background: red;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.range-input.vertical .range-input-buffer,
+.range-input.vertical .range-input-progress {
+  top: initial;
+  bottom: 0;
+}
+
+.range-input.vertical .range-input-thumb {
+  top: initial;
+  left: 50%;
+  transform: translate(-50%, 50%);
+}
+
+.range-input.vertical .range-input-thumb:hover {
+  transform: translate(-50%, 50%) scale(1.2);
+}

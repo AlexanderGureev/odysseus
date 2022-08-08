@@ -48,7 +48,7 @@ export type Events = {
   AdPlay: () => void;
   AdPause: () => void;
   AdStopped: () => void;
-  AdVolumeAvailabilityStateChange: () => void;
+  AdVolumeAvailabilityStateChange: (value: boolean) => void;
   AdVolumeChange: (payload: { volume: number }) => void;
   AllAdPodVideoComplete: () => void;
 };
@@ -65,6 +65,9 @@ export type TAdBlock = {
   isExclusive: () => boolean;
   isPromo: boolean;
   isDisposed: () => boolean;
+  getAdVolumeAvailability: () => boolean;
+  setVolume: (value: number) => void;
+  getVolume: () => number | undefined;
 };
 
 export type InitOpts = {
@@ -118,4 +121,9 @@ export type ExtensionItem = {
   '#text': string;
 };
 
-export type BlockMeta = { id: string | null; extensions: Extensions; type: 'VAST' | 'VPAID' | null };
+export type BlockMeta = {
+  id: string | null;
+  extensions: Extensions;
+  type: 'VAST' | 'VPAID' | null;
+  vpaidURL: string | null;
+};

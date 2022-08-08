@@ -30,10 +30,11 @@ export type TParams = {
   p2p?: string;
 };
 
+export const createParams = (params: Record<string, any>) =>
+  Object.keys(params).reduce((acc, key) => (params[key] ? { ...acc, [key]: params[key] } : acc), {});
+
 export const buildRequstByConfigSource = (configSource: TConfigSource, params: TParams): TRequestConfig => {
   const baseUrl = URL_MAP_BY_SOURCE[configSource];
-  const createParams = (params: Record<string, string | undefined>) =>
-    Object.keys(params).reduce((acc, key) => (params[key] ? { ...acc, [key]: params[key] } : acc), {});
 
   return {
     [TConfigSource.HUB]: () => {

@@ -40,7 +40,7 @@ export type TContentUrlConfig = {
   type: string;
 };
 export type TContentRollsConfig = {
-  points: TContentRollPoint[];
+  points?: TContentRollPoint[];
   url: TContentUrlConfig[];
 };
 export type TPreRollsConfig = {
@@ -52,7 +52,7 @@ export type TMiddleRollsConfig = {
   freq_points: number;
   freq_time: number;
   max_midrolls: number;
-  points: TRawPoint[];
+  points?: TRawPoint[];
   skip_adv: number;
   start_time: number;
   url: TAdItem[];

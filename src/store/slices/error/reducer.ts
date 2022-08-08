@@ -24,6 +24,7 @@ const config: FSMConfig<State, AppEvent> = {
     SELECT_SOURCE_ERROR: 'ERROR',
     CHECK_MANIFEST_REJECT: 'ERROR',
     FETCHING_MANIFEST_REJECT: 'ERROR',
+    FETCH_TRACK_CONFIG_REJECT: 'ERROR',
   },
   ERROR: {
     SET_ERROR: null,
@@ -53,7 +54,15 @@ const addMiddleware = () =>
   startListening({
     predicate: (action, currentState, prevState) => currentState.error.step !== prevState.error.step,
     effect: (action, api) => {
-      const { dispatch, getState, extra: services } = api;
+      const {
+        getState,
+        extra: { services, createDispatch },
+      } = api;
+
+      const dispatch = createDispatch({
+        getState,
+        dispatch: api.dispatch,
+      });
 
       const { step } = getState().error;
 

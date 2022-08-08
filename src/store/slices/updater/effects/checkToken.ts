@@ -1,5 +1,6 @@
 import { fetchConfig } from 'api';
 import { EffectOpts } from 'interfaces';
+import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { sendEvent } from 'store';
 import { ERROR_CODES } from 'types/errors';
 import { PlayerError } from 'utils/errors';
@@ -28,6 +29,7 @@ const TOKEN_REQUEST_TIMEOUT = 5000;
 const updateToken = async ({
   postMessageService,
   embeddedCheckService,
+  localStorageService,
 }: EffectOpts['services']): Promise<TokenUpdateResponse> => {
   const { url, token } = await new Promise<{ url: string; token: string }>((resolve, reject) => {
     postMessageService.one('updateConfig', ({ data: { config_url, action } }) => {
@@ -54,6 +56,8 @@ const updateToken = async ({
     next: null,
     previous: null,
   };
+
+  localStorageService.setItemByDomain(STORAGE_SETTINGS.USER_TOKEN, token);
 
   return {
     linked_tracks,
@@ -83,7 +87,10 @@ export const checkToken = async ({ getState, dispatch, services }: EffectOpts) =
       sendEvent({
         type: 'UPDATE_TOKEN',
         payload,
-      })
+      }),
+      {
+        currentSession: true,
+      }
     );
   } catch (err) {
     logger.error('[checkToken]', err);

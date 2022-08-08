@@ -26,7 +26,7 @@ export const preloadAdBlock = (point: TAdPointConfig, { getState, dispatch, serv
         dispatch(
           sendEvent({
             type: 'PRELOAD_AD_BLOCK_RESOLVE',
-            meta: point,
+            payload: { preloadedPoint: point },
           })
         );
       })

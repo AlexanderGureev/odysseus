@@ -27,11 +27,16 @@ export type EventsWithPayload =
       payload: { currentTime: number; duration: number; remainingTime: number };
     }
   | {
+      type: 'AD_BLOCK_VOLUME_CHANGE';
+      meta: { value: number };
+    }
+  | {
       type: 'PLAY_NEXT_BLOCK';
       payload: {
         index: number;
         links: AdLinksByType;
         skippable: boolean;
+        isVolumeAvailable: boolean;
       };
     }
   | {
@@ -56,7 +61,8 @@ export type EventsWithPayload =
   | {
       type: 'AD_STATE_CHANGE';
       payload: {
-        skippable: boolean;
+        skippable?: boolean;
+        isVolumeAvailable?: boolean;
       };
     };
 
@@ -74,6 +80,7 @@ export type FSMState = {
   isExclusive: boolean;
   isPromo: boolean;
   skippable: boolean;
+  isVolumeAvailable: boolean;
 
   currentTime: number | null;
   duration: number | null;

@@ -1,6 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 
-import { EventPayload } from './types';
+import type { EventPayload } from './types';
 
 export const FSM_EVENT = '@fsm/EVENT';
 

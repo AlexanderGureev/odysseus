@@ -16,12 +16,15 @@ const initialState: FSMState = {
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
     DO_INIT: 'PLAYBACK_SPEED_INIT',
+    START_PLAYBACK: 'READY',
   },
   PLAYBACK_SPEED_INIT: {
-    PLAYBACK_SPEED_INIT_RESOLVE: 'READY',
+    PLAYBACK_SPEED_INIT_RESOLVE: 'IDLE',
   },
   READY: {
     SET_PLAYBACK_SPEED: 'CHANGE_PLAYBACK_SPEED_PENDING',
+    AD_BREAK_STARTED: 'IDLE',
+    CHANGE_TRACK: 'IDLE',
   },
   CHANGE_PLAYBACK_SPEED_PENDING: {
     CHANGE_PLAYBACK_SPEED_RESOLVE: 'READY',
@@ -59,7 +62,15 @@ const addMiddleware = () =>
   startListening({
     predicate: (action, currentState, prevState) => currentState.playbackSpeed.step !== prevState.playbackSpeed.step,
     effect: (action, api) => {
-      const { dispatch, getState, extra: services } = api;
+      const {
+        getState,
+        extra: { services, createDispatch },
+      } = api;
+
+      const dispatch = createDispatch({
+        getState,
+        dispatch: api.dispatch,
+      });
 
       const { step } = getState().playbackSpeed;
 

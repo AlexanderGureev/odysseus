@@ -12,6 +12,7 @@ import { Nullable } from 'types';
 import { ERROR_CODES } from 'types/errors';
 import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
+import { request } from 'utils/request';
 
 export type Playlist = {
   uri: string;
@@ -36,9 +37,6 @@ export const getAudioFormatFromParsedManifest = (manifest: any) => {
   return BANDWIDTH && CODECS ? `${CODECS}@${Math.floor(BANDWIDTH / 1024)}k` : null;
 };
 
-// @ts-ignore
-const HLSParser = new Parser();
-
 type TParserMap = {
   [key in StreamProtocol]?: {
     parse: (txt: string, options?: any) => TParsedManifest;
@@ -53,6 +51,7 @@ const ParserByProtocol: TParserMap = {
   },
   HLS: {
     parse: (txt) => {
+      const HLSParser = new Parser();
       HLSParser.push(txt);
       HLSParser.end();
       return HLSParser.manifest;
@@ -93,7 +92,7 @@ export const serializeToString = (manifest: any) => {
 };
 
 const ManifestParser = () => {
-  let manifestData: Nullable<TManifestData> = null;
+  // let manifestData: Nullable<TManifestData> = null;
 
   const modifyManifest = (manifestURL: string, manifestText: string, protocol: StreamProtocol) => {
     const URL_DATA = new URL(manifestURL);
@@ -153,17 +152,18 @@ const ManifestParser = () => {
     return PARSER_BY_PROTOCOL[protocol]?.() || manifestText;
   };
 
-  const request = async (url: string) => {
+  const requestManifest = async (url: string) => {
     try {
-      const response = await fetch(url);
+      const response = await request.get(url);
       return response;
-    } catch (e) {
-      throw new PlayerError(ERROR_CODES.BALANCER_UNAVAILABLE, e?.message);
+    } catch (err) {
+      throw new PlayerError(ERROR_CODES.BALANCER_UNAVAILABLE, err?.message);
     }
   };
 
   const fetchManifest = async (source: TStreamItem): Promise<TManifestData> => {
-    const response = await request(source.url);
+    const response = await requestManifest(source.url);
+
     if (!response.ok) {
       const { origin } = new URL(source.url);
       const balancerUnavailable = response.url.includes(origin);
@@ -176,8 +176,7 @@ const ManifestParser = () => {
     try {
       const manifestText = modifyManifest(response.url, text, source.protocol);
       const parsedManifest = parse(source.protocol, manifestText);
-
-      manifestData = {
+      const manifestData = {
         url: `data:${VIDEO_EXTENSION[source.protocol]};base64,${Base64.encode(manifestText)}`,
         responseUrl: response.url,
         manifestText,
@@ -185,13 +184,13 @@ const ManifestParser = () => {
       };
 
       return manifestData;
-    } catch (e) {
-      logger.error('[ManifestParser]', 'fetchManifest error:', e?.message);
-      throw new PlayerError(ERROR_CODES.CDN_INVALID_DATA, e?.message);
+    } catch (err) {
+      logger.error('[ManifestParser]', 'fetchManifest error:', err?.message);
+      throw new PlayerError(ERROR_CODES.CDN_INVALID_DATA, err?.message);
     }
   };
 
-  const getManifest = (): Nullable<TManifestData> => manifestData;
+  // const getManifest = (): Nullable<TManifestData> => manifestData;
 
   const parse = (protocol: StreamProtocol, text: string): TParsedManifest => {
     const parser = ParserByProtocol[protocol];
@@ -199,7 +198,7 @@ const ManifestParser = () => {
     return parser.parse(text);
   };
 
-  return { parse, fetchManifest, getManifest };
+  return { parse, fetchManifest };
 };
 
 const instance = ManifestParser();

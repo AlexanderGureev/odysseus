@@ -15,6 +15,11 @@ export type Events = {
   waiting: () => void;
   canplay: () => void;
   ratechange: (value: number) => void;
+  progress: (payload: { loadedPercent: number; bufferedEnd: number }) => void;
+  fullscreenchange: (isFullscreen: boolean) => void;
+  play: () => void;
+  pause: () => void;
+  loadedmetadata: (payload: { duration: number }) => void;
 };
 
 export type TPlayerService = {
@@ -38,6 +43,8 @@ export type TPlayerService = {
   getState: () => TState;
   getVhs: () => any;
   getPlayer: () => Nullable<VideoJsPlayer>;
+  enterFullcreen: () => Promise<void>;
+  exitFullcreen: () => Promise<void>;
 };
 
 export type TState = {

@@ -23,11 +23,22 @@ export const startNextBlock = async ({
 
     currentBlock
       .on('AdStarted', () => {
+        console.log('[TEST] AdStarted');
+
         dispatch(
           sendEvent({
             type: 'PLAY_AD_BLOCK_RESOLVE',
           })
         );
+
+        const { step } = getState().visibility;
+        if (step === 'HIDDEN') {
+          dispatch(
+            sendEvent({
+              type: 'DO_PAUSE_AD_BLOCK',
+            })
+          );
+        }
       })
       .on('AdPlay', () => {
         dispatch(
@@ -40,6 +51,36 @@ export const startNextBlock = async ({
         dispatch(
           sendEvent({
             type: 'DO_PAUSE_AD_BLOCK',
+          })
+        );
+      })
+      .on('AdVolumeAvailabilityStateChange', (value) => {
+        console.log('[TEST] AdVolumeAvailabilityStateChange', { value });
+      })
+      .on('AdPodImpression', () => {
+        const isVolumeAvailable = currentBlock.getAdVolumeAvailability();
+
+        // const { volume } = getState().volume;
+        // currentBlock.setVolume(volume);
+
+        console.log('[TEST] AdPodImpression', { isVolumeAvailable, volume: currentBlock.getVolume() });
+
+        dispatch(
+          sendEvent({
+            type: 'AD_STATE_CHANGE',
+            payload: {
+              isVolumeAvailable,
+            },
+          })
+        );
+      })
+      .on('AdVolumeChange', ({ volume }) => {
+        console.log('[TEST] AdVolumeChange', volume);
+
+        dispatch(
+          sendEvent({
+            type: 'AD_BLOCK_VOLUME_CHANGE',
+            meta: { value: volume },
           })
         );
       })

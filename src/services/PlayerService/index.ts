@@ -3,7 +3,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import 'videojs-contrib-eme';
 
-import { VIDEO_TYPE } from 'components/Player/types';
+import { PLAYER_ID, VIDEO_TYPE } from 'components/Player/types';
+import { isAndroid, isIOS } from 'react-device-detect';
 import { IMediator, OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
 import { createFakeSource } from 'services/StreamService/utils';
 import { Nullable } from 'types';
@@ -17,7 +18,7 @@ import { Mediator } from '../MediatorService';
 import { Events, Hooks, HookType, PLAYER_TYPE, PlayerHooks, TState } from './types';
 
 const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
-  let player: Nullable<VideoJsPlayer> = null;
+  let player: VideoJsPlayer;
   let state: TState = {
     src: null,
     currentTime: 0,
@@ -88,12 +89,16 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
   const getPlayer = () => player;
 
   const intitializePlayer = (playerId: string, options: VideoJsPlayerOptions) => {
-    if (player) return player;
-
     return videojs(playerId, {
-      // @ts-ignore
-      enableSourceset: true,
       preload: 'metadata',
+      html5: {
+        vhs: {
+          overrideNative: isAndroid,
+        },
+        nativeAudioTracks: false,
+        nativeVideoTracks: false,
+        enableLowInitialPlaylist: true,
+      },
       ...options,
     });
   };
@@ -106,77 +111,59 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
         beforeSetSource: [],
       };
 
+      if (player) return resolve();
+
       player = intitializePlayer(playerId, options);
-
-      // const v = document.querySelector('video');
-      // if (!v) return;
-
-      // const oldSetAttribute = v.setAttribute;
-      // const oldLoad = v.load;
-      // const oldSrc = v.src;
-
-      // Object.defineProperty(v, 'src', {
-      //   set(v) {
-      //     console.log('[TEST] set src', { v });
-
-      //     // debugger;
-      //     oldSetAttribute('src', v);
-      //   },
-      // });
-
-      // v.setAttribute = function (attr, value) {
-      //   // if (/src/i.test(attr)) {
-      //   //   console.log('[TEST] setAttribute', { src: value });
-      //   // }
-
-      //   return oldSetAttribute(attr, value);
-      // };
-
-      // v.load = function () {
-      //   console.log('[TEST] load');
-
-      //   // return oldLoad();
-      // };
-
       player.eme();
-      player.on('error', onErrorHandler);
-      player.one('ready', resolve);
 
-      player.on('seeking', () => {
-        state.seeking = true;
-        if (state.videoType !== VIDEO_TYPE.FAKE_VIDEO) mediator.emit('seeking');
-      });
-      player.on('seeked', () => {
-        state.seeking = false;
-        if (state.videoType !== VIDEO_TYPE.FAKE_VIDEO) mediator.emit('seeked');
-      });
-      player.on('ended', () => {
-        if (state.videoType !== VIDEO_TYPE.FAKE_VIDEO) mediator.emit('ended');
-      });
-      player.on('waiting', () => {
-        if (state.videoType !== VIDEO_TYPE.FAKE_VIDEO) mediator.emit('waiting');
-      });
-      player.on('canplay', () => {
-        if (state.videoType !== VIDEO_TYPE.FAKE_VIDEO) mediator.emit('canplay');
-      });
-      player.on('ratechange', () => {
-        if (state.videoType !== VIDEO_TYPE.FAKE_VIDEO) mediator.emit('ratechange', getPlaybackRate());
-      });
-      player.on('timeupdate', () => {
-        if (state.videoType !== VIDEO_TYPE.FAKE_VIDEO) {
+      window._player = player;
+
+      const events: { [key in keyof Events]?: () => void } = {
+        seeking: () => mediator.emit('seeking'),
+        seeked: () => mediator.emit('seeked'),
+        ended: () => mediator.emit('ended'),
+        waiting: () => mediator.emit('waiting'),
+        canplay: () => mediator.emit('canplay'),
+        ratechange: () => mediator.emit('ratechange', getPlaybackRate()),
+        fullscreenchange: () => mediator.emit('fullscreenchange', isFullscreen()),
+        play: () => mediator.emit('play'),
+        pause: () => mediator.emit('pause'),
+        progress: () =>
+          mediator.emit('progress', {
+            loadedPercent: player.bufferedPercent() * 100,
+            bufferedEnd: player.bufferedEnd(),
+          }),
+        timeupdate: () =>
           mediator.emit('timeupdate', {
-            currentTime: toFixed(player!.currentTime()),
-            duration: player!.duration(),
-            remainingTime: toFixed(player!.remainingTime()),
-          });
-        }
+            currentTime: toFixed(player.currentTime()),
+            remainingTime: toFixed(player.remainingTime()),
+            duration: player.duration(),
+          }),
+        error: () => {
+          const nativeError = player.error();
+          const err = new PlayerError(nativeError?.code ?? ERROR_CODES.UNKNOWN, nativeError?.message);
+          mediator.emit('error', err);
+        },
+        loadedmetadata: () => {
+          mediator.emit('loadedmetadata', { duration: player.duration() });
+        },
+      };
+
+      Object.keys(events).forEach((event) => {
+        player.on(event, () => {
+          if (isDispatch()) {
+            events[event as keyof Events]?.();
+          }
+        });
       });
+
+      player.one('ready', resolve);
     });
+
+  const isDispatch = () => player.duration() > 0.1;
 
   const setSource = (source: videojs.Tech.SourceObject, type: VIDEO_TYPE = VIDEO_TYPE.PLAIN) =>
     new Promise<void>(async (resolve) => {
-      if (!player) return;
-
       if (type === VIDEO_TYPE.FAKE_VIDEO && state.videoType === VIDEO_TYPE.FAKE_VIDEO) return resolve();
 
       for (const hook of hooks.beforeSetSource) {
@@ -186,13 +173,11 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
       player.src(source);
       player.ready(() => {
         state.videoType = type;
-        player?.one('loadedmetadata', resolve);
+        player.one('loadedmetadata', resolve);
       });
     });
 
   const playVideo = async () => {
-    if (!player) throw new Error('player inst initialized');
-
     const promise = player.play();
 
     if (promise !== undefined) {
@@ -209,8 +194,6 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
     await setSource(createFakeSource(), VIDEO_TYPE.FAKE_VIDEO);
 
     const play = async (muted = false): Promise<{ autoplay: boolean; mute: boolean }> => {
-      if (!player) throw new Error('player inst initialized');
-
       try {
         player.muted(muted);
         await playVideo();
@@ -232,52 +215,38 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
   };
 
   const play = async () => {
-    player?.muted(true); // TODO FIX
     await playVideo();
   };
 
   const pause = () => {
-    if (!player) return;
     if (!player.paused()) player.pause();
   };
 
   const seek = (value: number) => {
-    if (!player) return;
-
     const time = player.currentTime();
     player.currentTime(time + value);
   };
 
-  const onErrorHandler = () => {
-    const nativeError = player?.error();
-    const err = new PlayerError(nativeError?.code ?? ERROR_CODES.UNKNOWN, nativeError?.message);
-    mediator.emit('error', err);
+  const getCurrentTime = () => player.currentTime();
+  const setPlaybackRate = (value: number) => player.playbackRate(value);
+  const getPlaybackRate = () => player.playbackRate();
+  const enterFullcreen = async () => {
+    await player.requestFullscreen();
   };
-
-  const isPaused = () => player?.paused() ?? true;
-  const isPlaying = () => !player?.paused();
-  const isMuted = () => player?.muted() ?? true;
-  const setVolume = (value: number) => player?.volume(value);
-  const getVolume = () => player?.volume() ?? 50;
-  const setMute = (status: boolean) => player?.muted(status);
-
+  const exitFullcreen = async () => {
+    await player.exitFullscreen();
+  };
+  const isFullscreen = () => player.isFullscreen();
+  const isMuted = () => player.muted();
+  const getVolume = () => player.volume();
+  const setVolume = (value: number) => {
+    player.volume(value);
+  };
+  const setMute = (status: boolean) => {
+    player.muted(status);
+  };
   const setCurrentTime = (value: number) => {
-    if (!player) return;
     player.currentTime(value);
-  };
-
-  const getCurrentTime = () => {
-    if (!player) return 0;
-    return player.currentTime();
-  };
-
-  const setPlaybackRate = (value: number) => {
-    if (!player) return;
-    player.playbackRate(value);
-  };
-
-  const getPlaybackRate = () => {
-    return player!.playbackRate();
   };
 
   return {
@@ -290,8 +259,6 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
     on: mediator.on,
     one: mediator.one,
     off: mediator.off,
-    isPaused,
-    isPlaying,
     setCurrentTime,
     getCurrentTime,
     setVolume,
@@ -305,6 +272,8 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
     addHook,
     setPlaybackRate,
     getPlaybackRate,
+    enterFullcreen,
+    exitFullcreen,
   };
 };
 

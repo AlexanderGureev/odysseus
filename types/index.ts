@@ -36,6 +36,9 @@ export const SERVICE_GROUP_ID: { [key in SkinClass]?: number } = {
 export type SubscriptionPreviewType = 'HUB' | 'PAK' | 'FALSE';
 
 export type TFeatureConfig = {
+  CONTINUE_WATCHING_NOTIFY?: boolean;
+  PREVIEW_TIMELINE?: 'PREVIEW' | 'TRACK';
+
   NEXT_EPISODE: 'POSTMESSAGE' | 'LINK' | false;
   PREV_EPISODE: 'POSTMESSAGE' | 'LINK' | false;
   SPLASH_SCREEN_VARIATION: 'MORE_TV' | null;
@@ -155,6 +158,13 @@ export type TStreamItem = {
 
 export type TStreamsConfig = TStreamItem[];
 
+export type LinkedTrackQueryParams = {
+  previewFrom: Nullable<string>;
+  previewTo: Nullable<string>;
+  sign: Nullable<string>;
+  p2p?: 0 | 1;
+};
+
 export type TLinkedTrackConfig = {
   canonicalUrl: string;
   caption?: string;
@@ -166,17 +176,26 @@ export type TLinkedTrackConfig = {
   thumbnail?: string;
   trackHubId?: number;
   trackId?: number;
+  trackVod: {
+    link: string;
+    playerLink: string;
+    queryParams: LinkedTrackQueryParams;
+  };
 };
+
 export type TLinkedTracks = {
   next: Nullable<TLinkedTrackConfig>;
   previous: Nullable<TLinkedTrackConfig>;
 };
+
 export type TAutoSwitchConfig = {
   caption: string;
   caption_v2: string;
   countdown: number;
   point: number;
   project_poster: Nullable<string>;
+  subtitle?: string;
+  title?: string;
 };
 
 export type HeartBeatTnsParams = Array<{ key: string; value: string | number }>;

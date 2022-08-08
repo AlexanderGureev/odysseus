@@ -13,7 +13,7 @@ const clearTimer = () => {
 };
 
 export const accumulation = ({ getState, dispatch }: EffectOpts) => {
-  const { inc, dec, type } = getState().rewind;
+  const { inc, dec, type } = getState().rewindAcc;
   const { currentTime } = getState().playback;
   clearTimer();
 

@@ -6,6 +6,7 @@ import './styles/index.css';
 import { ErrorManager } from 'components/ErrorManager';
 import { DEFAULT_PLAYER_ID } from 'components/Player/types';
 import { SkinConstructor } from 'components/SkinConstructor';
+import { Range } from 'components/UIKIT/Range';
 import { useAppDispatch, useAppSelector } from 'hooks';
 import { StreamProvider } from 'providers/StreamProvider';
 import React, { useEffect } from 'react';
@@ -17,6 +18,7 @@ import { APP_DB_NAME, CollectionName, Indexes } from 'services/IDBService/types'
 import { QUALITY_MARKS } from 'services/VigoService';
 import { WindowController } from 'services/WindowController';
 import { sendEvent, store } from 'store';
+import { getTrackInfo } from 'store/selectors';
 import { secToHumanReadeable } from 'utils';
 
 // start app
@@ -45,27 +47,63 @@ const qualityOptions = {
 
 const Player = () => {
   const dispatch = useAppDispatch();
+  const root = useAppSelector((state) => state.root);
   const playback = useAppSelector((state) => state.playback);
   const adBlock = useAppSelector((state) => state.adBlock);
   const adController = useAppSelector((state) => state.adController);
   const rewind = useAppSelector((state) => state.rewind);
+  const rewindAcc = useAppSelector((state) => state.rewindAcc);
 
   const adNotify = useAppSelector((state) => state.adTimeNotify);
   const quality = useAppSelector((state) => state.quality);
   const playbackSpeed = useAppSelector((state) => state.playbackSpeed);
+  const volume = useAppSelector((state) => state.volume);
+  const buffering = useAppSelector((state) => state.buffering);
+  const fullscreen = useAppSelector((state) => state.fullscreen);
+  const changeTrack = useAppSelector((state) => state.changeTrack);
+  const autoSwitch = useAppSelector((state) => state.autoSwitch);
+
+  const projectInfo = useAppSelector((state) => getTrackInfo(state));
 
   useEffect(() => {
-    dispatch(sendEvent({ type: 'DO_PLAYER_INIT', meta: { playerId: DEFAULT_PLAYER_ID } }));
+    dispatch(sendEvent({ type: 'DO_PLAYER_INIT' }));
   }, [dispatch]);
 
   return (
-    <>
+    <div data-vjs-player>
       <video id={DEFAULT_PLAYER_ID} preload="metadata" muted playsInline onError={(e) => console.log(e)} />
 
-      {playback.step !== 'IDLE' && adController.step !== 'AD_BREAK' && (
+      {root.step === 'READY' && adController.step !== 'AD_BREAK' && playback.duration && playback.duration > 0 && (
         <div className="controls">
+          <div className="project-info" style={{ marginBottom: '20px' }}>
+            <div>
+              {projectInfo.project_name} {projectInfo.min_age}+
+            </div>
+            <div>
+              {projectInfo.season_name} {projectInfo.episode_name}{' '}
+            </div>
+          </div>
           <div>
             Таймлайн: {secToHumanReadeable(playback.currentTime || 0)} / {secToHumanReadeable(playback.duration || 0)}
+            <div className="range-container" style={{ margin: '12px 5px', display: 'flex', alignItems: 'center' }}>
+              <Range
+                ariaLabel="video progress slider"
+                width="300px"
+                onDragEnd={(value) => {
+                  dispatch(sendEvent({ type: 'SEEK', meta: { to: value } }));
+                }}
+                bufferValue={buffering.bufferedEnd}
+                value={playback.currentTime || 0}
+                max={playback.duration || 0}
+                step={30}
+                getFormattedLabel={(value) => secToHumanReadeable(value)}
+              />
+              <div className="duration" style={{ marginLeft: '12px' }}>
+                {secToHumanReadeable(playback.duration || 0)}
+              </div>
+
+              {rewind.step === 'SEEKING' && <div style={{ position: 'absolute', right: 0 }}>seeking...</div>}
+            </div>
           </div>
 
           <div>
@@ -100,6 +138,34 @@ const Player = () => {
             </select>
           </div>
 
+          {!root.deviceInfo.isMobile && (
+            <div>
+              Звук:{' '}
+              <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center' }}>
+                <button
+                  style={{ position: 'absolute', left: '0' }}
+                  onClick={() => {
+                    dispatch(sendEvent({ type: 'SET_MUTE', payload: { value: !volume.muted } }));
+                  }}>
+                  {volume.muted ? 'unmute' : 'mute'}
+                </button>
+                <div className="range-container" style={{ position: 'absolute', left: '80px' }}>
+                  <Range
+                    ariaLabel="volume slider"
+                    width="300px"
+                    onChange={(value) => {
+                      dispatch(sendEvent({ type: 'SET_VOLUME', payload: { value } }));
+                    }}
+                    step={0.1}
+                    value={volume.muted ? 0 : volume.volume}
+                    max={1}
+                    getFormattedLabel={() => null}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           <button
             onClick={() => {
               dispatch(sendEvent({ type: 'DO_PLAY' }));
@@ -131,6 +197,32 @@ const Player = () => {
             onClick={() => {
               dispatch(
                 sendEvent({
+                  type: 'SEEK',
+                  meta: {
+                    to: autoSwitch.autoswitchPoint - 1,
+                  },
+                })
+              );
+            }}>
+            seek to autoswitch
+          </button>
+          <button
+            onClick={() => {
+              dispatch(
+                sendEvent({
+                  type: 'SEEK',
+                  meta: {
+                    to: autoSwitch.autoswitchPoint + 1,
+                  },
+                })
+              );
+            }}>
+            seek in autoswitch
+          </button>
+          <button
+            onClick={() => {
+              dispatch(
+                sendEvent({
                   type: 'INC_SEEK',
                   payload: {
                     value: 30,
@@ -138,7 +230,7 @@ const Player = () => {
                 })
               );
             }}>
-            seek +30 ({rewind.inc})
+            seek +30 ({rewindAcc.inc})
           </button>
           <button
             onClick={() => {
@@ -151,7 +243,7 @@ const Player = () => {
                 })
               );
             }}>
-            seek -30 ({rewind.dec})
+            seek -30 ({rewindAcc.dec})
           </button>
           <button
             onClick={() => {
@@ -166,6 +258,42 @@ const Player = () => {
             }}>
             seek to end
           </button>
+
+          <button
+            onClick={() => {
+              dispatch(
+                sendEvent({
+                  type: fullscreen.step === 'FULLSCREEN' ? 'EXIT_FULLCREEN' : 'ENTER_FULLCREEN',
+                })
+              );
+            }}>
+            {fullscreen.step === 'FULLSCREEN' ? 'exit fullscreen' : 'enter fullscreen'}
+          </button>
+
+          {changeTrack.next && (
+            <button
+              onClick={() => {
+                dispatch(
+                  sendEvent({
+                    type: 'GO_TO_NEXT_TRACK',
+                  })
+                );
+              }}>
+              next
+            </button>
+          )}
+          {changeTrack.prev && (
+            <button
+              onClick={() => {
+                dispatch(
+                  sendEvent({
+                    type: 'GO_TO_PREV_TRACK',
+                  })
+                );
+              }}>
+              prev
+            </button>
+          )}
         </div>
       )}
 
@@ -176,6 +304,32 @@ const Player = () => {
           </div>
           <div>
             таймлайн: {secToHumanReadeable(adBlock.currentTime || 0)} / {secToHumanReadeable(adBlock.duration || 0)}
+          </div>
+
+          <div className="range-container" style={{ margin: '12px 0', display: 'flex', alignItems: 'center' }}>
+            <button
+              style={{ position: 'absolute', left: '0' }}
+              onClick={() => {
+                dispatch(sendEvent({ type: 'SET_MUTE_AD_BLOCK', payload: { value: !volume.muted } }));
+              }}>
+              {volume.muted ? 'unmute' : 'mute'}
+            </button>
+
+            {!root.deviceInfo.isMobile && (
+              <div style={{ position: 'absolute', left: '80px' }}>
+                <Range
+                  ariaLabel="volume slider"
+                  width="300px"
+                  onChange={(value) => {
+                    dispatch(sendEvent({ type: 'SET_VOLUME_AD_BLOCK', payload: { value } }));
+                  }}
+                  step={0.1}
+                  value={volume.muted ? 0 : volume.volume}
+                  max={1}
+                  getFormattedLabel={() => null}
+                />
+              </div>
+            )}
           </div>
 
           <button
@@ -204,13 +358,41 @@ const Player = () => {
       )}
 
       {adNotify.time && <div className="ad-notify">{adNotify.time} сек. до рекламной паузы</div>}
-    </>
+
+      {autoSwitch.step === 'AUTOSWITCH_NOTIFY' && (
+        <div className="auto-switch">
+          <div>{Math.ceil(autoSwitch.countdownValue)} сек. до автопереключения</div>
+          <button
+            onClick={() => {
+              dispatch(
+                sendEvent({
+                  type: 'HIDE_AUTOSWITCH_NOTIFY',
+                })
+              );
+            }}>
+            {autoSwitch.cancelButtonText}
+          </button>
+          <button
+            onClick={() => {
+              dispatch(
+                sendEvent({
+                  type: 'START_AUTOSWITCH',
+                })
+              );
+            }}>
+            {autoSwitch.buttonText}
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 
 const PlayerManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const { step, isShowPlayerUI } = useAppSelector((state) => state.root);
+  const adultNotify = useAppSelector((state) => state.adultNotify);
+  const resumeVideoNotify = useAppSelector((state) => state.resumeVideoNotify);
 
   return (
     <div className="player-manager">
@@ -232,9 +414,40 @@ const PlayerManager: React.FC = () => {
           BIG_PLAY_BUTTON
         </div>
       )}
-      {step === 'PAYWALL' && 'paywall'}
-      {step === 'ADULT_NOTIFY' && 'ADULT_NOTIFY'}
-      {step === 'RESUME_VIDEO_NOTIFY' && 'RESUME_VIDEO_NOTIFY'}
+      {step === 'PAYWALL' && <div className="overlay">paywall</div>}
+
+      {adultNotify.step === 'ADULT_NOTIFY' && (
+        <div className="overlay">
+          <button
+            onClick={() => {
+              dispatch(sendEvent({ type: 'ADULT_NOTIFY_RESOLVE' }));
+            }}>
+            мне есть 18
+          </button>
+          <button
+            onClick={() => {
+              dispatch(sendEvent({ type: 'ADULT_NOTIFY_REJECT' }));
+            }}>
+            мне нет 18
+          </button>
+        </div>
+      )}
+      {resumeVideoNotify.step === 'RESUME_VIDEO_NOTIFY' && resumeVideoNotify.time && (
+        <div className="overlay">
+          <button
+            onClick={() => {
+              dispatch(sendEvent({ type: 'RESUME_VIDEO_NOTIFY_RESOLVE' }));
+            }}>
+            продолжить видео c {secToHumanReadeable(resumeVideoNotify.time)}
+          </button>
+          <button
+            onClick={() => {
+              dispatch(sendEvent({ type: 'RESUME_VIDEO_NOTIFY_REJECT' }));
+            }}>
+            начать с начала
+          </button>
+        </div>
+      )}
     </div>
   );
 };

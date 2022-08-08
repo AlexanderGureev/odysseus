@@ -5,19 +5,25 @@ import { listenerMiddleware } from './middleware';
 import adBlock from './slices/adBlock/reducer';
 import adController from './slices/adController/reducer';
 import adTimeNotify from './slices/adTimeNotify/reducer';
+import adultNotify from './slices/adultNotify/reducer';
 import autoSwitch from './slices/autoSwitch/reducer';
 import buffering from './slices/buffering/reducer';
 import changeTrack from './slices/changeTrack/reducer';
 import error from './slices/error/reducer';
+import fullscreen from './slices/fullscreen/reducer';
+import hotkeys from './slices/hotkeys/reducer';
 import network from './slices/network/reducer';
 import playback from './slices/playback/reducer';
 import playbackSpeed from './slices/playbackSpeed/reducer';
 import quality from './slices/quality/reducer';
 import resumeVideo from './slices/resumeVideo/reducer';
+import resumeVideoNotify from './slices/resumeVideoNotify/reducer';
 import rewind from './slices/rewind/reducer';
+import rewindAcc from './slices/rewindAcc/reducer';
 import root from './slices/root/reducer';
 import switcher from './slices/switcher/reducer';
 import updater from './slices/updater/reducer';
+import visibility from './slices/visibility/reducer';
 import volume from './slices/volume/reducer';
 import watchpoint from './slices/watchpoint/reducer';
 /*
@@ -47,6 +53,7 @@ const rootReducer = combineReducers({
   playback: playback.reducer,
   watchpoint: watchpoint.reducer,
   rewind: rewind.reducer,
+  rewindAcc: rewindAcc.reducer,
   buffering: buffering.reducer,
   adTimeNotify: adTimeNotify.reducer,
   quality: quality.reducer,
@@ -55,6 +62,11 @@ const rootReducer = combineReducers({
   autoSwitch: autoSwitch.reducer,
   playbackSpeed: playbackSpeed.reducer,
   volume: volume.reducer,
+  visibility: visibility.reducer,
+  fullscreen: fullscreen.reducer,
+  adultNotify: adultNotify.reducer,
+  resumeVideoNotify: resumeVideoNotify.reducer,
+  hotkeys: hotkeys.reducer,
   error: error.reducer,
 });
 
@@ -67,6 +79,7 @@ switcher.addMiddleware();
 playback.addMiddleware();
 watchpoint.addMiddleware();
 rewind.addMiddleware();
+rewindAcc.addMiddleware();
 buffering.addMiddleware();
 adTimeNotify.addMiddleware();
 quality.addMiddleware();
@@ -75,6 +88,11 @@ changeTrack.addMiddleware();
 autoSwitch.addMiddleware();
 playbackSpeed.addMiddleware();
 volume.addMiddleware();
+visibility.addMiddleware();
+fullscreen.addMiddleware();
+adultNotify.addMiddleware();
+resumeVideoNotify.addMiddleware();
+hotkeys.addMiddleware();
 error.addMiddleware();
 
 // console.log(

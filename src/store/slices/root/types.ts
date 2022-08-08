@@ -1,3 +1,4 @@
+import { NextTrackConfig } from 'api/types';
 import { TParams } from 'server/utils';
 import { TManifestData } from 'services/ManifestParser';
 import { TCapabilities } from 'services/StreamService/utils/supports';
@@ -16,8 +17,6 @@ export type State =
   | 'PARSE_CONFIG_PENDING'
   | 'CHECK_ADULT_CONTENT'
   | 'CHECK_RESUME_VIDEO'
-  | 'ADULT_NOTIFY'
-  | 'RESUME_VIDEO_NOTIFY'
   | 'PLAYER_INIT_PENDING'
   | 'CHECK_PERMISSIONS_PENDING'
   | 'FETCHING_CONFIG'
@@ -36,7 +35,8 @@ export type State =
   | 'FETCHING_MANIFEST'
   | 'INITIAL_FETCHING_MANIFEST'
   | 'INITIAL_SELECT_MANIFEST_PENDING'
-  | 'SELECT_MANIFEST_PENDING';
+  | 'SELECT_MANIFEST_PENDING'
+  | 'SETUP_INITIAL_VOLUME';
 
 export type EventsWithPayload =
   | WithoutPayload<
@@ -45,16 +45,7 @@ export type EventsWithPayload =
       | 'CHECK_PREVIEW_REJECT'
       | 'INIT_SERVICES_RESOLVE'
       | 'INIT_ANALYTICS_RESOLVE'
-      | 'SHOW_ADULT_NOTIFY'
-      | 'SKIP_ADULT_NOTIFY'
-      | 'SHOW_RESUME_VIDEO_NOTIFY'
-      | 'SKIP_RESUME_VIDEO_NOTIFY'
-      | 'ADULT_NOTIFY_RESOLVE'
-      | 'ADULT_NOTIFY_REJECT'
-      | 'RESUME_VIDEO_NOTIFY_RESOLVE'
-      | 'RESUME_VIDEO_NOTIFY_REJECT'
       | 'PLAYER_INIT_RESOLVE'
-      | 'CHANGE_TRACK'
       | 'FETCH_CONFIG_REJECT'
       | 'DO_INIT'
       | 'SET_SOURCE'
@@ -64,6 +55,7 @@ export type EventsWithPayload =
       | 'CHECK_AUTOPLAY_RESOLVE'
       | 'SHOW_BIG_PLAY_BUTTON'
       | 'SELECT_MANIFEST_RESOLVE'
+      | 'SETUP_INITIAL_VOLUME_RESOLVE'
     >
   | ErrorPayload<
       | 'CHECK_ERROR_REJECT'
@@ -95,7 +87,7 @@ export type EventsWithPayload =
     }
   | {
       type: 'CHECK_PREVIEW_RESOLVE';
-      payload: { previews: TStreamItem[] };
+      payload: { previews: TStreamItem[]; previewDuration: number };
     }
   | {
       type: 'CHECK_PERMISSIONS_RESOLVE';
@@ -115,7 +107,6 @@ export type EventsWithPayload =
     }
   | {
       type: 'DO_PLAYER_INIT';
-      meta: { playerId: string };
     }
   | {
       type: 'SET_STATE';
@@ -132,6 +123,10 @@ export type EventsWithPayload =
       payload: {
         manifestData: TManifestData;
       };
+    }
+  | {
+      type: 'CHANGE_TRACK';
+      meta: { config: NextTrackConfig; context: Partial<TParams> | null; params?: TrackParams };
     };
 
 export type Event = EventsWithPayload['type'];
@@ -171,6 +166,7 @@ export enum DeviceType {
 
 export type DeviceInfo = {
   isMobile: boolean;
+  isSafari: boolean | undefined;
   osName: string | undefined;
   osVersion: string | undefined;
   deviceType: DeviceType | undefined;
@@ -181,6 +177,7 @@ export type DeviceInfo = {
   brand: string | undefined;
   engineName: string | undefined;
   engineVersion: string | undefined;
+  browserVersion: string | undefined;
 };
 
 export type SessionState = {
@@ -194,18 +191,18 @@ type Permissions = {
   mute: boolean;
 };
 
-export type TrackParams = Partial<{
-  sign: string;
-  pf: string;
-  pt: string;
-  userId: string;
-  p2p: boolean;
-  adult: boolean;
-  autoplay: boolean;
-  trial_available: boolean;
-  startAt: number;
-  isVkApp: boolean;
-}>;
+export type TrackParams = {
+  sign?: string | null;
+  pf?: string | null;
+  pt?: string | null;
+  userId?: string | null;
+  p2p?: boolean;
+  adult?: boolean;
+  autoplay?: boolean;
+  trial_available?: boolean;
+  startAt?: number | null;
+  isVkApp?: boolean;
+};
 
 export type FSMState = {
   step: State;
@@ -221,6 +218,8 @@ export type FSMState = {
   adPoints: TAdPointsConfig;
   features: TParsedFeatures;
   previews: TStreamItem[] | null;
+  previewDuration: number | null;
+
   capabilities: Array<keyof TCapabilities>;
   permissions: Permissions;
 
