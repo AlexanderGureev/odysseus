@@ -2,7 +2,7 @@ import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { DEFAULT_PLAYER_ID } from 'components/Player/types';
 import { isMobile } from 'react-device-detect';
 import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { on } from 'utils';
 import { dbclick } from 'utils/dbclick';
@@ -57,7 +57,7 @@ const hotkeys = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.hotkeys.step !== prevState.hotkeys.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, hotkeys.name),
     effect: (action, api) => {
       const {
         getState,

@@ -6,7 +6,7 @@ import { browserVersion, isSafari } from 'react-device-detect';
 import { HORUS_EVENT } from 'services/HorusService/types';
 import { LocalStorageService } from 'services/LocalStorageService';
 import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
-import { Playlist } from 'services/ManifestParser';
+import { Playlist } from 'services/ManifestParser/types';
 import { Mediator } from 'services/MediatorService';
 import { PlayerService } from 'services/PlayerService';
 import { createSource } from 'services/StreamService/utils';
@@ -132,7 +132,10 @@ const StreamQualityManager = (playerService: IPlayerService, localStorageService
   //   return qualityRecord[qualityMark]?.uri || null;
   // };
 
-  const setQuality = async (qualityItem: TQualityItem, opts: { currentStream: TStreamItem; currentTime: number }) => {
+  const setQuality = async (
+    qualityItem: TQualityItem,
+    opts: { currentStream: TStreamItem; currentTime: number; isOldSafari: boolean }
+  ) => {
     logger.log('[StreamQualityManager]', 'setQuality', qualityItem);
 
     if (isRepresentationsSupport()) {
@@ -142,8 +145,17 @@ const StreamQualityManager = (playerService: IPlayerService, localStorageService
       });
     } else {
       const source = createSource({ ...opts.currentStream, url: qualityItem.uri });
+
       await playerService.setSource(source);
-      playerService.setCurrentTime(opts.currentTime);
+
+      if (opts.isOldSafari) {
+        playerService.one('timeupdate', () => {
+          playerService.setCurrentTime(opts.currentTime);
+        });
+      } else {
+        playerService.setCurrentTime(opts.currentTime);
+      }
+
       await playerService.play();
     }
 

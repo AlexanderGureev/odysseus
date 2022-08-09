@@ -97,19 +97,19 @@ const AnalyticsEventManagerService = () => {
   const SEND_HANDLER_EVENT_MAP: TSendMap = {
     [AnalyticsEvent.PLAY]: () => {
       logger.log('[AnalyticsEventManagerService]', 'PLAY EVENT');
-      PostMessageService.emit('play', { payload: createPayload(0) });
+      // PostMessageService.emit('play', { payload: createPayload(0) });
     },
     [AnalyticsEvent.VIEW]: ({ currentTime }) => {
       logger.log('[AnalyticsEventManagerService]', 'VIEW EVENT', state.viewPoint);
-      PostMessageService.emit('view', {
-        payload: { ...createPayload(currentTime), value: state.viewPoint },
-      });
+      // PostMessageService.emit('view', {
+      //   payload: { ...createPayload(currentTime), value: state.viewPoint },
+      // });
     },
     [AnalyticsEvent.WATCH_POINT]: ({ currentTime, value }) => {
       logger.log('[AnalyticsEventManagerService]', 'WATCH_POINT EVENT', value);
-      PostMessageService.emit('watchpoint', {
-        payload: { ...createPayload(currentTime), value },
-      });
+      // PostMessageService.emit('watchpoint', {
+      //   payload: { ...createPayload(currentTime), value },
+      // });
     },
   };
 

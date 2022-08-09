@@ -14,39 +14,19 @@ import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
 import { request } from 'utils/request';
 
-export type Playlist = {
-  uri: string;
-  attributes: {
-    'VIDEO-RANGE': string;
-    CODECS: string;
-    'FRAME-RATE': string;
-    RESOLUTION: {
-      width: number;
-      height: number;
-    };
-    BANDWIDTH: number;
-    'PROGRAM-ID': number;
-    NAME?: string;
-  };
-};
+import { RawManifest, TManifestData, TParsedManifest, TParserMap } from './types';
 
-export const getAudioFormatFromParsedManifest = (manifest: any) => {
+export const getAudioFormat = (manifest: RawManifest) => {
   const { BANDWIDTH = null, CODECS = null } =
     manifest?.mediaGroups?.AUDIO?.audio?.main?.playlists?.[0]?.attributes || {};
 
   return BANDWIDTH && CODECS ? `${CODECS}@${Math.floor(BANDWIDTH / 1024)}k` : null;
 };
 
-type TParserMap = {
-  [key in StreamProtocol]?: {
-    parse: (txt: string, options?: any) => TParsedManifest;
-  };
-};
-
 const ParserByProtocol: TParserMap = {
   DASH: {
     parse: (txt, options: { manifestUri?: string } = {}) => {
-      return MPDParser.parse(txt, options) as TParsedManifest;
+      return MPDParser.parse(txt, options) as RawManifest;
     },
   },
   HLS: {
@@ -58,10 +38,6 @@ const ParserByProtocol: TParserMap = {
     },
   },
 };
-
-export type TParsedManifest = { playlists: Playlist[]; mediaGroups: TMediaGroup };
-export type TManifestData = { url: string; responseUrl: string; manifestText: string; parsedManifest: TParsedManifest };
-export type TMediaGroup = { AUDIO: any; VIDEO: any; 'CLOSED-CAPTIONS': any; SUBTITLES: any };
 
 export const stringToMpdXml = (manifestString: string): Nullable<HTMLElement> => {
   if (manifestString === '') {
@@ -92,8 +68,6 @@ export const serializeToString = (manifest: any) => {
 };
 
 const ManifestParser = () => {
-  // let manifestData: Nullable<TManifestData> = null;
-
   const modifyManifest = (manifestURL: string, manifestText: string, protocol: StreamProtocol) => {
     const URL_DATA = new URL(manifestURL);
 
@@ -195,7 +169,15 @@ const ManifestParser = () => {
   const parse = (protocol: StreamProtocol, text: string): TParsedManifest => {
     const parser = ParserByProtocol[protocol];
     if (!parser) throw new PlayerError(ERROR_CODES.UNKNOWN, `no parser found for protocol: ${protocol}`);
-    return parser.parse(text);
+    const data = parser.parse(text);
+
+    return {
+      audioFormat: getAudioFormat(data),
+      playlists: data.playlists.map((p) => ({
+        attributes: p.attributes,
+        uri: p.uri,
+      })),
+    };
   };
 
   return { parse, fetchManifest };

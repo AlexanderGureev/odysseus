@@ -55,9 +55,12 @@ const request = () => {
 
         const extendedOpts = json
           ? { ...opts, headers: { 'Content-Type': 'application/json', ...parsedHeaders }, body: JSON.stringify(json) }
-          : opts;
+          : { ...opts, headers: { ...parsedHeaders } };
 
-        const response = await fetch(target, { method, ...extendedOpts });
+        const response = await fetch(target, {
+          method,
+          ...extendedOpts,
+        });
         checkStatus(response);
 
         logger.log('[http request]', 'before response', { method, url, status: response.status });

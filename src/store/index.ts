@@ -7,10 +7,12 @@ import adController from './slices/adController/reducer';
 import adTimeNotify from './slices/adTimeNotify/reducer';
 import adultNotify from './slices/adultNotify/reducer';
 import autoSwitch from './slices/autoSwitch/reducer';
+import beholder from './slices/beholder/reducer';
 import buffering from './slices/buffering/reducer';
 import changeTrack from './slices/changeTrack/reducer';
 import error from './slices/error/reducer';
 import fullscreen from './slices/fullscreen/reducer';
+import heartbeat from './slices/heartbeat/reducer';
 import hotkeys from './slices/hotkeys/reducer';
 import network from './slices/network/reducer';
 import playback from './slices/playback/reducer';
@@ -21,8 +23,7 @@ import resumeVideoNotify from './slices/resumeVideoNotify/reducer';
 import rewind from './slices/rewind/reducer';
 import rewindAcc from './slices/rewindAcc/reducer';
 import root from './slices/root/reducer';
-import switcher from './slices/switcher/reducer';
-import updater from './slices/updater/reducer';
+import splashscreen from './slices/splashscreen/reducer';
 import visibility from './slices/visibility/reducer';
 import volume from './slices/volume/reducer';
 import watchpoint from './slices/watchpoint/reducer';
@@ -48,10 +49,9 @@ const rootReducer = combineReducers({
   resumeVideo: resumeVideo.reducer,
   adController: adController.reducer,
   adBlock: adBlock.reducer,
-  updater: updater.reducer,
-  switcher: switcher.reducer,
   playback: playback.reducer,
   watchpoint: watchpoint.reducer,
+  heartbeat: heartbeat.reducer,
   rewind: rewind.reducer,
   rewindAcc: rewindAcc.reducer,
   buffering: buffering.reducer,
@@ -67,6 +67,8 @@ const rootReducer = combineReducers({
   adultNotify: adultNotify.reducer,
   resumeVideoNotify: resumeVideoNotify.reducer,
   hotkeys: hotkeys.reducer,
+  splashscreen: splashscreen.reducer,
+  beholder: beholder.reducer,
   error: error.reducer,
 });
 
@@ -74,10 +76,9 @@ root.addMiddleware();
 resumeVideo.addMiddleware();
 adController.addMiddleware();
 adBlock.addMiddleware();
-updater.addMiddleware();
-switcher.addMiddleware();
 playback.addMiddleware();
 watchpoint.addMiddleware();
+heartbeat.addMiddleware();
 rewind.addMiddleware();
 rewindAcc.addMiddleware();
 buffering.addMiddleware();
@@ -93,6 +94,8 @@ fullscreen.addMiddleware();
 adultNotify.addMiddleware();
 resumeVideoNotify.addMiddleware();
 hotkeys.addMiddleware();
+splashscreen.addMiddleware();
+beholder.addMiddleware();
 error.addMiddleware();
 
 // console.log(

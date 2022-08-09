@@ -19,7 +19,7 @@ export function off<T extends Window | Document | HTMLElement | EventTarget>(
 
 export const isNil = <T>(value: T) => value === null || value === undefined;
 
-export const toNum = (value: string | boolean | null | undefined) => {
+export const toNum = <T>(value: T) => {
   if (typeof value !== 'string') return value;
   if (value && !Number.isNaN(Number(value))) return Number(value);
   return value;

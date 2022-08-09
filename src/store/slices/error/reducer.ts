@@ -1,11 +1,11 @@
-import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
-import type { AppEvent, FSMConfig } from 'store/types';
+import { createAction, createSlice } from '@reduxjs/toolkit';
+import { FSM_EVENT } from 'store/actions';
+import { isStepChange, startListening } from 'store/middleware';
+import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
 
-import { ActionPayload, FSMState, State } from './types';
+import { FSMState, State } from './types';
 
 const initialState: FSMState = {
   step: 'IDLE',
@@ -25,9 +25,9 @@ const config: FSMConfig<State, AppEvent> = {
     CHECK_MANIFEST_REJECT: 'ERROR',
     FETCHING_MANIFEST_REJECT: 'ERROR',
     FETCH_TRACK_CONFIG_REJECT: 'ERROR',
+    PLAYER_ERROR: 'ERROR',
   },
   ERROR: {
-    SET_ERROR: null,
     RELOAD: 'IDLE',
   },
 };
@@ -37,22 +37,28 @@ const error = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(createAction<ActionPayload>(FSM_EVENT), (state, action) => {
-      const { type, payload } = action.payload;
+    builder.addCase(createAction<EventPayload>(FSM_EVENT), (state, action) => {
+      const { type, payload, meta } = action.payload;
 
       const next = config[state.step]?.[type];
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'error', `${state.step} -> ${type} -> ${next}`);
 
-      return next ? { ...state, step: next, ...payload } : { ...state, ...payload };
+      const step = next || state.step;
+
+      switch (type) {
+        default:
+          const { error } = meta as { error: PlayerError };
+          return { ...state, step, error, ...payload };
+      }
     });
   },
 });
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.error.step !== prevState.error.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, error.name),
     effect: (action, api) => {
       const {
         getState,
@@ -74,20 +80,7 @@ const addMiddleware = () =>
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         ERROR: () => {
-          const {
-            payload: { meta },
-          } = action as PayloadAction<{
-            meta: { error: PlayerError };
-          }>;
-
-          dispatch(
-            sendEvent({
-              type: 'SET_ERROR',
-              payload: {
-                error: meta.error,
-              },
-            })
-          );
+          return;
         },
       };
 

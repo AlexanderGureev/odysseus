@@ -1,6 +1,6 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FSM_EVENT } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
@@ -60,7 +60,7 @@ const rewindAcc = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.rewindAcc.step !== prevState.rewindAcc.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, rewindAcc.name),
     effect: (action, api) => {
       const {
         getState,

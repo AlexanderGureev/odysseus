@@ -1,18 +1,20 @@
-import { VIDEO_TYPE } from 'components/Player/types';
-import { DefaultPayload, WithoutPayload } from 'store/types';
+import { DefaultPayload } from 'store/types';
 
 export type State = 'IDLE' | 'CHECK_AD_WATCHPOINT_PENDING' | 'CHECK_PLAIN_WATCHPOINT_PENDING';
 
-export type EventsWithPayload = {
-  type: 'CHECK_PLAIN_WATCHPOINT_RESOLVE';
-  payload?: {
-    previousTime: number;
-    progress: {
-      [VIDEO_TYPE.AD]: number;
-      [VIDEO_TYPE.PLAIN]: number;
+export type EventsWithPayload =
+  | {
+      type: 'CHECK_PLAIN_WATCHPOINT_RESOLVE';
+      payload?: {
+        previousTime: number;
+      };
+    }
+  | {
+      type: 'WATCHPOINT';
+      payload: {
+        value: WatchPoint;
+      };
     };
-  };
-};
 
 export type Event = EventsWithPayload['type'];
 
@@ -21,16 +23,8 @@ export type ActionPayload = DefaultPayload<Event> & EventsWithPayload;
 export type FSMState = {
   step: State;
 
-  previous: {
-    [VIDEO_TYPE.AD]: number;
-    [VIDEO_TYPE.PLAIN]: number;
-  };
-  progress: {
-    [VIDEO_TYPE.AD]: number;
-    [VIDEO_TYPE.PLAIN]: number;
-  };
-
   previousTime: number;
+  points: WatchPoint[];
 };
 
 export type WatchPoint = { value: number | '3min' | '1min' | '30sec'; num: number; measure: 'percents' | 'seconds' };

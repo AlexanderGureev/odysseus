@@ -1,6 +1,6 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
-import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { FSM_EVENT } from 'store/actions';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
@@ -35,7 +35,7 @@ const network = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.network.step !== prevState.network.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, network.name),
     effect: (action, api) => {
       const {
         getState,

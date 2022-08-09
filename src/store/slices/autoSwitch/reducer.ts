@@ -1,6 +1,6 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { SkinClass } from 'types';
 import { isNil } from 'utils';
@@ -131,7 +131,7 @@ const autoSwitch = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.autoSwitch.step !== prevState.autoSwitch.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, autoSwitch.name),
     effect: (action, api) => {
       const {
         getState,

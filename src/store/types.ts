@@ -5,10 +5,12 @@ import * as adController from './slices/adController';
 import * as adTimeNotify from './slices/adTimeNotify';
 import * as adultNotify from './slices/adultNotify';
 import * as autoSwitch from './slices/autoSwitch';
+import * as beholder from './slices/beholder';
 import * as buffering from './slices/buffering';
 import * as changeTrack from './slices/changeTrack';
 import * as error from './slices/error';
 import * as fullscreen from './slices/fullscreen';
+import * as heartbeat from './slices/heartbeat';
 import * as hotkeys from './slices/hotkeys';
 import * as network from './slices/network';
 import * as playback from './slices/playback';
@@ -19,7 +21,7 @@ import * as resumeVideoNotify from './slices/resumeVideoNotify';
 import * as rewind from './slices/rewind';
 import * as rewindAcc from './slices/rewindAcc';
 import * as root from './slices/root';
-import * as switcher from './slices/switcher';
+import * as splashscreen from './slices/splashscreen';
 import * as updater from './slices/updater';
 import * as visibility from './slices/visibility';
 import * as volume from './slices/volume';
@@ -51,7 +53,6 @@ export type EventPayload =
   | adController.ActionPayload
   | adBlock.ActionPayload
   | updater.ActionPayload
-  | switcher.ActionPayload
   | playback.ActionPayload
   | rewind.ActionPayload
   | adTimeNotify.ActionPayload
@@ -70,14 +71,16 @@ export type EventPayload =
   | adultNotify.ActionPayload
   | resumeVideoNotify.ActionPayload
   | hotkeys.ActionPayload
-  | rewindAcc.ActionPayload;
+  | rewindAcc.ActionPayload
+  | splashscreen.ActionPayload
+  | beholder.ActionPayload
+  | heartbeat.ActionPayload;
 
 export type AppEvent =
   | root.Event
   | adController.Event
   | adBlock.Event
   | updater.Event
-  | switcher.Event
   | playback.Event
   | rewind.Event
   | adTimeNotify.Event
@@ -96,4 +99,7 @@ export type AppEvent =
   | adultNotify.Event
   | resumeVideoNotify.Event
   | hotkeys.Event
-  | rewindAcc.Event;
+  | rewindAcc.Event
+  | splashscreen.Event
+  | beholder.Event
+  | heartbeat.Event;

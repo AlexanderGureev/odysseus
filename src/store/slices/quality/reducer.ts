@@ -1,7 +1,7 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { QUALITY_MARKS } from 'services/VigoService';
-import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { FSM_EVENT } from 'store/actions';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { toFixed } from 'utils';
 import { logger } from 'utils/logger';
@@ -86,7 +86,7 @@ const quality = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.quality.step !== prevState.quality.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, quality.name),
     effect: (action, api) => {
       const {
         getState,

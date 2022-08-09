@@ -1,6 +1,6 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, FSMConfig } from 'store/types';
 import { toFixed } from 'utils';
 import { logger } from 'utils/logger';
@@ -75,7 +75,7 @@ const buffering = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.buffering.step !== prevState.buffering.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, buffering.name),
     effect: (action, api) => {
       const {
         getState,

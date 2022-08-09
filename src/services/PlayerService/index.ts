@@ -15,7 +15,7 @@ import { logger } from 'utils/logger';
 import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
 
 import { Mediator } from '../MediatorService';
-import { Events, Hooks, HookType, PLAYER_TYPE, PlayerHooks, TState } from './types';
+import { Events, Hooks, HookType, PLAYER_TYPE, PlayerHooks, SetSourceOpts, TState } from './types';
 
 const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
   let player: VideoJsPlayer;
@@ -36,6 +36,8 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
     seeking: false,
     videoType: VIDEO_TYPE.PLAIN,
   };
+
+  let isSetupSource = false;
 
   let hooks: PlayerHooks = {
     beforeSetSource: [],
@@ -103,6 +105,12 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
     });
   };
 
+  const parseNativeError = () => {
+    const nativeError = player.error();
+    const err = new PlayerError(nativeError?.code ?? ERROR_CODES.UNKNOWN, nativeError?.message);
+    return err;
+  };
+
   const init = (playerId: string, options: VideoJsPlayerOptions = {}) =>
     new Promise<void>((resolve) => {
       logger.log('[PlayerService]', 'init');
@@ -140,8 +148,8 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
             duration: player.duration(),
           }),
         error: () => {
-          const nativeError = player.error();
-          const err = new PlayerError(nativeError?.code ?? ERROR_CODES.UNKNOWN, nativeError?.message);
+          if (isSetupSource) return;
+          const err = parseNativeError();
           mediator.emit('error', err);
         },
         loadedmetadata: () => {
@@ -162,19 +170,54 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
 
   const isDispatch = () => player.duration() > 0.1;
 
-  const setSource = (source: videojs.Tech.SourceObject, type: VIDEO_TYPE = VIDEO_TYPE.PLAIN) =>
-    new Promise<void>(async (resolve) => {
+  const setSource = (source: videojs.Tech.SourceObject, { type = VIDEO_TYPE.PLAIN, timeout }: SetSourceOpts = {}) =>
+    new Promise<void>(async (resolve, reject) => {
       if (type === VIDEO_TYPE.FAKE_VIDEO && state.videoType === VIDEO_TYPE.FAKE_VIDEO) return resolve();
+
+      isSetupSource = true;
 
       for (const hook of hooks.beforeSetSource) {
         await hook(type);
       }
 
+      let timer = timeout
+        ? setTimeout(() => {
+            const error = new PlayerError(
+              ERROR_CODES.ERROR_DATA_LOADING,
+              `source set timeout ${timeout / 1000}s expired`
+            );
+
+            reject(error);
+          }, timeout)
+        : null;
+
+      const onError = () => {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+
+        const err = parseNativeError();
+        reject(err);
+      };
+
+      player.one('error', onError);
       player.src(source);
+      player.loop(false);
       player.ready(() => {
         state.videoType = type;
-        player.one('loadedmetadata', resolve);
+        player.one('loadedmetadata', () => {
+          if (timer) {
+            clearTimeout(timer);
+            timer = null;
+          }
+
+          player.off('error', onError);
+          resolve();
+        });
       });
+    }).finally(() => {
+      isSetupSource = false;
     });
 
   const playVideo = async () => {
@@ -191,7 +234,9 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
   };
 
   const checkPermissions = async () => {
-    await setSource(createFakeSource(), VIDEO_TYPE.FAKE_VIDEO);
+    await setSource(createFakeSource(), {
+      type: VIDEO_TYPE.FAKE_VIDEO,
+    });
 
     const play = async (muted = false): Promise<{ autoplay: boolean; mute: boolean }> => {
       try {

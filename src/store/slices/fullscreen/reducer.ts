@@ -1,7 +1,6 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
-import { isIOS } from 'react-device-detect';
 import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
@@ -58,7 +57,7 @@ const fullscreen = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.fullscreen.step !== prevState.fullscreen.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, fullscreen.name),
     effect: (action, api) => {
       const {
         getState,

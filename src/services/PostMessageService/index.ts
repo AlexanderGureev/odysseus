@@ -1,24 +1,20 @@
 import { logger } from 'utils/logger';
 
 import { Mediator } from '../MediatorService';
-import {
-  INPUT_PLAYER_POST_MESSAGE,
-  OUTPUT_PLAYER_POST_MESSAGE,
-  TInputMessage,
-  TOutputMessage,
-  TPostMessageService,
-} from './types';
+import { INPUT_PLAYER_POST_MESSAGE, InputMessage, OutputEvents } from './types';
 
 const DEFAULT_PARAMS = { app_version: window?.ENV?.APP_VERSION || '' };
 
-const PostMessageService = (): TPostMessageService => {
+const PostMessageService = () => {
   const mediator = Mediator<INPUT_PLAYER_POST_MESSAGE>();
 
-  const emit = (event: OUTPUT_PLAYER_POST_MESSAGE, data: TOutputMessage = {}) => {
-    window.parent.postMessage({ event, ...data, ...DEFAULT_PARAMS }, '*');
+  const emit = <E extends keyof OutputEvents, C extends OutputEvents[E]>(event: E, data?: Parameters<C>[0]) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.parent.postMessage({ event, ...data, payload: { ...data?.payload, ...DEFAULT_PARAMS } }, '*');
   };
 
-  const eventHandler = (event: MessageEvent<TInputMessage>) => {
+  const eventHandler = (event: MessageEvent<InputMessage>) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { event: eventName, method = '', cmd: command, callback, ...rest } = event?.data ?? {};
 

@@ -1,33 +1,20 @@
-import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
-import { toFixed } from 'utils';
 import { logger } from 'utils/logger';
 
 import { FSMState, State, watchPoints } from './types';
 
-const HEARTBEAT_PLAIN_VIDEO_SEC = 30;
-
 const initialState: FSMState = {
   step: 'IDLE',
-
-  previous: {
-    AD: 0,
-    PLAIN: 0,
-  },
-
-  progress: {
-    AD: 0,
-    PLAIN: 0,
-  },
-
-  previousTime: 0,
+  previousTime: -1,
+  points: [],
 };
 
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
-    AD_BLOCK_TIME_UPDATE: null,
+    PARSE_CONFIG_RESOLVE: null,
     TIME_UPDATE: 'CHECK_PLAIN_WATCHPOINT_PENDING',
   },
   CHECK_PLAIN_WATCHPOINT_PENDING: {
@@ -53,15 +40,28 @@ const watchpoint = createSlice({
       logger.log('[FSM]', 'watchpoint', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
-        case 'TIME_UPDATE':
-        case 'AD_BLOCK_TIME_UPDATE':
-          const videoType = type === 'AD_BLOCK_TIME_UPDATE' ? 'AD' : 'PLAIN';
-          const diff = Math.abs(payload.currentTime - state.previous[videoType]);
+        case 'PARSE_CONFIG_RESOLVE': {
+          const scrobbling = payload.config.config.scrobbling;
 
-          if (diff < 1) state.progress[videoType] = toFixed(state.progress[videoType] + diff);
-          state.previous[videoType] = payload.currentTime;
-          state.step = step;
+          const points = scrobbling?.mandatory_points?.length
+            ? scrobbling.mandatory_points.map((value) => ({
+                value,
+                num: value,
+                measure: 'percents',
+              }))
+            : [];
+
+          const uniquePoints = [...watchPoints, ...points].reduce(
+            (acc, point) => ({
+              ...acc,
+              [`${point.measure}:${point.num}`]: point,
+            }),
+            {}
+          );
+
+          state.points = Object.values(uniquePoints);
           break;
+        }
         default:
           return { ...state, step, ...payload };
       }
@@ -71,7 +71,7 @@ const watchpoint = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.watchpoint.step !== prevState.watchpoint.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, watchpoint.name),
     effect: (action, api) => {
       const {
         getState,
@@ -83,7 +83,7 @@ const addMiddleware = () =>
         dispatch: api.dispatch,
       });
 
-      const { step, progress, previousTime } = getState().watchpoint;
+      const { step } = getState().watchpoint;
 
       const opts = {
         dispatch,
@@ -94,57 +94,43 @@ const addMiddleware = () =>
       const handler: { [key in State]?: () => Promise<void> | void } = {
         CHECK_PLAIN_WATCHPOINT_PENDING: () => {
           const {
-            payload: { payload },
-          } = action as PayloadAction<{
-            payload: { currentTime: number };
-          }>;
-
-          const currentTime = Math.floor(payload.currentTime);
-
-          const newProgress = {
-            ...progress,
-          };
-
-          const {
-            playback: { duration },
-            root: { config },
+            watchpoint: { points, previousTime },
+            playback: { currentTime, duration },
             quality: { qualityStats },
             buffering: { bufferingTime, initialBufferTime },
           } = getState();
 
-          const demonStatPayload = {
-            bufferTime: bufferingTime,
-            currentTime,
-            initialBufferTime,
-            playTimeByQuality: qualityStats,
-          };
-
-          const period = config.config.scrobbling?.period;
+          // const demonStatPayload = {
+          //   bufferTime: bufferingTime,
+          //   currentTime,
+          //   initialBufferTime,
+          //   playTimeByQuality: qualityStats,
+          // };
 
           // if (currentTime === 0) {
           //   opts.services.demonService.sendStat(demonStatPayload);
           // }
 
-          if (period && progress.PLAIN > period) {
-            logger.log('[hearbeat]', { type: 'PLAIN', value: HEARTBEAT_PLAIN_VIDEO_SEC });
-            newProgress.PLAIN = 0;
-            opts.services.demonService.sendStat(demonStatPayload);
-          }
+          // opts.services.demonService.sendStat(demonStatPayload);
 
-          if (!duration || Math.floor(previousTime) === currentTime) {
-            dispatch(
-              sendEvent({
-                type: 'CHECK_PLAIN_WATCHPOINT_RESOLVE',
-              })
-            );
-            return;
-          }
+          const time = Math.floor(currentTime || 0);
 
-          for (const { measure, num, value } of watchPoints) {
-            const sec = measure === 'percents' ? Math.floor((num / 100) * duration) : num;
+          if (duration && previousTime !== time) {
+            for (const { measure, num, value } of points) {
+              const sec = measure === 'percents' ? Math.floor((num / 100) * duration) : num;
 
-            if (sec === currentTime) {
-              logger.log('[watchpoint]', { num, value });
+              if (sec === time) {
+                console.log('[TEST] WATCHPOINT', { measure, num, value });
+
+                dispatch(
+                  sendEvent({
+                    type: 'WATCHPOINT',
+                    payload: {
+                      value: { measure, num, value },
+                    },
+                  })
+                );
+              }
             }
           }
 
@@ -152,8 +138,7 @@ const addMiddleware = () =>
             sendEvent({
               type: 'CHECK_PLAIN_WATCHPOINT_RESOLVE',
               payload: {
-                previousTime: payload.currentTime,
-                progress: newProgress,
+                previousTime: time,
               },
             })
           );

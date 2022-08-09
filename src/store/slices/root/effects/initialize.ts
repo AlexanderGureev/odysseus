@@ -4,6 +4,7 @@ import { browserVersion, engineName, engineVersion, isMobile, isSafari, osName, 
 import { APP_DB_NAME, CollectionName, Indexes } from 'services/IDBService/types';
 import { sendEvent } from 'store/actions';
 import { ERROR_CODES } from 'types/errors';
+import { on } from 'utils';
 import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
 import { randomHash12 } from 'utils/randomHash';
@@ -61,6 +62,12 @@ const createAppDatabase = async ({ services: { dbService, windowService } }: Eff
   }
 };
 
+const registerListeners = ({ dispatch }: EffectOpts) => {
+  on(window, 'beforeunload', () => {
+    dispatch(sendEvent({ type: 'BEFORE_UNLOAD' }));
+  });
+};
+
 export const initialize = async (opts: EffectOpts) => {
   const {
     dispatch,
@@ -76,6 +83,7 @@ export const initialize = async (opts: EffectOpts) => {
 
   try {
     await createAppDatabase(opts);
+    registerListeners(opts);
 
     const [isEmbedded] = await Promise.all([
       embeddedCheckService.getEmbededStatus(),
@@ -106,7 +114,6 @@ export const initialize = async (opts: EffectOpts) => {
       },
       deviceInfo: getDeviceInfo(),
     };
-    console.log('[TEST]', payload.deviceInfo);
 
     dispatch(
       sendEvent({

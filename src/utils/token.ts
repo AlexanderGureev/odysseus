@@ -3,6 +3,8 @@ import { Nullable } from 'types';
 
 import { logger } from './logger';
 
+export const DELTA = 5000;
+
 export const getTokenExpiredTime = (token: string): Nullable<number> => {
   let expiredTime = null;
 
@@ -14,4 +16,10 @@ export const getTokenExpiredTime = (token: string): Nullable<number> => {
   }
 
   return expiredTime;
+};
+
+export const isExpired = (token: string) => {
+  const decoded: { exp: number; iat: number } = jwtDecode(token);
+  const expiredAt = decoded.exp * 1000;
+  return Date.now() >= expiredAt;
 };

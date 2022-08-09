@@ -1,15 +1,13 @@
-import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAction, createSlice } from '@reduxjs/toolkit';
 import { fetchConfig } from 'api';
-import { createParams } from 'server/utils';
 import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { TLinkedTracks } from 'types';
 import { ERROR_CODES } from 'types/errors';
 import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
 
-import { TrackParams } from '../root';
 import { checkToken } from '../updater/effects';
 import { FSMState, State } from './types';
 
@@ -86,7 +84,7 @@ const changeTrack = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.changeTrack.step !== prevState.changeTrack.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, changeTrack.name),
     effect: (action, api) => {
       const {
         getState,
@@ -116,6 +114,7 @@ const addMiddleware = () =>
                 config: {
                   playlist: { items },
                 },
+                meta,
               },
             } = getState();
 
@@ -136,7 +135,9 @@ const addMiddleware = () =>
                 type: 'CHANGE_TRACK',
                 meta: {
                   config,
-                  context: {},
+                  context: {
+                    user_token: meta.userToken,
+                  },
                   params: {
                     p2p: `${query?.p2p}` === '1',
                     startAt: null,

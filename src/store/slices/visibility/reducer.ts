@@ -1,6 +1,6 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
@@ -46,7 +46,7 @@ const visibility = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.visibility.step !== prevState.visibility.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, visibility.name),
     effect: (action, api) => {
       const {
         getState,

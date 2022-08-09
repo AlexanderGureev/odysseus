@@ -6,14 +6,10 @@ import { DemonInitOpts, PlayerStats } from 'services/DemonService/types';
 import { LocationState } from 'services/EmbeddedCheckService/types';
 import { HORUS_EVENT } from 'services/HorusService/types';
 import { TStoresConfig } from 'services/IDBService/types';
-import { TManifestData, TParsedManifest } from 'services/ManifestParser';
+import { TManifestData, TParsedManifest } from 'services/ManifestParser/types';
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
-import { Events, Hooks, HookType } from 'services/PlayerService/types';
-import {
-  INPUT_PLAYER_POST_MESSAGE,
-  OUTPUT_PLAYER_POST_MESSAGE,
-  TOutputMessage,
-} from 'services/PostMessageService/types';
+import { Events, Hooks, HookType, SetSourceOpts } from 'services/PlayerService/types';
+import { INPUT_PLAYER_POST_MESSAGE, OutputEvents } from 'services/PostMessageService/types';
 import { TMeta, TQualityItem, TQualityList, TQualityRecord } from 'services/StreamQualityManager/types';
 import { TSource } from 'services/StreamService/types';
 import { TNSEvent } from 'services/TNSCounter/types';
@@ -51,7 +47,7 @@ export interface IAmberdataService {
 
 export interface IPostMessageService {
   init: () => void;
-  emit: (event: OUTPUT_PLAYER_POST_MESSAGE, data?: TOutputMessage) => void;
+  emit: <E extends keyof OutputEvents, C extends OutputEvents[E]>(event: E, data?: Parameters<C>[0]) => void;
   on: Subscribe<INPUT_PLAYER_POST_MESSAGE>;
   one: OnceSubscribe<INPUT_PLAYER_POST_MESSAGE>;
   off: Unsubscribe<INPUT_PLAYER_POST_MESSAGE>;
@@ -108,7 +104,7 @@ export interface IHorusService {
 
 export interface IPlayerService {
   init: (playerId: string, options: VideoJsPlayerOptions) => Promise<void>;
-  setSource: (source: TSource, type?: VIDEO_TYPE) => Promise<void>;
+  setSource: (source: TSource, opts?: SetSourceOpts) => Promise<void>;
   checkPermissions: () => Promise<{ autoplay: boolean; mute: boolean }>;
   play: () => Promise<void>;
   pause: () => void;
@@ -177,6 +173,7 @@ export interface IQualityService {
     opts: {
       currentStream: TStreamItem;
       currentTime: number;
+      isOldSafari: boolean;
     }
   ) => Promise<void>;
 

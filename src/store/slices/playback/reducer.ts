@@ -1,7 +1,7 @@
-import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAction, createSlice } from '@reduxjs/toolkit';
 import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
@@ -106,7 +106,7 @@ const playback = createSlice({
 
 const addMiddleware = () => {
   startListening({
-    predicate: (action, currentState, prevState) => currentState.playback.step !== prevState.playback.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, playback.name),
     effect: (action, api) => {
       const {
         getState,
@@ -128,6 +128,15 @@ const addMiddleware = () => {
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         PLAYBACK_INIT: () => {
+          services.playerService.on('error', (error) => {
+            dispatch(
+              sendEvent({
+                type: 'PLAYER_ERROR',
+                meta: { error },
+              })
+            );
+          });
+
           services.playerService.on('play', () => {
             dispatch(
               sendEvent({

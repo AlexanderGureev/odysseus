@@ -1,7 +1,7 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TParams } from 'server/utils';
 import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { TConfig, TExtendedConfig } from 'types';
 import { logger } from 'utils/logger';
@@ -103,19 +103,10 @@ const config: FSMConfig<State, AppEvent> = {
     RESUME_VIDEO_NOTIFY_REJECT: 'CHECK_PERMISSIONS_PENDING',
     SKIP_RESUME_VIDEO_NOTIFY: 'CHECK_PERMISSIONS_PENDING',
   },
-
   // платный трек недоступен для просмотра
-  PAYWALL: {},
-  // // первый render приложения
-  // RENDER: {
-  //   SET_STATE: null,
-  //   DO_PLAYER_INIT: 'PLAYER_INIT_PENDING',
-  // },
-  // // инициализация playService (videojs)
-  // PLAYER_INIT_PENDING: {
-  //   PLAYER_INIT_RESOLVE: 'CHECK_PERMISSIONS_PENDING',
-  //   PLAYER_INIT_REJECT: 'ERROR',
-  // },
+  PAYWALL: {
+    CLICK_PAYWALL_BUTTON: null,
+  },
   // проверка прав на запуск (autoplay, mute)
   CHECK_PERMISSIONS_PENDING: {
     CHECK_PERMISSIONS_RESOLVE: 'INITIAL_SELECT_SOURCE_PENDING',
@@ -281,7 +272,7 @@ const root = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.root.step !== prevState.root.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, root.name),
     effect: (action, api) => {
       const {
         getState,

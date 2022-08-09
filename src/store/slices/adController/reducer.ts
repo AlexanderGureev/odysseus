@@ -1,6 +1,6 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, FSMConfig } from 'store/types';
 import { TAdPointConfig } from 'types/ad';
 import { logger } from 'utils/logger';
@@ -99,7 +99,7 @@ const adController = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.adController.step !== prevState.adController.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, adController.name),
     effect: (action, api) => {
       const {
         getState,

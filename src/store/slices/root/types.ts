@@ -1,6 +1,6 @@
 import { NextTrackConfig } from 'api/types';
 import { TParams } from 'server/utils';
-import { TManifestData } from 'services/ManifestParser';
+import { TManifestData } from 'services/ManifestParser/types';
 import { TCapabilities } from 'services/StreamService/utils/supports';
 import { DefaultPayload, ErrorPayload, WithoutPayload } from 'store/types';
 import { SkinClass, TConfig, TExtendedConfig, TParsedFeatures, TStreamItem } from 'types';
@@ -56,6 +56,8 @@ export type EventsWithPayload =
       | 'SHOW_BIG_PLAY_BUTTON'
       | 'SELECT_MANIFEST_RESOLVE'
       | 'SETUP_INITIAL_VOLUME_RESOLVE'
+      | 'CLICK_PAYWALL_BUTTON'
+      | 'BEFORE_UNLOAD'
     >
   | ErrorPayload<
       | 'CHECK_ERROR_REJECT'

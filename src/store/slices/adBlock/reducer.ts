@@ -1,6 +1,6 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FSM_EVENT } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, FSMConfig } from 'store/types';
 import { AdCategory } from 'types/ad';
 import { logger } from 'utils/logger';
@@ -95,7 +95,7 @@ const adBlock = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.adBlock.step !== prevState.adBlock.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, adBlock.name),
     effect: (action, api) => {
       const {
         getState,

@@ -1,6 +1,6 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FSM_EVENT, sendEvent } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import { getSavedProgressTime, isOldSafari } from 'store/selectors';
 import type { AppEvent, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
@@ -32,6 +32,13 @@ const config: FSMConfig<State, AppEvent> = {
     LOAD_META_REJECT: 'IDLE',
   },
   LAUNCH_SETUP: {
+    LAUNCH_SETUP_RESOLVE: 'SPLASH_SCREEN_PENDING',
+  },
+  SPLASH_SCREEN_PENDING: {
+    SHOWING_SPLASHCREEN_END: 'RESUME_VIDEO_END',
+    INIT_SPLASHCREEN_REJECT: 'RESUME_VIDEO_END',
+  },
+  RESUME_VIDEO_END: {
     RESUME_VIDEO_RESOLVE: 'IDLE',
   },
 };
@@ -56,9 +63,7 @@ const resumeVideo = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => {
-      return !['IDLE', prevState.resumeVideo.step].includes(currentState.resumeVideo.step);
-    },
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, resumeVideo.name),
     effect: (action, api) => {
       const {
         getState,
@@ -83,7 +88,7 @@ const addMiddleware = () =>
         LAUNCH_SETUP: () => {
           const {
             resumeVideoNotify: { isResetStartTime },
-            playback: { currentTime },
+            playback: { currentTime, duration },
             playbackSpeed: { currentSpeed },
             volume: { volume, muted },
             root: {
@@ -103,7 +108,8 @@ const addMiddleware = () =>
           services.playerService.setVolume(volume);
           services.playerService.setPlaybackRate(currentSpeed);
 
-          const startPosition = isResetStartTime || previews ? 0 : startAt ?? savedTime ?? currentTime ?? 0;
+          const value = isResetStartTime || previews ? 0 : startAt ?? savedTime ?? currentTime ?? 0;
+          const startPosition = value < (duration || 0) ? value : 0;
 
           if (isOldSafari(getState())) {
             services.playerService.one('timeupdate', () => {
@@ -115,12 +121,15 @@ const addMiddleware = () =>
 
           dispatch(
             sendEvent({
-              type: 'RESUME_VIDEO_RESOLVE',
+              type: 'LAUNCH_SETUP_RESOLVE',
             })
           );
         },
         CHECK_TOKEN_PENDING: () => checkToken(opts),
         CHECK_MANIFEST_PENDING: () => checkManifest(opts),
+        RESUME_VIDEO_END: () => {
+          dispatch(sendEvent({ type: 'RESUME_VIDEO_RESOLVE' }));
+        },
       };
 
       const effect = handler[step];

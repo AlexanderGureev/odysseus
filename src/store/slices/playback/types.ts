@@ -40,9 +40,6 @@ export type EventsWithPayload =
       payload: { duration: number };
     }
   | {
-      type: 'DO_PAUSE_RESOLVE';
-    }
-  | {
       type: 'DO_PLAY_RESOLVE';
     };
 

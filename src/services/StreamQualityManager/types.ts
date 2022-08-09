@@ -1,4 +1,4 @@
-import { Playlist } from 'services/ManifestParser';
+import { Playlist } from 'services/ManifestParser/types';
 import { QUALITY_MARKS } from 'services/VigoService';
 import { Nullable } from 'types';
 

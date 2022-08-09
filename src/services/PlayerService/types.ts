@@ -24,7 +24,7 @@ export type Events = {
 
 export type TPlayerService = {
   init: (playerId: string, options?: VideoJsPlayerOptions) => Promise<void>;
-  setSource: (source: videojs.Tech.SourceObject, type?: VIDEO_TYPE) => Promise<void>;
+  setSource: (source: videojs.Tech.SourceObject, opts?: SetSourceOpts) => Promise<void>;
   initialPlay: (muted?: boolean) => Promise<void>;
   play: () => Promise<void>;
   pause: () => void;
@@ -72,6 +72,8 @@ export enum PLAYER_TYPE {
 export type Hooks = {
   beforeSetSource: (type: VIDEO_TYPE) => Promise<void> | void;
 };
+
+export type SetSourceOpts = { type?: VIDEO_TYPE; timeout?: number };
 
 export type HookType = keyof Hooks;
 

@@ -103,7 +103,7 @@ export const startNextBlock = async ({
 
     vigoService.sendStat({ type: 'suspendStats' });
 
-    await playerService.setSource(createFakeSource(), VIDEO_TYPE.FAKE_VIDEO);
+    await playerService.setSource(createFakeSource(), { type: VIDEO_TYPE.FAKE_VIDEO });
     await currentBlock.play();
   } catch (err) {
     logger.error('[ad play pending]', { index }, err?.message);

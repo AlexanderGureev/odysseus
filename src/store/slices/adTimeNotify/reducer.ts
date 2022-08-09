@@ -1,6 +1,6 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FSM_EVENT } from 'store/actions';
-import { startListening } from 'store/middleware';
+import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
@@ -74,7 +74,7 @@ const adTimeNotify = createSlice({
 
 const addMiddleware = () =>
   startListening({
-    predicate: (action, currentState, prevState) => currentState.adTimeNotify.step !== prevState.adTimeNotify.step,
+    predicate: (action, currentState, prevState) => isStepChange(prevState, currentState, adTimeNotify.name),
     effect: (action, api) => {
       const {
         getState,

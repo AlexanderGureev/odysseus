@@ -23,7 +23,7 @@ type TRequestConfig = { url: string; params: Record<string, string> } | undefine
 export type TParams = {
   partner_id: string;
   track_id: string;
-  user_token?: string;
+  user_token?: string | null;
   sign?: string;
   pf?: string;
   pt?: string;
@@ -70,7 +70,7 @@ export const buildRequstByConfigSource = (configSource: TConfigSource, params: T
 
 export const DATA_REQUEST_TIMEOUT = 5000;
 
-export const toNumber = (value: string | number | undefined) => {
+export const toNumber = (value: string | number | null | undefined) => {
   if (value === null || value === undefined) return null;
   const num = Number(value);
   return !isNaN(num) ? num : null;

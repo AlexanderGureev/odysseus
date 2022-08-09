@@ -17,6 +17,10 @@ body {
   overflow: hidden;
 }
 
+#root {
+  background: #000;
+}
+
 #root,
 .player-manager,
 #video-player,
@@ -26,6 +30,7 @@ body {
 }
 
 .controls {
+  background: rgba(255, 255, 255, 0.6);
   position: absolute;
   left: 25px;
   top: 25px;
@@ -49,4 +54,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.splash-screen {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.splash-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
 }

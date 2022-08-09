@@ -1,52 +1,218 @@
-import { PLAYER_ERROR_TYPE } from 'components/ErrorManager/types';
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
 import { Nullable } from 'types';
+import { ERROR_TYPE } from 'types/errors';
 
 export enum ERROR_CODE {
   ADULT_CONTENT = 154,
   RESUME_NOTIFY = 155,
 }
 
-// Ивенты направленные от плеера к вебу
-export type OUTPUT_PLAYER_POST_MESSAGE =
-  | 'getPageLocation'
-  | 'switch_cancel'
-  | 'new_track'
-  | 'auto_switch'
-  | 'inited'
-  | 'inited-player'
-  | 'started'
-  | 'video-started'
-  | 'paused'
-  | 'ended'
-  | 'error'
-  | 'autoplay'
-  | 'resumed'
-  | 'rewound'
-  | 'adShown'
-  | 'pay_and_watch_button'
-  | 'adTestShown'
-  | 'subscription_restore'
-  | 'new-video-started'
-  | 'exit-full-screen'
-  | 'enter-full-screen'
-  | 'show_payment_popup'
-  | 'button_disable_ad'
-  | 'launch-player'
-  | 'play'
-  | 'view'
-  | 'watchpoint'
-  | 'time_roll'
-  | 'player_refresh'
-  | 'playerStarted'
-  | 'notify'
-  | 'token_expired'
-  | 'BI';
+export enum NOTIFY_TYPES {
+  PAYWALL_ON_START = 1,
+  PAYWALL_AFTER_PREVIEW = 2,
+}
 
-// export enum NOTIFY_TYPES {
-//   PAYWALL_ON_START = 1,
-//   PAYWALL_AFTER_PREVIEW = 2,
-// }
+type Payload<T> = {
+  payload: T;
+};
+
+export type OutputEvents = {
+  loaded: () => void;
+
+  getPageLocation: () => void;
+  switch_cancel: (
+    data: Payload<{
+      videosession_id: string;
+      time_cursor: number;
+      trackDescription: TLinkedTrack;
+      trackId: number;
+      projectId: number;
+    }>
+  ) => void;
+  new_track: (
+    data: Payload<{
+      target: 'next' | 'prev';
+      auto: boolean;
+      trackDescription: TLinkedTrack;
+      overlay: boolean;
+      videosession_id: string;
+      time_cursor: number;
+      track_id: number;
+      project_id: number;
+    }>
+  ) => void;
+  auto_switch: (
+    data: Payload<{
+      videosession_id: string;
+      time_cursor: number;
+      trackDescription: TLinkedTrack;
+      trackId: number;
+      projectId: number;
+    }>
+  ) => void;
+
+  inited: (data: Payload<{ adv: boolean }>) => void;
+  'inited-player': () => void;
+  started: (data: { time: number; payload: { sub_button: boolean } }) => void;
+  'video-started': () => void;
+  paused: (data: { time: number }) => void;
+  ended: (data: { time: number }) => void;
+  error: (data: { code: number; payload?: { code: number; type: ERROR_TYPE; track_id: number | null } }) => void;
+
+  rewound: (data: { time: number; previousTime: number }) => void;
+  adShown: (data: { time: number }) => void;
+  pay_and_watch_button: (data: Payload<{ time_cursor: number; btn_type: string }>) => void;
+
+  subscription_restore: () => void;
+
+  'exit-full-screen': () => void;
+  'enter-full-screen': () => void;
+  show_payment_popup: () => void;
+  button_disable_ad: () => void;
+  'launch-player': (data: Payload<{ volume: number; is_sub_button: boolean }>) => void;
+  play: (data: Payload<{ videosession_id: string; track_id: number }>) => void;
+  view: (data: Payload<{ videosession_id: string; track_id: number }>) => void;
+  watchpoint: (
+    data: Payload<{
+      track_id: number;
+      videosession_id: string;
+      user_id: string;
+      time_cursor: number;
+      duration: number;
+      value: number;
+      sid: string;
+    }>
+  ) => void;
+  time_roll: (
+    data: Payload<{
+      event_value: string;
+      videosession_id: string;
+      time_cursor: number;
+      track_id: number;
+      project_id: number;
+    }>
+  ) => void;
+  player_refresh: () => void;
+  playerStarted: () => void;
+  notify: (data: { code: NOTIFY_TYPES }) => void;
+  token_expired: () => void;
+  BI: (
+    data: Payload<{
+      page?: string;
+      block?: string;
+      event_name?: string;
+      event_type?: string;
+      event_value?: string;
+      answer?: string;
+    }>
+  ) => void;
+  play_btn_click: (data: Payload<{ btn_type: 'play' | 'pause' }>) => void;
+
+  error_response: (
+    data: Payload<{
+      project_id: number;
+      track_id: number;
+      videosession_id: string;
+      time_cursor: number;
+    }>
+  ) => void;
+  error_response_send: (
+    data: Payload<{
+      project_id: number;
+      track_id: number;
+      videosession_id: string;
+      time_cursor: number;
+      event_value: string;
+    }>
+  ) => void;
+  error_response_ok: (
+    data: Payload<{
+      project_id: number;
+      track_id: number;
+      videosession_id: string;
+      time_cursor: number;
+      event_value: string;
+    }>
+  ) => void;
+  error_close: (
+    data: Payload<{
+      project_id: number;
+      track_id: number;
+      videosession_id: string;
+      time_cursor: number;
+      event_value: string;
+    }>
+  ) => void;
+
+  recommendation_show: (
+    data: Payload<{
+      track_id: number;
+      project_id: number;
+      event_name: string;
+      event_type: string;
+    }>
+  ) => void;
+  recommendation_hide: (
+    data: Payload<{
+      track_id: number;
+      project_id: number;
+      event_name: string;
+    }>
+  ) => void;
+  recommendation_tile: (
+    data: Payload<{
+      track_id: number;
+      project_id: number;
+      event_name: string;
+      event_value: string;
+      position: number;
+    }>
+  ) => void;
+  recommendation_left: (
+    data: Payload<{
+      track_id: number;
+      project_id: number;
+      event_name: string;
+    }>
+  ) => void;
+  recommendation_right: (
+    data: Payload<{
+      track_id: number;
+      project_id: number;
+      event_name: string;
+    }>
+  ) => void;
+
+  change_track: (
+    data: Payload<{
+      track_id: number;
+      canonical_url: string;
+    }>
+  ) => void;
+  audio: () => void;
+  audio_choice: (data: Payload<{ event_value: 'english' | 'russian' }>) => void;
+  volume: (data: Payload<{ volume: number }>) => void;
+
+  player_status: (
+    data: Payload<{
+      time_cursor: number;
+      video_type: string;
+      loadedmetadata: boolean;
+      started: boolean;
+      error_code: number;
+      error_shown: boolean;
+      app_version: string;
+    }>
+  ) => void;
+  watchprogress: (data: {
+    data: {
+      track_id: number;
+      project_id: number;
+      time_cursor: number;
+      duration: number;
+    };
+  }) => void;
+};
 
 export type PlayerParams = {
   startAt?: number | null;
@@ -115,29 +281,6 @@ export type TLinkedTrack = {
   };
 };
 
-export type TOutputMessage = {
-  code?: ERROR_CODE;
-  volume?: string;
-  time?: number;
-  duration?: number;
-  previousTime?: number;
-  target?: string;
-  trackDescription?: TLinkedTrack;
-  payload?: {
-    code?: string;
-    type?: PLAYER_ERROR_TYPE;
-    track_id?: number | null;
-    videosession_id?: string | null;
-    time_cursor?: number;
-    trackDescription?: TLinkedTrack;
-    trackId?: number;
-    projectId?: number;
-    adv?: boolean;
-    value?: number | string | null;
-    answer?: string;
-  };
-};
-
 export type TMessage = {
   event: keyof INPUT_PLAYER_POST_MESSAGE;
   location?: string;
@@ -151,11 +294,11 @@ export type TLegacyMessage = {
   cmd?: any; // TODO REMOVE
 };
 
-export type TInputMessage = TMessage & TLegacyMessage;
+export type InputMessage = TMessage & TLegacyMessage;
 
 export type TPostMessageService = {
   init: () => void;
-  emit: (event: OUTPUT_PLAYER_POST_MESSAGE, data?: TOutputMessage) => void;
+  emit: <E extends keyof OutputEvents, C extends OutputEvents[E]>(event: E, data: Parameters<C>[0]) => void;
   on: Subscribe<INPUT_PLAYER_POST_MESSAGE>;
   one: OnceSubscribe<INPUT_PLAYER_POST_MESSAGE>;
   off: Unsubscribe<INPUT_PLAYER_POST_MESSAGE>;

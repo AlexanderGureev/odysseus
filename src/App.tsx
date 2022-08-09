@@ -7,7 +7,6 @@ import React from 'react';
 import { AmberdataService } from 'services/AmberdataService';
 import { EmbeddedCheckService } from 'services/EmbeddedCheckService';
 import { PostMessageService } from 'services/PostMessageService';
-import { OUTPUT_PLAYER_POST_MESSAGE } from 'services/PostMessageService/types';
 import { SauronService } from 'services/SauronService';
 import { logger } from 'utils/logger';
 

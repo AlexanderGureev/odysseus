@@ -7,7 +7,7 @@ import { logger } from 'utils/logger';
 export const selectSource = ({ dispatch, services: { streamService } }: EffectOpts) => {
   try {
     const stream = streamService.getStream();
-    if (!stream) throw new PlayerError(ERROR_CODES.UNKNOWN, 'stream is undefined');
+    if (!stream) throw new Error('stream is undefined');
 
     dispatch(
       sendEvent({

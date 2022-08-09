@@ -35,13 +35,30 @@ export const SERVICE_GROUP_ID: { [key in SkinClass]?: number } = {
 
 export type SubscriptionPreviewType = 'HUB' | 'PAK' | 'FALSE';
 
+type MIN_AGE_RESTRICTION = 0 | 6 | 12 | 16 | 18;
+
+type DISCLAIMER_AGE_RESTRICTIONS = {
+  show_duration: null | number;
+  images: {
+    [key in MIN_AGE_RESTRICTION | 'default']?: string;
+  };
+};
+
 export type TFeatureConfig = {
   CONTINUE_WATCHING_NOTIFY?: boolean;
   PREVIEW_TIMELINE?: 'PREVIEW' | 'TRACK';
 
+  DISCLAIMER_AGE_RESTRICTIONS?: Nullable<DISCLAIMER_AGE_RESTRICTIONS>;
+
+  SPLASH_SCREEN_IMAGE?: string;
+  SPLASH_SCREEN_DURATION?: number;
+  // SPLASH_SCREEN_ENABLED?: boolean;
+  // SPLASH_SCREEN_VARIATION: 'MORE_TV' | null;
+  AD_SPLASH_SCREEN_IMAGE?: string;
+  AD_SPLASH_SCREEN_DURATION?: number;
+
   NEXT_EPISODE: 'POSTMESSAGE' | 'LINK' | false;
   PREV_EPISODE: 'POSTMESSAGE' | 'LINK' | false;
-  SPLASH_SCREEN_VARIATION: 'MORE_TV' | null;
   SUBSCRIPTION_TITLE: string;
   SUBSCRIPTION_PREVIEW: SubscriptionPreviewType;
   AUTOPLAY: 'ALWAYS' | 'NEVER' | 'ON' | 'OFF';
@@ -52,6 +69,7 @@ export type TFeatureConfig = {
   ADV_PLAY_WAIT_TIMEOUT: string;
   ADV_INTERSECTION_TIMEOUT: string;
   ADV_PAUSE_ROLL_ACTIVATE_TIMEOUT: string;
+  LOADING_SOURCE_TIMEOUT?: string;
 
   ADV_START_WARNING: string;
   CONTROLS: boolean;
@@ -286,6 +304,7 @@ export type TParsedFeatures = Partial<
       ADV_PLAY_WAIT_TIMEOUT: number;
       ADV_INTERSECTION_TIMEOUT: number;
       ADV_PAUSE_ROLL_ACTIVATE_TIMEOUT: number;
+      LOADING_SOURCE_TIMEOUT?: number;
     }
   >
 >;

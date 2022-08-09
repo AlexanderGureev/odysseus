@@ -1,6 +1,7 @@
 import { ILocalStorageService } from 'interfaces';
 import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { AppState } from 'store';
+import { isNil } from 'utils';
 
 export const getPlaylistItem = (state: AppState) => state.root.config.playlist.items[0];
 
@@ -59,5 +60,18 @@ export const getSavedProgressTime = (state: AppState, localStorageService: ILoca
 
 export const isOldSafari = (state: AppState) => {
   const { deviceInfo } = state.root;
-  return deviceInfo.isSafari && deviceInfo.browserVersion && parseInt(deviceInfo.browserVersion) <= 13;
+  return Boolean(deviceInfo.isSafari && deviceInfo.browserVersion && parseInt(deviceInfo.browserVersion) <= 13);
+};
+
+export const getStartAt = (state: AppState) => {
+  const { duration } = getPlaylistItem(state);
+  const {
+    root: {
+      params: { startAt },
+    },
+  } = state;
+
+  if (!duration) return startAt;
+
+  return typeof startAt === 'number' && startAt < duration ? startAt : null;
 };

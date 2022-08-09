@@ -1,5 +1,6 @@
 import { EffectOpts } from 'interfaces';
 import { sendEvent } from 'store/actions';
+import { isOldSafari } from 'store/selectors';
 import { ERROR_CODES } from 'types/errors';
 import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
@@ -23,6 +24,7 @@ export const changeQuality = async ({ getState, dispatch, services: { qualitySer
     await qualityService.setQuality(data, {
       currentStream,
       currentTime: currentTime || 0,
+      isOldSafari: isOldSafari(getState()),
     });
 
     dispatch(

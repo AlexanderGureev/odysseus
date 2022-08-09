@@ -1,7 +1,7 @@
 import { EffectOpts } from 'interfaces';
 import { ERROR_CODE } from 'services/PostMessageService/types';
 import { sendEvent } from 'store';
-import { getSavedProgressTime } from 'store/selectors';
+import { getSavedProgressTime, getStartAt } from 'store/selectors';
 
 export const checkResumeVideo = async ({
   getState,
@@ -10,16 +10,13 @@ export const checkResumeVideo = async ({
 }: EffectOpts) => {
   const {
     resumeVideoNotify: { isActive },
-    root: {
-      params: { startAt },
-      features,
-    },
+    root: { features, previews },
   } = getState();
 
   const savedTime = getSavedProgressTime(getState(), localStorageService);
-  const time = startAt ?? savedTime ?? 0;
+  const time = getStartAt(getState()) ?? savedTime ?? 0;
 
-  if (isActive && features.CONTINUE_WATCHING_NOTIFY && time > 1) {
+  if (isActive && !previews && features.CONTINUE_WATCHING_NOTIFY && time > 1) {
     dispatch(
       sendEvent({
         type: 'SHOW_RESUME_VIDEO_NOTIFY',

@@ -1,5 +1,4 @@
 import { EffectOpts } from 'interfaces';
-import { isIOS, isSafari } from 'react-device-detect';
 import { createSource } from 'services/StreamService/utils';
 import { sendEvent } from 'store';
 import { ERROR_CODES } from 'types/errors';
@@ -9,7 +8,7 @@ import { logger } from 'utils/logger';
 export const loadMeta = async ({ getState, dispatch, services: { playerService } }: EffectOpts) => {
   try {
     const {
-      root: { currentStream },
+      root: { currentStream, features },
       quality: { currentURL },
     } = getState();
 
@@ -18,9 +17,11 @@ export const loadMeta = async ({ getState, dispatch, services: { playerService }
     }
 
     const source = createSource({ ...currentStream, url: currentURL });
-    logger.log('[loadMeta]', { source });
+    logger.log('[loadMeta]', { source, timeout: features.LOADING_SOURCE_TIMEOUT });
 
-    await playerService.setSource(source);
+    await playerService.setSource(source, {
+      timeout: features.LOADING_SOURCE_TIMEOUT,
+    });
 
     dispatch(
       sendEvent({
@@ -34,9 +35,12 @@ export const loadMeta = async ({ getState, dispatch, services: { playerService }
       sendEvent({
         type: 'LOAD_META_REJECT',
         meta: {
-          error: new PlayerError(ERROR_CODES.UNKNOWN, err?.message).serialize(),
+          error: err.serialize(),
         },
-      })
+      }),
+      {
+        currentSession: true,
+      }
     );
   }
 };

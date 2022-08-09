@@ -39,33 +39,33 @@ export const ViewedTimeContainer = () => {
 };
 
 const BeholderService = () => {
-  let state: TBeholderState = initalState;
-  let points: Record<string, boolean> = {};
+  const state: TBeholderState = initalState;
+  const points: Record<string, boolean> = {};
   const viewedTimeContainer = ViewedTimeContainer();
 
   const init = async ({ serviceDisabled, seasonName, userId, ...params }: TBeholderParams) => {
     logger.log('[BeholderService]', 'init');
 
-    if (!params.userToken || serviceDisabled) {
-      state = initalState;
-      return;
-    }
+    // if (!params.userToken || serviceDisabled) {
+    //   state = initalState;
+    //   return;
+    // }
 
-    state = {
-      ...state,
-      ...params,
-      userId: userId || -1,
-      disabled: false,
-    };
+    // state = {
+    //   ...state,
+    //   ...params,
+    //   userId: userId || -1,
+    //   disabled: false,
+    // };
 
-    const num = seasonName?.match(CONTAIN_NUMBER_REGEX)?.[0];
-    if (num) state.seasonNum = Number(num);
+    // const num = seasonName?.match(CONTAIN_NUMBER_REGEX)?.[0];
+    // if (num) state.seasonNum = Number(num);
 
-    if (params.scrobbling?.mandatory_points?.length) {
-      points = params.scrobbling.mandatory_points.reduce((acc, key) => ({ ...acc, [key]: false }), {});
-    }
+    // if (params.scrobbling?.mandatory_points?.length) {
+    //   points = params.scrobbling.mandatory_points.reduce((acc, key) => ({ ...acc, [key]: false }), {});
+    // }
 
-    state.token = await fetchToken();
+    // state.token = await fetchToken();
   };
 
   const isPointReached = (currentTime: number) => {

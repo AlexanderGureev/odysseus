@@ -1,4 +1,5 @@
 import { isNil } from 'lodash';
+import { toNumber } from 'server/utils';
 import { TParsedFeatures } from 'types';
 import { toNum } from 'utils';
 
@@ -69,14 +70,17 @@ export const AUTOPLAY_MATRIX: TAutoPlayMatrix = {
 
 const PARSE_MAP: Record<string, (value?: string) => string | number | boolean | undefined | null> = {
   sign: (value?: string) => value,
-  pf: (value?: string) => toNum(value) ?? null,
-  pt: (value?: string) => toNum(value) ?? null,
+  pf: (value?: string) => toNumber(value),
+  pt: (value?: string) => toNumber(value),
   userId: (value?: string) => value,
   p2p: (value?: string) => ['1', 'true'].includes(value || ''),
   adult: (value?: string) => (value ? ['1', 'true'].includes(value) : true),
   autoplay: (value?: string) => value?.toLowerCase(),
   trial_available: (value?: string) => ['1', 'true'].includes(value || ''),
-  startAt: (value?: string) => toNum(value) ?? null,
+  startAt: (value?: string) => {
+    const num = toNumber(value);
+    return typeof num === 'number' && num >= 0 ? num : null;
+  },
 };
 
 export const parseQueryParams = (features: TParsedFeatures): TQueryParams => {

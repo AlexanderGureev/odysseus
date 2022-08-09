@@ -4,8 +4,8 @@ import { PlayerError } from 'utils/errors';
 export type State = 'IDLE' | 'ERROR';
 
 export type EventsWithPayload = {
-  type: 'SET_ERROR';
-  payload: {
+  type: 'PLAYER_ERROR';
+  meta: {
     error: PlayerError | null;
   };
 };

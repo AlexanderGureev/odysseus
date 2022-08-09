@@ -8,10 +8,14 @@ export type State =
   | 'LAUNCH_SETUP'
   | 'CHECK_TOKEN_PENDING'
   | 'CHECK_MANIFEST_PENDING'
-  | 'FETCHING_MANIFEST';
+  | 'FETCHING_MANIFEST'
+  | 'SPLASH_SCREEN_PENDING'
+  | 'RESUME_VIDEO_END';
 
 export type EventsWithPayload =
-  | WithoutPayload<'RESUME_VIDEO_RESOLVE' | 'RESUME_VIDEO' | 'LOAD_META_RESOLVE' | 'INIT_RESUME_VIDEO'>
+  | WithoutPayload<
+      'RESUME_VIDEO_RESOLVE' | 'RESUME_VIDEO' | 'LOAD_META_RESOLVE' | 'INIT_RESUME_VIDEO' | 'LAUNCH_SETUP_RESOLVE'
+    >
   | ErrorPayload<'LOAD_META_REJECT'>;
 
 export type Event = EventsWithPayload['type'];

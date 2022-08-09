@@ -8,7 +8,6 @@ import { DEFAULT_PLAYER_ID } from 'components/Player/types';
 import { SkinConstructor } from 'components/SkinConstructor';
 import { Range } from 'components/UIKIT/Range';
 import { useAppDispatch, useAppSelector } from 'hooks';
-import { StreamProvider } from 'providers/StreamProvider';
 import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
@@ -19,7 +18,9 @@ import { QUALITY_MARKS } from 'services/VigoService';
 import { WindowController } from 'services/WindowController';
 import { sendEvent, store } from 'store';
 import { getTrackInfo } from 'store/selectors';
+import { Screens } from 'store/slices/splashscreen';
 import { secToHumanReadeable } from 'utils';
+import { sleep } from 'utils/retryUtils';
 
 // start app
 store.dispatch(sendEvent({ type: 'DO_INIT' }));
@@ -388,11 +389,36 @@ const Player = () => {
   );
 };
 
+const SpashScreen: React.FC<{ data: Screens }> = ({ data }) => {
+  const dispatch = useAppDispatch();
+  const [image, setImage] = React.useState<string | null>(null);
+
+  React.useLayoutEffect(() => {
+    const imageIterator = async () => {
+      for (const { img, duration } of data) {
+        setImage(img);
+        await sleep(duration);
+      }
+    };
+
+    imageIterator().then(() => {
+      dispatch(sendEvent({ type: 'SHOWING_SPLASHCREEN_END' }));
+    });
+  }, [data, dispatch]);
+
+  return image ? (
+    <div className="splash-screen">
+      <img src={image} />
+    </div>
+  ) : null;
+};
+
 const PlayerManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const { step, isShowPlayerUI } = useAppSelector((state) => state.root);
   const adultNotify = useAppSelector((state) => state.adultNotify);
   const resumeVideoNotify = useAppSelector((state) => state.resumeVideoNotify);
+  const splashscreen = useAppSelector((state) => state.splashscreen);
 
   return (
     <div className="player-manager">
@@ -448,6 +474,30 @@ const PlayerManager: React.FC = () => {
           </button>
         </div>
       )}
+
+      {step === 'BIG_PLAY_BUTTON' && (
+        <div className="overlay">
+          <button
+            onClick={() => {
+              dispatch(sendEvent({ type: 'CLICK_BIG_PLAY_BUTTON' }));
+            }}>
+            play
+          </button>
+        </div>
+      )}
+
+      {step === 'PAYWALL' && (
+        <div className="overlay">
+          <button
+            onClick={() => {
+              dispatch(sendEvent({ type: 'CLICK_PAYWALL_BUTTON' }));
+            }}>
+            купить подписку
+          </button>
+        </div>
+      )}
+
+      {splashscreen.step === 'SHOWING_SPLASHCREEN' && <SpashScreen data={splashscreen.screens} />}
     </div>
   );
 };
