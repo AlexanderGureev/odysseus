@@ -70,3 +70,54 @@ body {
   object-fit: contain;
   background: #000;
 }
+
+.network-notify {
+  position: fixed;
+  top: 0px;
+  z-index: 1000;
+  background: red;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 6px 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.network-notify button {
+  pointer-events: all;
+  margin-left: 10px;
+}
+
+.network-notify.offline {
+  opacity: 1;
+  background-color: #ff3b30;
+}
+
+.network-notify.rejected {
+  background-color: #808080;
+}
+
+@keyframes hide {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.network-notify.online {
+  background-color: #4cd964;
+  animation: hide 0.3s ease forwards;
+  animation-delay: 3s;
+  pointer-events: none;
+  opacity: 1;
+}
+
+.favourites {
+  position: absolute;
+  right: 0;
+  top: 0;
+}

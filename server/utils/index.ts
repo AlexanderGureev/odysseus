@@ -100,6 +100,7 @@ export const createEnv = (req: express.Request): TEnvConfig => ({
   YOUBORA_ACCOUNT_CODE: process.env.YOUBORA_ACCOUNT_CODE,
   YOUBORA_SERVICE_ENABLED: toBool(process.env.YOUBORA_SERVICE_ENABLED),
   YMID: toNumber(process.env.YMID),
+  PUBLIC_BE_ENDPOINT: process.env.PUBLIC_BE_ENDPOINT,
 });
 
 export const isNumber = (num: string | undefined) => num && !Number.isNaN(Number(num));

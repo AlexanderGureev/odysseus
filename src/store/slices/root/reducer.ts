@@ -1,5 +1,6 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TParams } from 'server/utils';
+import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
@@ -391,7 +392,12 @@ const addMiddleware = () =>
         BIG_PLAY_BUTTON: () => {
           return;
         },
-        READY: () => startPlayback(opts),
+        READY: () => {
+          const { config } = getState().root;
+
+          services.localStorageService.setItemByDomain(STORAGE_SETTINGS.USER_ID, config.config?.user_id || null);
+          startPlayback(opts);
+        },
       };
 
       const effect = handler[step];

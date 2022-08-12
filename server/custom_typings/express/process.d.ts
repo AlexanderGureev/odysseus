@@ -6,6 +6,7 @@ export interface IProcessEnv {
   PAK_HOST: string;
   HYDRA_HOST: string;
   BE_ENDPOINT: string;
+  PUBLIC_BE_ENDPOINT: string;
   CTC_BE_ENDPOINT: string;
   HORUS_SRC: string;
   TURMS_ENDPOINT?: string;

@@ -76,7 +76,7 @@ const TARRIFS_ENDPOINT_BY_THEME: { [key in SkinClass]?: string } = {
 };
 
 export const serviceTariffsRequest = async (
-  userToken: string | undefined,
+  userToken: string | null | undefined,
   theme: SkinClass,
   options: TOptions = {}
 ) => {
@@ -134,7 +134,7 @@ const SUBSCRIPTION_ENDPOINT_BY_THEME: { [key in SkinClass]?: string } = {
 };
 
 export const userSubscriptionRequest = async (
-  userToken: string | undefined,
+  userToken: string | null | undefined,
   theme: SkinClass,
   options: TOptions = {}
 ) => {

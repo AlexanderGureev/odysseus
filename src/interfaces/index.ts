@@ -4,8 +4,16 @@ import { AmberdataEventPayload, CrashEventPayload, TAmberdataParams } from 'serv
 import { TBeholderParams } from 'services/BeholderService/types';
 import { DemonInitOpts, PlayerStats } from 'services/DemonService/types';
 import { LocationState } from 'services/EmbeddedCheckService/types';
+import {
+  CreateFavourite,
+  DeleteFavouriteById,
+  FavouriteItem,
+  FavouritesResponse,
+  FavouriteStoreItem,
+  GetFavouritesParams,
+} from 'services/FavouritesService/types';
 import { HORUS_EVENT } from 'services/HorusService/types';
-import { TStoresConfig } from 'services/IDBService/types';
+import { TQuery, TStoresConfig } from 'services/IDBService/types';
 import { TManifestData, TParsedManifest } from 'services/ManifestParser/types';
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
 import { Events, Hooks, HookType, SetSourceOpts } from 'services/PlayerService/types';
@@ -33,6 +41,19 @@ export interface IEmbeddedCheckService {
 
 export interface IDBService {
   connect: (dbName: string, stores: TStoresConfig, version?: number) => Promise<IDBDatabase>;
+  runTransaction<T>(collectionName: string, type: IDBTransactionMode, query: TQuery<T>): Promise<T>;
+}
+
+export interface IPersistentStore<T> {
+  put: (data: T[]) => Promise<void>;
+  getBy: <K extends IDBValidKey>(indexName: string, key: K) => Promise<T[]>;
+  getAll: () => Promise<T[]>;
+  deleteByKey: <K extends IDBValidKey>(key: K) => Promise<void>;
+  clear: () => Promise<void>;
+}
+
+export interface IAuthService {
+  getToken: () => string | null;
 }
 
 export interface IWindowService {
@@ -193,6 +214,19 @@ export interface IDemonService {
   sendStat: (payload: PlayerStats) => void;
 }
 
+export interface IFavouritesService {
+  init: (db: IDBService, authSvc: IAuthService) => void;
+  sync: () => void;
+  createFavourites: (params: CreateFavourite) => Promise<FavouriteItem[]>;
+  fetchFavourites: (params?: GetFavouritesParams) => Promise<FavouritesResponse>;
+  fetchFavouriteById: (params: DeleteFavouriteById) => Promise<FavouriteItem>;
+  deleteFavouriteById: (params: DeleteFavouriteById) => Promise<void>;
+  getFavouritesByProjectId: (projectId: number) => Promise<FavouriteStoreItem>;
+  getStagedFavourites: () => Promise<FavouriteStoreItem[]>;
+  putFavourites: (data: FavouriteStoreItem[]) => Promise<void>;
+  clearFavourites: () => Promise<void>;
+}
+
 export interface IServices {
   embeddedCheckService: IEmbeddedCheckService;
   dbService: IDBService;
@@ -215,6 +249,7 @@ export interface IServices {
   manifestService: IManifestService;
   qualityService: IQualityService;
   demonService: IDemonService;
+  favouritesService: IFavouritesService;
 }
 
 export type EffectOpts = {

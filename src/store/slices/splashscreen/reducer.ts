@@ -14,21 +14,20 @@ export const DEFAULT_AD_SPLASH_SCREEN_DURATION = 3500;
 const initialState: FSMState = {
   step: 'IDLE',
   screens: [],
+  disabled: false,
 };
 
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
+    CHANGE_TRACK: null,
     LAUNCH_SETUP_RESOLVE: 'INIT_SPLASHCREEN',
   },
   INIT_SPLASHCREEN: {
     INIT_SPLASHCREEN_RESOLVE: 'SHOWING_SPLASHCREEN',
-    INIT_SPLASHCREEN_REJECT: 'DISABLED',
+    INIT_SPLASHCREEN_REJECT: 'IDLE',
   },
   SHOWING_SPLASHCREEN: {
-    SHOWING_SPLASHCREEN_END: 'DISABLED',
-  },
-  DISABLED: {
-    CHANGE_TRACK: 'IDLE',
+    SHOWING_SPLASHCREEN_END: 'IDLE',
   },
 };
 
@@ -42,10 +41,18 @@ const splashscreen = createSlice({
 
       const next = config[state.step]?.[type];
       if (next === undefined) return state;
+      const step = next || state.step;
 
       logger.log('[FSM]', 'splashscreen', `${state.step} -> ${type} -> ${next}`);
 
-      return next ? { ...state, step: next, ...payload } : state;
+      switch (type) {
+        case 'CHANGE_TRACK':
+          return initialState;
+        case 'SHOWING_SPLASHCREEN_END':
+          return { ...state, step, disabled: true };
+        default:
+          return { ...state, step, ...payload };
+      }
     });
   },
 });
@@ -75,6 +82,7 @@ const addMiddleware = () =>
       const handler: { [key in State]?: () => Promise<void> | void } = {
         INIT_SPLASHCREEN: () => {
           const {
+            splashscreen: { disabled },
             root: {
               features: {
                 DISCLAIMER_AGE_RESTRICTIONS,
@@ -85,6 +93,10 @@ const addMiddleware = () =>
               },
             },
           } = getState();
+
+          if (disabled) {
+            return dispatch(sendEvent({ type: 'INIT_SPLASHCREEN_REJECT' }));
+          }
 
           const minAge = getMinAge(getState());
           const screens: Screens = [];

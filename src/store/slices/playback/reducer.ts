@@ -50,14 +50,14 @@ const config: FSMConfig<State, AppEvent> = {
     DO_PAUSE: 'PAUSED',
     AD_BREAK_STARTED: 'AD_BREAK',
     TIME_UPDATE: null,
-    SEEK: null,
+    SEEK_STARTED: null,
   },
   PAUSED: {
     SET_PLAYING: 'PLAYING',
     DO_PLAY: 'CHECK_TOKEN_PENDING',
     ENDED: 'END',
     TIME_UPDATE: null,
-    SEEK: null,
+    SEEK_STARTED: null,
   },
   END: {
     CHECK_POST_ROLL_RESOLVE: 'RESET',
@@ -79,14 +79,16 @@ const playback = createSlice({
       const next = config[state.step]?.[type];
       const step = next || state.step;
 
-      if (type === 'CHANGE_TRACK') return { ...initialState, step: 'READY' };
-      if (['GO_TO_NEXT_TRACK', 'GO_TO_PREV_TRACK'].includes(type)) return { ...state, step: 'PAUSED' };
+      if (['CHANGE_TRACK'].includes(type)) return { ...initialState, step: 'READY' };
+      if (['RESUME_VIDEO'].includes(type)) return { ...state, step: 'READY' };
+      if (['NETWORK_ERROR', 'GO_TO_NEXT_TRACK', 'GO_TO_PREV_TRACK'].includes(type)) return { ...state, step: 'PAUSED' };
+
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'playback', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
-        case 'SEEK':
+        case 'SEEK_STARTED':
           const duration = state.duration || 0;
           state.currentTime = meta.to < 0 ? 0 : meta.to > duration ? duration : meta.to;
           break;
@@ -172,6 +174,7 @@ const addMiddleware = () => {
             if (next === undefined) return;
 
             if (trackId) {
+              console.log('[TEST] timeup', payload);
               services.localStorageService.setItemByProject(
                 trackId,
                 STORAGE_SETTINGS.CURRENT_TIME,
@@ -235,6 +238,7 @@ const addMiddleware = () => {
           } = getState();
 
           if (trackId) {
+            console.log('[TEST] end');
             services.localStorageService.setItemByProject(trackId, STORAGE_SETTINGS.CURRENT_TIME, 0);
           }
 

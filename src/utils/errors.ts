@@ -1,4 +1,4 @@
-import { ERROR_CODES, ERROR_ITEM_MAP, ERROR_TYPE, RawPlayerError } from 'types/errors';
+import { ERROR_CODES, ERROR_ITEM_MAP, ERROR_TYPE, RawPlayerError } from '../../types/errors';
 
 export class PlayerError extends Error {
   code: number;

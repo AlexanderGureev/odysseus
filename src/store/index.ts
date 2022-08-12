@@ -11,10 +11,14 @@ import beholder from './slices/beholder/reducer';
 import buffering from './slices/buffering/reducer';
 import changeTrack from './slices/changeTrack/reducer';
 import error from './slices/error/reducer';
+import favourites from './slices/favourites/reducer';
+import favouritesController from './slices/favouritesController/reducer';
 import fullscreen from './slices/fullscreen/reducer';
 import heartbeat from './slices/heartbeat/reducer';
 import hotkeys from './slices/hotkeys/reducer';
 import network from './slices/network/reducer';
+import networkRecovery from './slices/networkRecovery/reducer';
+import offlineMode from './slices/offlineMode/reducer';
 import playback from './slices/playback/reducer';
 import playbackSpeed from './slices/playbackSpeed/reducer';
 import quality from './slices/quality/reducer';
@@ -27,6 +31,7 @@ import splashscreen from './slices/splashscreen/reducer';
 import visibility from './slices/visibility/reducer';
 import volume from './slices/volume/reducer';
 import watchpoint from './slices/watchpoint/reducer';
+
 /*
 Ограничения для системы:
 1) плоский конфиг fsm
@@ -45,30 +50,66 @@ sendEvent(type: "DO_INIT", payload: {}, meta: {})
 */
 
 const rootReducer = combineReducers({
+  /* 
+  корневой автомат, точка входа в приложение:
+  1) парсинг конфига
+  2) проверка ошибок
+  3) инициализация основных сервисов
+  */
   root: root.reducer,
+  // дочерный автомат root для запуска основного видео, проверка токена и манифеста, начальная иницилизация
   resumeVideo: resumeVideo.reducer,
+  // рекламный контроллер, управляет показом рекламы
   adController: adController.reducer,
+  // управление рекламной паузой, загрука и воспроизведение креатива, управление воспроизведением
   adBlock: adBlock.reducer,
+  // управление воспроизведением основного видео
   playback: playback.reducer,
+  // детекция и отправка событий при достижении watchpoint
   watchpoint: watchpoint.reducer,
+  // детекция и отправка событий на каждый heartbeat
   heartbeat: heartbeat.reducer,
+  // управление перемоткой основного видео
   rewind: rewind.reducer,
+  // накопление перемотки и отправка события SEEK в автомат rewind
   rewindAcc: rewindAcc.reducer,
+  // детекция буферизации, сбор статистики
   buffering: buffering.reducer,
+  // управление показом плашки "n сек, до рекламы"
   adTimeNotify: adTimeNotify.reducer,
+  // управление качеством потока
   quality: quality.reducer,
+  // контроль за состоянием сети
   network: network.reducer,
+  // цикл восстановления сети
+  networkRecovery: networkRecovery.reducer,
+  // обработка ивентов в offline режиме
+  offlineMode: offlineMode.reducer,
+  // переключение серий, загрузка конфига
   changeTrack: changeTrack.reducer,
+  // автопереключение серий в начале титров или в конце трека
   autoSwitch: autoSwitch.reducer,
+  // управление скоростью воспроизведения
   playbackSpeed: playbackSpeed.reducer,
+  // управление звуком на рекламе и основном видео
   volume: volume.reducer,
+  // детекция видимости страницы
   visibility: visibility.reducer,
+  // управление полноэкранным режимом
   fullscreen: fullscreen.reducer,
+  // экрана 18+
   adultNotify: adultNotify.reducer,
+  // экран "продолжить просмотр"
   resumeVideoNotify: resumeVideoNotify.reducer,
+  // обработка горячих клавиш
   hotkeys: hotkeys.reducer,
+  // управление показом splashscreen
   splashscreen: splashscreen.reducer,
+  // отправка прогресса просмотра
   beholder: beholder.reducer,
+  favourites: favourites.reducer,
+  favouritesController: favouritesController.reducer,
+  // модуль сбора ошибок
   error: error.reducer,
 });
 
@@ -85,6 +126,8 @@ buffering.addMiddleware();
 adTimeNotify.addMiddleware();
 quality.addMiddleware();
 network.addMiddleware();
+networkRecovery.addMiddleware();
+offlineMode.addMiddleware();
 changeTrack.addMiddleware();
 autoSwitch.addMiddleware();
 playbackSpeed.addMiddleware();
@@ -96,6 +139,8 @@ resumeVideoNotify.addMiddleware();
 hotkeys.addMiddleware();
 splashscreen.addMiddleware();
 beholder.addMiddleware();
+favourites.addMiddleware();
+favouritesController.addMiddleware();
 error.addMiddleware();
 
 // console.log(

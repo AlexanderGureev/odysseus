@@ -21,7 +21,7 @@ const config: FSMConfig<State, AppEvent> = {
     SEEK: 'SEEK_START',
   },
   SEEK_START: {
-    SEEK_START_RESOLVE: 'SEEKING',
+    SEEK_STARTED: 'SEEKING',
   },
   SEEKING: {
     SEEK: 'SEEK_START',
@@ -91,6 +91,8 @@ const addMiddleware = () =>
           );
         },
         SEEK_START: () => {
+          const { currentTime } = getState().playback;
+
           const {
             payload: { meta },
           } = action as PayloadAction<{
@@ -100,7 +102,11 @@ const addMiddleware = () =>
           opts.services.playerService.setCurrentTime(meta.to);
           dispatch(
             sendEvent({
-              type: 'SEEK_START_RESOLVE',
+              type: 'SEEK_STARTED',
+              meta: {
+                to: meta.to,
+                from: currentTime || 0,
+              },
             })
           );
         },

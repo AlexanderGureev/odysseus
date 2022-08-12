@@ -3,11 +3,13 @@ import './publicPath';
 import './styles/fonts.css';
 import './styles/index.css';
 
+import cn from 'classnames';
 import { ErrorManager } from 'components/ErrorManager';
 import { DEFAULT_PLAYER_ID } from 'components/Player/types';
 import { SkinConstructor } from 'components/SkinConstructor';
 import { Range } from 'components/UIKIT/Range';
 import { useAppDispatch, useAppSelector } from 'hooks';
+import { debounce } from 'lodash';
 import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
@@ -46,6 +48,21 @@ const qualityOptions = {
   },
 };
 
+const FavouritesButton = () => {
+  const dispatch = useAppDispatch();
+  const { isFavourites } = useAppSelector((state) => state.favouritesController);
+
+  const handleClick = React.useCallback(() => {
+    dispatch(sendEvent({ type: 'SET_FAVOURITES', payload: { isFavourites: !isFavourites } }));
+  }, [dispatch, isFavourites]);
+
+  return (
+    <div className="favourites">
+      <button onClick={handleClick}>{isFavourites ? 'в избранном' : 'в избранное'}</button>
+    </div>
+  );
+};
+
 const Player = () => {
   const dispatch = useAppDispatch();
   const root = useAppSelector((state) => state.root);
@@ -63,6 +80,7 @@ const Player = () => {
   const fullscreen = useAppSelector((state) => state.fullscreen);
   const changeTrack = useAppSelector((state) => state.changeTrack);
   const autoSwitch = useAppSelector((state) => state.autoSwitch);
+  const favourites = useAppSelector((state) => state.favourites);
 
   const projectInfo = useAppSelector((state) => getTrackInfo(state));
 
@@ -295,6 +313,8 @@ const Player = () => {
               prev
             </button>
           )}
+
+          {favourites.step === 'READY' && <FavouritesButton />}
         </div>
       )}
 
@@ -413,6 +433,47 @@ const SpashScreen: React.FC<{ data: Screens }> = ({ data }) => {
   ) : null;
 };
 
+const NetworkNotify = () => {
+  const dispatch = useAppDispatch();
+  const network = useAppSelector((state) => state.network);
+  const networkRecovery = useAppSelector((state) => state.networkRecovery);
+
+  const [isOnline, setIsOnline] = React.useState(false);
+  const prevStatus = React.useRef(network.step);
+
+  React.useEffect(() => {
+    setIsOnline(network.step === 'ONLINE' && prevStatus.current === 'OFFLINE');
+    prevStatus.current = network.step;
+  }, [network.step]);
+
+  return (
+    <div
+      className={cn('network-notify', {
+        ['online']: isOnline,
+        ['offline']: network.step === 'OFFLINE',
+        ['rejected']: networkRecovery.step === 'REJECTED',
+      })}>
+      <div>network {network.step === 'ONLINE' ? 'online' : 'offline'}</div>
+      {networkRecovery.step === 'TIMEOUT_WAITING' && (
+        <button
+          onClick={() => {
+            dispatch(sendEvent({ type: 'CLICK_RETRY_BUTTON' }));
+          }}>
+          повторить {networkRecovery.step === 'TIMEOUT_WAITING' && networkRecovery.timerValue}
+        </button>
+      )}
+      {networkRecovery.step === 'REJECTED' && (
+        <button
+          onClick={() => {
+            dispatch(sendEvent({ type: 'RELOAD' }));
+          }}>
+          обновить страницу
+        </button>
+      )}
+    </div>
+  );
+};
+
 const PlayerManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const { step, isShowPlayerUI } = useAppSelector((state) => state.root);
@@ -498,6 +559,8 @@ const PlayerManager: React.FC = () => {
       )}
 
       {splashscreen.step === 'SHOWING_SPLASHCREEN' && <SpashScreen data={splashscreen.screens} />}
+
+      <NetworkNotify />
     </div>
   );
 };

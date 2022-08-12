@@ -9,7 +9,14 @@ export type EventsWithPayload =
         to: number;
       };
     }
-  | WithoutPayload<'SEEK_END' | 'REWIND_INIT_RESOLVE' | 'SEEK_START_RESOLVE'>;
+  | {
+      type: 'SEEK_STARTED';
+      meta: {
+        to: number;
+        from: number;
+      };
+    }
+  | WithoutPayload<'SEEK_END' | 'REWIND_INIT_RESOLVE'>;
 
 export type Event = EventsWithPayload['type'];
 

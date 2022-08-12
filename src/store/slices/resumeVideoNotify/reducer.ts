@@ -17,7 +17,7 @@ const initialState: FSMState = {
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
     CHECK_RESUME: 'CHECK_RESUME_VIDEO',
-    CHANGE_TRACK: null,
+    RESUME_VIDEO_RESOLVE: null,
   },
   CHECK_RESUME_VIDEO: {
     SHOW_RESUME_VIDEO_NOTIFY: 'RESUME_VIDEO_NOTIFY',
@@ -48,7 +48,7 @@ const resumeVideoNotify = createSlice({
       const step = next || state.step;
 
       switch (type) {
-        case 'CHANGE_TRACK':
+        case 'RESUME_VIDEO_RESOLVE':
           state.isResetStartTime = false;
           break;
         case 'RESUME_VIDEO_NOTIFY_REJECT':

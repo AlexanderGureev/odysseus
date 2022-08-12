@@ -30,6 +30,10 @@ interface Window {
   };
 
   _player: import('video.js').VideoJsPlayer;
+
+  mozIndexedDB?: any;
+  webkitIndexedDB?: any;
+  msIndexedDB?: any;
 }
 
 declare interface HTMLVideoElement {

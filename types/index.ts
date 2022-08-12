@@ -45,6 +45,9 @@ type DISCLAIMER_AGE_RESTRICTIONS = {
 };
 
 export type TFeatureConfig = {
+  ENABLE_FAVOURITES?: boolean;
+  FEATURE_FAVOURITES_CACHE_TTL?: number;
+
   CONTINUE_WATCHING_NOTIFY?: boolean;
   PREVIEW_TIMELINE?: 'PREVIEW' | 'TRACK';
 
@@ -118,6 +121,7 @@ export type TEnvConfig = {
   YOUBORA_ACCOUNT_CODE?: string;
   YOUBORA_SERVICE_ENABLED: boolean;
   YMID: number | null;
+  PUBLIC_BE_ENDPOINT: string;
 };
 
 export type THydraResponse = {

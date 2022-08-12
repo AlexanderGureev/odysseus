@@ -34,7 +34,7 @@ export const getCurrentTime = () => {
   return '[' + hh + ':' + mm + ':' + ss + '.' + mmm + ']';
 };
 
-const pad = (num: number | string) => `0${num}`.slice(-2);
+export const pad = (num: number | string) => `0${num}`.slice(-2);
 
 export const secToHumanReadeable = (sec: number, padHours = true): string => {
   let secs = String(Math.floor(sec));
@@ -50,3 +50,6 @@ export const secToHumanReadeable = (sec: number, padHours = true): string => {
 };
 
 export const toFixed = (num: number, fractionDigits = 3) => Number(num.toFixed(fractionDigits));
+
+export const toRecord = <T, K extends keyof T, R extends { [key in string]: T }>(arr: T[], key: K) =>
+  arr.reduce((acc, item) => ({ ...acc, [`${item[key]}`]: item }), {} as R);

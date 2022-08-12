@@ -5,6 +5,7 @@ export { BeholderService } from './BeholderService';
 export { ChannelService } from './ChannelService';
 export { DemonService } from './DemonService';
 export { EmbeddedCheckService } from './EmbeddedCheckService';
+export { FavouritesService } from './FavouritesService';
 export { GAService } from './GaService/service';
 export { HorusService } from './HorusService';
 export { IDBService } from './IDBService';

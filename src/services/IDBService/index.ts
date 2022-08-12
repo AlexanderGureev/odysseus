@@ -34,7 +34,7 @@ controller.runTransaction<TEvent>('events', 'readonly', async (store, done, { ge
 */
 
 import { Nullable } from '../../../types';
-import { TDoneFunction,TQuery, TStoresConfig, TTransactionApi } from './types';
+import { TDoneFunction, TQuery, TStoresConfig, TTransactionApi } from './types';
 
 const IDBService = () => {
   let db: Nullable<IDBDatabase> = null;
@@ -99,9 +99,9 @@ const IDBService = () => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const transaction = db!.transaction([collectionName], type);
 
-      transaction.oncomplete = () => {
-        return;
-      };
+      const txComplete = new Promise((resolve) => {
+        transaction.oncomplete = resolve;
+      });
 
       transaction.onerror = reject;
 
@@ -138,7 +138,7 @@ const IDBService = () => {
 
       const doneFn: TDoneFunction<T> = (error, record) => {
         if (error) reject(error);
-        else resolve(record as T);
+        else txComplete.then(() => resolve(record as T));
       };
 
       query(objectStoreRequest, doneFn, api).catch(reject);

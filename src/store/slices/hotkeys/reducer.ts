@@ -1,5 +1,5 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { DEFAULT_PLAYER_ID } from 'components/Player/types';
+import { PLAYER_ID } from 'components/Player/types';
 import { isMobile } from 'react-device-detect';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
@@ -30,6 +30,7 @@ const config: FSMConfig<State, AppEvent> = {
   READY: {
     AD_BREAK_STARTED: 'IDLE',
     KEYBOARD_EVENT: 'PROCESSING_KEYBOARD_EVENT',
+    NETWORK_ERROR: 'IDLE',
   },
   PROCESSING_KEYBOARD_EVENT: {
     PROCESSING_KEYBOARD_EVENT_RESOLVE: 'READY',
@@ -84,7 +85,7 @@ const addMiddleware = () =>
             return;
           }
 
-          const node = document.getElementById(DEFAULT_PLAYER_ID);
+          const node = document.getElementById(PLAYER_ID);
           if (node) {
             dbclick(node, () => {
               const { step } = getState().fullscreen;

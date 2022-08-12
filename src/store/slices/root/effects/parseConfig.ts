@@ -98,11 +98,7 @@ export const parseConfig = async (
   params: TrackParams | undefined,
   opts: EffectOpts
 ) => {
-  const {
-    getState,
-    dispatch,
-    services: { localStorageService },
-  } = opts;
+  const { getState, dispatch, services } = opts;
 
   try {
     if (!rawConfig) throw new Error('rawConfig is undefined');
@@ -143,9 +139,6 @@ export const parseConfig = async (
         id: uuidv4(),
       },
     };
-
-    localStorageService.setItemByDomain(STORAGE_SETTINGS.USER_ID, config.config?.user_id || null);
-    localStorageService.setItemByDomain(STORAGE_SETTINGS.USER_TOKEN, config.context?.user_token || null);
 
     dispatch(
       sendEvent({

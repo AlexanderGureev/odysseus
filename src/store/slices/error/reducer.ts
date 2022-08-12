@@ -2,7 +2,7 @@ import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FSM_EVENT } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
-import { PlayerError } from 'utils/errors';
+import { RawPlayerError } from 'types/errors';
 import { logger } from 'utils/logger';
 
 import { FSMState, State } from './types';
@@ -26,9 +26,13 @@ const config: FSMConfig<State, AppEvent> = {
     FETCHING_MANIFEST_REJECT: 'ERROR',
     FETCH_TRACK_CONFIG_REJECT: 'ERROR',
     PLAYER_ERROR: 'ERROR',
+    NETWORK_ERROR: 'NETWORK_ERROR',
   },
   ERROR: {
     RELOAD: 'IDLE',
+  },
+  NETWORK_ERROR: {
+    GO_ONLINE: 'IDLE',
   },
 };
 
@@ -48,8 +52,10 @@ const error = createSlice({
       const step = next || state.step;
 
       switch (type) {
+        case 'GO_ONLINE':
+          return initialState;
         default:
-          const { error } = meta as { error: PlayerError };
+          const { error } = meta as { error: RawPlayerError };
           return { ...state, step, error, ...payload };
       }
     });

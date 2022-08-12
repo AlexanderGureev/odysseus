@@ -1,8 +1,12 @@
 import fetch from 'isomorphic-fetch';
 
 import { BaseError } from '../../server/utils/error';
+import { ERROR_CODES } from '../../types/errors';
 import { isNil } from '../utils';
+import { PlayerError } from './errors';
 import { logger } from './logger';
+
+export const NETWORK_CHECK_PATH = 'https://odysseus.more.tv/check_connection';
 
 export class HTTPResponseError extends BaseError {
   response: Response;
@@ -15,7 +19,14 @@ export class HTTPResponseError extends BaseError {
   }
 }
 
-type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export class NetworkError extends BaseError {
+  constructor(message?: string) {
+    super(`NetworkError, onLine: ${navigator.onLine}, error message: ${message} `);
+    this.name = 'NetworkError';
+  }
+}
+
+type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS';
 
 export type RawHeaders = { [k: string]: string[] | undefined };
 
@@ -24,9 +35,31 @@ export type ReqInit = Omit<RequestInit, 'headers'> & {
   params?: Record<string, any>;
   headers?: Record<string, string | undefined>;
   timeout?: number;
+  networkCheck?: boolean;
+};
+
+export type Hooks = {
+  networkError: () => void;
+};
+
+export type HookType = keyof Hooks;
+
+export type RequestHooks = {
+  [key in HookType]: Hooks[key][];
 };
 
 const request = () => {
+  let hooks: RequestHooks = {
+    networkError: [],
+  };
+
+  const addHook = <T extends HookType, C extends Hooks[T]>(type: T, hook: C) => {
+    hooks = {
+      ...hooks,
+      [type]: [...hooks[type], hook],
+    };
+  };
+
   const checkStatus = (response: Response) => {
     if (response.status >= 200 && response.status < 500) {
       return response;
@@ -35,9 +68,20 @@ const request = () => {
     }
   };
 
+  const checkNetwork = async () => {
+    try {
+      await fetch(NETWORK_CHECK_PATH, {
+        method: 'OPTIONS',
+      });
+    } catch (err) {
+      for (const hook of hooks.networkError) hook();
+      throw new PlayerError(ERROR_CODES.ERROR_NETWORK, `request checkNetwork, message: ${err?.message}`);
+    }
+  };
+
   const createRequest =
     (method: HTTPMethod) =>
-    async (url: string, { json, params = {}, headers = {}, ...opts }: ReqInit = {}) => {
+    async (url: string, { json, params = {}, headers = {}, networkCheck = true, ...opts }: ReqInit = {}) => {
       try {
         logger.log('[http request]', 'before request', { method, url, params, headers });
 
@@ -67,6 +111,9 @@ const request = () => {
         return response;
       } catch (error) {
         logger.log('[http request]', 'request failed', { method, url, message: error.message });
+
+        if (error instanceof HTTPResponseError) throw error;
+        if (networkCheck) await checkNetwork();
         throw error;
       }
     };
@@ -77,6 +124,8 @@ const request = () => {
     put: createRequest('PUT'),
     patch: createRequest('PATCH'),
     delete: createRequest('DELETE'),
+    options: createRequest('OPTIONS'),
+    addHook,
   };
 };
 

@@ -229,6 +229,10 @@ const bootstrap = async () => {
     }
   });
 
+  app.options('/check_connection', (req, res) => {
+    res.status(200).end();
+  });
+
   //   app.get('/live/:channelId', LivePlayerHandler, EndpointLogger('live'));
   //   app.get('/_metrics', MetricsHandler);
 

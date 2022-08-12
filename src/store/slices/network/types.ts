@@ -1,9 +1,9 @@
 import { DefaultPayload, WithoutPayload } from 'store/types';
 
-export type State = 'IDLE' | 'ERROR';
+export type State = 'IDLE' | 'INITIALIZE_NETWORK' | 'ONLINE' | 'OFFLINE';
 
 export type EventsWithPayload = {
-  type: '_net';
+  type: 'INITIALIZE_NETWORK_RESOLVE' | 'GO_ONLINE' | 'GO_OFFLINE';
 };
 
 export type Event = EventsWithPayload['type'];

@@ -1,7 +1,10 @@
 import { ILocalStorageService } from 'interfaces';
+import { isIOS, isMobile } from 'react-device-detect';
+import { Device, FavouritesItemMeta } from 'services/FavouritesService/types';
 import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { AppState } from 'store';
-import { isNil } from 'utils';
+import { AppliedTariffModifiers, SubscriptionStatus, SubscriptionType, UserSubscription } from 'types/UserSubscription';
+import { pad } from 'utils';
 
 export const getPlaylistItem = (state: AppState) => state.root.config.playlist.items[0];
 
@@ -27,11 +30,10 @@ export const getTrackInfo = (state: AppState) => {
 
 export const isCurrentUserEqualsLocalStorage = (
   localStorageService: ILocalStorageService,
-  opts: { userId: number | null; userToken: string | null }
+  opts: { userId: number | null }
 ) => {
   const lsUserId = localStorageService.getItemByDomain(STORAGE_SETTINGS.USER_ID);
-  const lsToken = localStorageService.getItemByDomain(STORAGE_SETTINGS.USER_TOKEN);
-  return !(lsUserId !== opts.userId || lsToken !== opts.userToken);
+  return lsUserId === opts.userId;
 };
 
 export const getSavedProgressTime = (state: AppState, localStorageService: ILocalStorageService) => {
@@ -40,7 +42,7 @@ export const getSavedProgressTime = (state: AppState, localStorageService: ILoca
       config: {
         config: { user_id },
       },
-      meta: { trackId, userToken },
+      meta: { trackId },
     },
   } = state;
 
@@ -48,7 +50,6 @@ export const getSavedProgressTime = (state: AppState, localStorageService: ILoca
     !trackId ||
     !isCurrentUserEqualsLocalStorage(localStorageService, {
       userId: user_id,
-      userToken,
     })
   ) {
     return null;
@@ -74,4 +75,52 @@ export const getStartAt = (state: AppState) => {
   if (!duration) return startAt;
 
   return typeof startAt === 'number' && startAt < duration ? startAt : null;
+};
+
+export const getUserSubscriptionType = (userSubscriptions: UserSubscription | null): SubscriptionType => {
+  if (!userSubscriptions) return 'none';
+
+  if (
+    userSubscriptions.appliedTariffModifiers.includes(AppliedTariffModifiers.GOOGLE_FREE_TRIAL) ||
+    userSubscriptions.appliedTariffModifiers.includes(AppliedTariffModifiers.APPLE_FREE_TRIAL) ||
+    userSubscriptions.appliedTariffModifiers.includes(AppliedTariffModifiers.MAP_FREE_TRIAL)
+  )
+    return 'trial';
+
+  if (
+    userSubscriptions.appliedTariffModifiers.includes(AppliedTariffModifiers.GOOGLE_INTRODUCTORY_PRICE) ||
+    userSubscriptions.appliedTariffModifiers.includes(AppliedTariffModifiers.APPLE_INTRODUCTORY_PRICE)
+  )
+    return 'introductory_price';
+
+  if (userSubscriptions.promocodeActivatedId) return 'promocode';
+  return 'full_price';
+};
+
+const SubscriptionTypeMap: Record<SubscriptionType, SubscriptionStatus> = {
+  unknown: SubscriptionStatus.UNSUBSCIBED,
+  none: SubscriptionStatus.UNSUBSCIBED,
+  full_price: SubscriptionStatus.SUBSCRIBED,
+  promocode: SubscriptionStatus.SUBSCRIBED,
+  introductory_price: SubscriptionStatus.SUBSCRIBED,
+  trial: SubscriptionStatus.TRIAL,
+};
+
+export const getFavouritesMeta = (state: AppState): FavouritesItemMeta => {
+  const {
+    root: {
+      config: { subscription },
+    },
+  } = state;
+
+  const timezoneOffset = -new Date().getTimezoneOffset();
+  const mark = timezoneOffset >= 0 ? '+' : '-';
+  const timezone = `${mark}${pad(Math.floor(Math.abs(timezoneOffset) / 60))}:${pad(Math.abs(timezoneOffset) % 60)}`;
+  const type = getUserSubscriptionType(subscription?.[0] || null);
+
+  return {
+    device: isIOS ? Device.WEB_MOBILE_IOS : isMobile ? Device.WEB_MOBILE_ANDROID : Device.WEB_DESKTOP,
+    timezone: String(timezone),
+    subscribe: SubscriptionTypeMap[type],
+  };
 };

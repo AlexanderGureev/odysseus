@@ -102,6 +102,8 @@ const addMiddleware = () =>
           console.log('[TEST] launch setup', {
             time: isResetStartTime || previews ? 0 : startAt ?? savedTime ?? currentTime ?? 0,
             savedTime,
+            startAt,
+            currentTime,
           });
 
           services.playerService.setMute(muted);

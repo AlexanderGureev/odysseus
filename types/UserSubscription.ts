@@ -6,6 +6,12 @@ export enum PaymentMethodType {
   MAP_PAYMENTS = 'MAP_PAYMENTS',
 }
 
+export enum SubscriptionStatus {
+  UNSUBSCIBED = 'unsubscribed',
+  SUBSCRIBED = 'subscribed',
+  TRIAL = 'trial',
+}
+
 export enum StateType {
   NEW_FULL_PRICE = 'NEW_FULL_PRICE',
   NEW_TRIAL = 'NEW_TRIAL',

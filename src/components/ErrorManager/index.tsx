@@ -4,35 +4,15 @@ import useMediaQuery from 'hooks/useMedia';
 import React, { useEffect } from 'react';
 import { sendEvent } from 'store';
 import { SkinClass } from 'types';
-import { ERROR_CODES } from 'types/errors';
+import { ERROR_CODES, ERROR_TYPE, RawPlayerError } from 'types/errors';
 
 import Styles from './index.module.css';
 import { ERROR_TEXT_BY_TYPE } from './templates';
 
-const ErrorManager = ({ children }: React.PropsWithChildren) => {
-  const dispatch = useAppDispatch();
-  const { error } = useAppSelector((state) => state.error);
-  const { session } = useAppSelector((state) => state.root);
-
-  const match = useMediaQuery('(max-width: 375px)');
-
-  useEffect(() => {
-    // dispatch(
-    //   sendEvent({
-    //     type: 'SHOW_ERROR',
-    //     payload: {
-    //       error: {
-    //         code: 105,
-    //         title: ERROR_TYPE.ENCRYPTED,
-    //       },
-    //     },
-    //   })
-    // );
-  }, [dispatch]);
-
-  if (!error) return <>{children}</>;
-
+const ErrorTemplate: React.FC<{ error: RawPlayerError }> = ({ error }) => {
   const { icon, text, btn_text, footer_icons, onClick } = ERROR_TEXT_BY_TYPE[error.title](SkinClass.MORE_TV, true);
+  const match = useMediaQuery('(max-width: 375px)');
+  const { session } = useAppSelector((state) => state.root);
 
   return (
     <div className={cn(Styles.error_container, `code_${ERROR_CODES[error.title]}`)}>
@@ -60,6 +40,36 @@ const ErrorManager = ({ children }: React.PropsWithChildren) => {
         </div>
       </div>
     </div>
+  );
+};
+
+const ErrorManager = ({ children }: React.PropsWithChildren) => {
+  const dispatch = useAppDispatch();
+  const { step, error } = useAppSelector((state) => state.error);
+
+  useEffect(() => {
+    // dispatch(
+    //   sendEvent({
+    //     type: 'SHOW_ERROR',
+    //     payload: {
+    //       error: {
+    //         code: 105,
+    //         title: ERROR_TYPE.ENCRYPTED,
+    //       },
+    //     },
+    //   })
+    // );
+  }, [dispatch]);
+
+  if (error && step === 'ERROR') {
+    return <ErrorTemplate error={error} />;
+  }
+
+  return (
+    <>
+      {children}
+      {error && <ErrorTemplate error={error} />}
+    </>
   );
 };
 

@@ -54,6 +54,20 @@ const createAppDatabase = async ({ services: { dbService, windowService } }: Eff
           },
         ],
       },
+      {
+        name: CollectionName.FAVOURITES,
+        keyPath: 'id',
+        indexes: [
+          {
+            name: Indexes.BY_PROJECT_ID,
+            field: 'id',
+          },
+          {
+            name: Indexes.BY_IS_STORED_IN_GONDWANA,
+            field: 'isStoredInGondwana',
+          },
+        ],
+      },
     ]);
 
     await windowService.init();
@@ -70,6 +84,7 @@ const registerListeners = ({ dispatch }: EffectOpts) => {
 
 export const initialize = async (opts: EffectOpts) => {
   const {
+    getState,
     dispatch,
     services: {
       embeddedCheckService,
@@ -78,6 +93,8 @@ export const initialize = async (opts: EffectOpts) => {
       horusService,
       youboraService,
       localStorageService,
+      favouritesService,
+      dbService,
     },
   } = opts;
 
@@ -91,6 +108,9 @@ export const initialize = async (opts: EffectOpts) => {
       sauronService.init(),
       horusService.init(),
       youboraService.init(),
+      favouritesService.init(dbService, {
+        getToken: () => getState().root.meta.userToken,
+      }),
     ]);
 
     const { hostname } = embeddedCheckService.getState();

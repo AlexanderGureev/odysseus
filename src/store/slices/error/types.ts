@@ -1,14 +1,9 @@
-import { DefaultPayload, WithoutPayload } from 'store/types';
-import { PlayerError } from 'utils/errors';
+import { DefaultPayload, ErrorPayload, WithoutPayload } from 'store/types';
+import { RawPlayerError } from 'types/errors';
 
-export type State = 'IDLE' | 'ERROR';
+export type State = 'IDLE' | 'ERROR' | 'NETWORK_ERROR';
 
-export type EventsWithPayload = {
-  type: 'PLAYER_ERROR';
-  meta: {
-    error: PlayerError | null;
-  };
-};
+export type EventsWithPayload = ErrorPayload<'PLAYER_ERROR' | 'NETWORK_ERROR'>;
 
 export type Event = EventsWithPayload['type'];
 
@@ -17,5 +12,5 @@ export type ActionPayload = DefaultPayload<Event> & EventsWithPayload;
 export type FSMState = {
   step: State;
 
-  error: PlayerError | null;
+  error: RawPlayerError | null;
 };

@@ -86,8 +86,8 @@ const AmberdataService = () => {
 
   const sendAmberdataInitStat = (paid: boolean, adFoxPartner: number | undefined, adFoxSeason: number | undefined) => {
     const resultedParams: { [key in PARAMS]?: Nullable<string | number> } = {
-      [PARAMS.ADFOX_PARTNER]: adFoxPartner || null,
-      [PARAMS.SEASON]: adFoxSeason || null,
+      [PARAMS.ADFOX_PARTNER]: !paid && adFoxPartner ? adFoxPartner : null,
+      [PARAMS.SEASON]: !paid && adFoxSeason ? adFoxSeason : null,
       [PARAMS.EVENT_TYPE]: AmberdataEvent.OPEN,
       [PARAMS.PAID_CONTENT]: paid ? 1 : 0,
     };

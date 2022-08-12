@@ -9,10 +9,14 @@ import * as beholder from './slices/beholder';
 import * as buffering from './slices/buffering';
 import * as changeTrack from './slices/changeTrack';
 import * as error from './slices/error';
+import * as favourites from './slices/favourites';
+import * as favouritesController from './slices/favouritesController';
 import * as fullscreen from './slices/fullscreen';
 import * as heartbeat from './slices/heartbeat';
 import * as hotkeys from './slices/hotkeys';
 import * as network from './slices/network';
+import * as networkRecovery from './slices/networkRecovery';
+import * as offlineMode from './slices/offlineMode';
 import * as playback from './slices/playback';
 import * as playbackSpeed from './slices/playbackSpeed';
 import * as quality from './slices/quality';
@@ -74,7 +78,11 @@ export type EventPayload =
   | rewindAcc.ActionPayload
   | splashscreen.ActionPayload
   | beholder.ActionPayload
-  | heartbeat.ActionPayload;
+  | heartbeat.ActionPayload
+  | networkRecovery.ActionPayload
+  | offlineMode.ActionPayload
+  | favourites.ActionPayload
+  | favouritesController.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -102,4 +110,8 @@ export type AppEvent =
   | rewindAcc.Event
   | splashscreen.Event
   | beholder.Event
-  | heartbeat.Event;
+  | heartbeat.Event
+  | networkRecovery.Event
+  | offlineMode.Event
+  | favourites.Event
+  | favouritesController.Event;

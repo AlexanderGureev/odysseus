@@ -212,6 +212,17 @@ export type OutputEvents = {
       duration: number;
     };
   }) => void;
+
+  set_favorites: (
+    data: Payload<{
+      projectId: number;
+      isFavorites: boolean;
+      redirect: boolean;
+      videosession_id: string;
+      time_cursor: number;
+      track_id: number | null;
+    }>
+  ) => void;
 };
 
 export type PlayerParams = {
@@ -252,6 +263,7 @@ export type INPUT_PLAYER_POST_MESSAGE = {
   mute: (p: any) => void;
   unmute: (p: any) => void;
   testAdvPoint: (p: any) => void;
+  set_favorites: (p: { data: { isFavorites: boolean } }) => void;
 };
 
 export type TLinkedTracks = {
