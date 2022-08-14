@@ -21,6 +21,7 @@ export type EventsWithPayload =
       | 'PLAY_AD_BLOCK_RESOLVE'
       | 'PAUSE_AD_BLOCK_RESOLVE'
       | 'RESET'
+      | 'AD_BLOCK_IMPRESSION'
     >
   | {
       type: 'AD_BLOCK_TIME_UPDATE';
@@ -63,6 +64,12 @@ export type EventsWithPayload =
       payload: {
         skippable?: boolean;
         isVolumeAvailable?: boolean;
+      };
+    }
+  | {
+      type: 'AD_BLOCK_VIDEO_QUARTILE';
+      payload: {
+        value: number;
       };
     };
 

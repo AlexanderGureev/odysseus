@@ -6,6 +6,7 @@ import adBlock from './slices/adBlock/reducer';
 import adController from './slices/adController/reducer';
 import adTimeNotify from './slices/adTimeNotify/reducer';
 import adultNotify from './slices/adultNotify/reducer';
+import analytics from './slices/analytics/reducer';
 import autoSwitch from './slices/autoSwitch/reducer';
 import beholder from './slices/beholder/reducer';
 import buffering from './slices/buffering/reducer';
@@ -31,7 +32,6 @@ import splashscreen from './slices/splashscreen/reducer';
 import visibility from './slices/visibility/reducer';
 import volume from './slices/volume/reducer';
 import watchpoint from './slices/watchpoint/reducer';
-
 /*
 Ограничения для системы:
 1) плоский конфиг fsm
@@ -50,6 +50,7 @@ sendEvent(type: "DO_INIT", payload: {}, meta: {})
 */
 
 const rootReducer = combineReducers({
+  analytics: analytics.reducer,
   /* 
   корневой автомат, точка входа в приложение:
   1) парсинг конфига
@@ -107,12 +108,15 @@ const rootReducer = combineReducers({
   splashscreen: splashscreen.reducer,
   // отправка прогресса просмотра
   beholder: beholder.reducer,
+  // активность фичи "избранное" и выбор режима работы
   favourites: favourites.reducer,
+  // обработка избранного и синхронизация
   favouritesController: favouritesController.reducer,
   // модуль сбора ошибок
   error: error.reducer,
 });
 
+analytics.addMiddleware();
 root.addMiddleware();
 resumeVideo.addMiddleware();
 adController.addMiddleware();

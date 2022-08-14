@@ -120,8 +120,6 @@ const addMiddleware = () =>
               const sec = measure === 'percents' ? Math.floor((num / 100) * duration) : num;
 
               if (sec === time) {
-                console.log('[TEST] WATCHPOINT', { measure, num, value });
-
                 dispatch(
                   sendEvent({
                     type: 'WATCHPOINT',

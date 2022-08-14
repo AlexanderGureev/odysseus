@@ -133,12 +133,6 @@ export const AdBlock = ({
         mediator.emit('AdPodImpression');
       });
       adPlaybackController.subscribe('AdPodVideoFirstQuartile', () => {
-        if (adPlaybackController) {
-          console.log('[TEST] AdPodVideoFirstQuartile', {
-            allowVolume: adPlaybackController.getAdVolumeAvailabilityState(),
-          });
-        }
-
         mediator.emit('AdPodVideoQuartile', 1);
       });
       adPlaybackController.subscribe('AdPodVideoMidpoint', () => {

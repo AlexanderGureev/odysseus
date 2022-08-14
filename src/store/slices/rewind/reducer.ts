@@ -15,10 +15,11 @@ const config: FSMConfig<State, AppEvent> = {
     DO_INIT: 'REWIND_INIT',
   },
   REWIND_INIT: {
-    REWIND_INIT_RESOLVE: 'READY',
+    REWIND_INIT_RESOLVE: 'DISABLED',
   },
   READY: {
     SEEK: 'SEEK_START',
+    AD_BREAK_STARTED: 'DISABLED',
   },
   SEEK_START: {
     SEEK_STARTED: 'SEEKING',
@@ -26,6 +27,9 @@ const config: FSMConfig<State, AppEvent> = {
   SEEKING: {
     SEEK: 'SEEK_START',
     SEEK_END: 'READY',
+  },
+  DISABLED: {
+    START_PLAYBACK: 'READY',
   },
 };
 
@@ -76,7 +80,9 @@ const addMiddleware = () =>
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         REWIND_INIT: () => {
-          opts.services.playerService.on('seeked', () => {
+          services.playerService.on('seeked', () => {
+            if (getState().rewind.step === 'DISABLED') return; // TODO FIX
+
             dispatch(
               sendEvent({
                 type: 'SEEK_END',
@@ -99,7 +105,7 @@ const addMiddleware = () =>
             meta: { to: number };
           }>;
 
-          opts.services.playerService.setCurrentTime(meta.to);
+          services.playerService.setCurrentTime(meta.to);
           dispatch(
             sendEvent({
               type: 'SEEK_STARTED',

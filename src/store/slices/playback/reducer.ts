@@ -174,7 +174,6 @@ const addMiddleware = () => {
             if (next === undefined) return;
 
             if (trackId) {
-              console.log('[TEST] timeup', payload);
               services.localStorageService.setItemByProject(
                 trackId,
                 STORAGE_SETTINGS.CURRENT_TIME,

@@ -152,6 +152,9 @@ const addMiddleware = () =>
       };
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
+        AUTOSWITCH_NOTIFY: () => {
+          dispatch(sendEvent({ type: 'AUTOSWITCH_NOTIFY_SHOWN' }));
+        },
         AUTOSWITCH_PENDING: () => {
           dispatch(sendEvent({ type: 'GO_TO_NEXT_TRACK', payload: { params: { startAt: 0 } } }));
         },

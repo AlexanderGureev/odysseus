@@ -1,9 +1,11 @@
+import { PayloadAction } from '@reduxjs/toolkit';
 import { RawPlayerError } from 'types/errors';
 
 import * as adBlock from './slices/adBlock';
 import * as adController from './slices/adController';
 import * as adTimeNotify from './slices/adTimeNotify';
 import * as adultNotify from './slices/adultNotify';
+import * as analytics from './slices/analytics';
 import * as autoSwitch from './slices/autoSwitch';
 import * as beholder from './slices/beholder';
 import * as buffering from './slices/buffering';
@@ -82,7 +84,8 @@ export type EventPayload =
   | networkRecovery.ActionPayload
   | offlineMode.ActionPayload
   | favourites.ActionPayload
-  | favouritesController.ActionPayload;
+  | favouritesController.ActionPayload
+  | analytics.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -114,4 +117,5 @@ export type AppEvent =
   | networkRecovery.Event
   | offlineMode.Event
   | favourites.Event
-  | favouritesController.Event;
+  | favouritesController.Event
+  | analytics.Event;

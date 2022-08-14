@@ -3,15 +3,20 @@ import { FavouriteStoreItem } from 'services/FavouritesService/types';
 import { sendEvent } from 'store/actions';
 import { logger } from 'utils/logger';
 
-export const updateFavourites = async ({ getState, dispatch, services }: EffectOpts) => {
+export const updateFavourites = async (
+  currentState: boolean,
+  newState: boolean,
+  { getState, dispatch, services }: EffectOpts
+) => {
   const {
     playback: { currentTime },
     favourites: { mode },
     favouritesController: { isFavourites },
     root: {
       config: { trackInfo },
-      meta: { trackId },
+      meta: { trackId, isEmbedded },
       session: { videosession_id },
+      features: { AUTH_URL },
     },
   } = getState();
 
@@ -20,27 +25,46 @@ export const updateFavourites = async ({ getState, dispatch, services }: EffectO
 
     const data: FavouriteStoreItem = {
       id: trackInfo.project.id,
-      isFavourites: isFavourites ? 1 : 0,
+      isFavourites: newState ? 1 : 0,
       isStoredInGondwana: 0,
       source: 'player',
       updatedAt: Date.now(),
     };
 
     await services.favouritesService.putFavourites([data]);
-    services.postMessageService.emit('set_favorites', {
-      payload: {
-        isFavorites: isFavourites,
-        projectId: trackInfo.project.id,
-        redirect: false,
-        time_cursor: currentTime || 0,
-        track_id: trackId,
-        videosession_id,
-      },
-    });
 
-    dispatch(sendEvent({ type: mode === 'ANONYMOUS_MODE' ? 'UPDATE_FAVOURITES_RESOLVE' : 'START_SYNC_FAVOURITES' }));
+    if (mode === 'ANONYMOUS_MODE' && isEmbedded && AUTH_URL) {
+      window.open(AUTH_URL, '_blank');
+    }
+
+    if (mode === 'ANONYMOUS_MODE') {
+      services.postMessageService.emit('set_favorites', {
+        payload: {
+          isFavorites: isFavourites,
+          projectId: trackInfo.project.id,
+          redirect: true,
+          time_cursor: currentTime || 0,
+          track_id: trackId,
+          videosession_id,
+        },
+      });
+
+      dispatch(sendEvent({ type: 'UPDATE_FAVOURITES_RESOLVE', payload: { isFavourites: newState } }));
+    } else {
+      dispatch(
+        sendEvent({
+          type: 'START_SYNC_FAVOURITES',
+          payload: {
+            isFavourites: newState,
+          },
+          meta: {
+            prevState: currentState,
+          },
+        })
+      );
+    }
   } catch (err) {
     logger.error('[update favourites failed]', { mode }, err?.message);
-    dispatch(sendEvent({ type: 'ROLLBACK_FAVOURITES_STATE', payload: { isFavourites: !isFavourites } }));
+    dispatch(sendEvent({ type: 'UPDATE_FAVOURITES_REJECT' }));
   }
 };

@@ -1,6 +1,6 @@
 import { DefaultPayload, WithoutPayload } from 'store/types';
 
-export type State = 'IDLE' | 'REWIND_INIT' | 'READY' | 'SEEK_START' | 'SEEKING';
+export type State = 'IDLE' | 'REWIND_INIT' | 'READY' | 'SEEK_START' | 'SEEKING' | 'DISABLED';
 
 export type EventsWithPayload =
   | {

@@ -22,7 +22,7 @@ const config: FSMConfig<State, AppEvent> = {
     DO_INIT: 'REBUFFERING_INIT',
   },
   REBUFFERING_INIT: {
-    REBUFFERING_INIT_RESOLVE: 'READY',
+    REBUFFERING_INIT_RESOLVE: 'DISABLED',
   },
   READY: {
     BUFFERING_START: 'BUFFERING',
@@ -98,6 +98,8 @@ const addMiddleware = () =>
       const handler: { [key in State]?: () => Promise<void> | void } = {
         REBUFFERING_INIT: () => {
           services.playerService.on('progress', (payload) => {
+            if (getState().buffering.step === 'DISABLED') return; // TODO FIX
+
             dispatch(
               sendEvent({
                 type: 'BUFFER_UPDATE',
@@ -107,6 +109,8 @@ const addMiddleware = () =>
           });
 
           services.playerService.on('waiting', () => {
+            if (getState().buffering.step === 'DISABLED') return;
+
             dispatch(
               sendEvent({
                 type: 'BUFFERING_START',
@@ -115,6 +119,8 @@ const addMiddleware = () =>
           });
 
           services.playerService.on('canplay', () => {
+            if (getState().buffering.step === 'DISABLED') return;
+
             dispatch(
               sendEvent({
                 type: 'BUFFERING_END',

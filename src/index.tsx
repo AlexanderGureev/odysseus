@@ -53,7 +53,7 @@ const FavouritesButton = () => {
   const { isFavourites } = useAppSelector((state) => state.favouritesController);
 
   const handleClick = React.useCallback(() => {
-    dispatch(sendEvent({ type: 'SET_FAVOURITES', payload: { isFavourites: !isFavourites } }));
+    dispatch(sendEvent({ type: 'SET_FAVOURITES', meta: { isFavourites: !isFavourites } }));
   }, [dispatch, isFavourites]);
 
   return (

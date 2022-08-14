@@ -216,7 +216,6 @@ export interface IDemonService {
 
 export interface IFavouritesService {
   init: (db: IDBService, authSvc: IAuthService) => void;
-  sync: () => void;
   createFavourites: (params: CreateFavourite) => Promise<FavouriteItem[]>;
   fetchFavourites: (params?: GetFavouritesParams) => Promise<FavouritesResponse>;
   fetchFavouriteById: (params: DeleteFavouriteById) => Promise<FavouriteItem>;

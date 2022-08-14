@@ -15,22 +15,35 @@ export type State =
 export type EventsWithPayload =
   | {
       type:
-        | 'UPDATE_FAVOURITES_RESOLVE'
-        | 'UPDATE_LOCAL_FAVOURITES_RESOLVE'
         | 'TTL_EXPIRED'
         | 'CHECK_TTL_FAVOURITES_RESOLVE'
         | 'INITIAL_SYNC_FAVOURITES_REJECT'
         | 'SYNC_FAVOURITES_RESOLVE'
         | 'SYNC_FAVOURITES_REJECT'
-        | 'START_SYNC_FAVOURITES'
         | 'GET_FAVOURITES_STATUS_REJECT'
-        | 'INITIAL_SYNC_FAVOURITES_RESOLVE';
+        | 'INITIAL_SYNC_FAVOURITES_RESOLVE'
+        | 'UPDATE_FAVOURITES_REJECT';
     }
   | {
-      type: 'SET_FAVOURITES' | 'ROLLBACK_FAVOURITES_STATE' | 'GET_FAVOURITES_STATUS_RESOLVE';
-      payload: {
+      type: 'SET_FAVOURITES';
+      meta: {
         isFavourites: boolean;
       };
+    }
+  | {
+      type: 'START_SYNC_FAVOURITES';
+      payload: { isFavourites: boolean };
+      meta: {
+        prevState: boolean;
+      };
+    }
+  | {
+      type:
+        | 'UPDATE_FAVOURITES_RESOLVE'
+        | 'UPDATE_LOCAL_FAVOURITES_RESOLVE'
+        | 'ROLLBACK_FAVOURITES_STATE'
+        | 'GET_FAVOURITES_STATUS_RESOLVE';
+      payload: { isFavourites: boolean };
     }
   | {
       type: 'SET_LOCAL_FAVOURITES';

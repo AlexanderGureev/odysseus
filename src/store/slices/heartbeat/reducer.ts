@@ -126,8 +126,6 @@ const addMiddleware = () =>
           heartbeatPoints.forEach((point) => {
             newProgress.PLAIN[point] = 0;
 
-            console.log('[TEST] HEARTBEAT', { value: point });
-
             dispatch(
               sendEvent({
                 type: 'HEARTBEAT_VIDEO',

@@ -7,6 +7,7 @@ import { toFixed } from 'utils';
 import { logger } from 'utils/logger';
 
 import { changeQuality } from './effects/changeQuality';
+import { getVideoMeta } from './effects/getVideoMeta';
 import { init } from './effects/init';
 import { FSMState, State } from './types';
 
@@ -16,6 +17,8 @@ const initialState: FSMState = {
   qualityList: [],
   currentQualityMark: QUALITY_MARKS.AQ,
   previousTime: 0,
+  previousBitrate: null,
+
   qualityStats: {
     AQ: 0,
     LD: 0,
@@ -23,7 +26,16 @@ const initialState: FSMState = {
     HD: 0,
     UHD: 0,
   },
-
+  videoMeta: {
+    video_resolution: null,
+    video_format: null,
+    dropped_frames: null,
+    shown_frames: null,
+    frame_rate: null,
+    video_codec: null,
+    audio_codec: null,
+    bitrate: null,
+  },
   currentURL: null,
 };
 
@@ -37,8 +49,11 @@ const config: FSMConfig<State, AppEvent> = {
   },
   READY: {
     CHANGE_CURRENT_QUALITY: 'QUALITY_CHANGE_PENDING',
-    TIME_UPDATE: null,
+    TIME_UPDATE: 'GET_VIDEO_META',
     // CHECK_MANIFEST_RESOLVE: "QUALITY_INITIALIZATION"
+  },
+  GET_VIDEO_META: {
+    GET_VIDEO_META_RESOLVE: 'READY',
   },
   QUALITY_CHANGE_PENDING: {
     QUALITY_CHANGE_RESOLVE: 'READY',
@@ -109,6 +124,7 @@ const addMiddleware = () =>
       const handler: { [key in State]?: () => Promise<void> | void } = {
         QUALITY_INITIALIZATION: () => init(opts),
         QUALITY_CHANGE_PENDING: () => changeQuality(opts),
+        GET_VIDEO_META: () => getVideoMeta(opts),
       };
 
       const effect = handler[step];

@@ -23,8 +23,6 @@ export const startNextBlock = async ({
 
     currentBlock
       .on('AdStarted', () => {
-        console.log('[TEST] AdStarted');
-
         dispatch(
           sendEvent({
             type: 'PLAY_AD_BLOCK_RESOLVE',
@@ -54,8 +52,18 @@ export const startNextBlock = async ({
           })
         );
       })
+      .on('AdPodVideoQuartile', (quartile: number) => {
+        dispatch(
+          sendEvent({
+            type: 'AD_BLOCK_VIDEO_QUARTILE',
+            payload: {
+              value: quartile,
+            },
+          })
+        );
+      })
       .on('AdVolumeAvailabilityStateChange', (value) => {
-        console.log('[TEST] AdVolumeAvailabilityStateChange', { value });
+        return;
       })
       .on('AdPodImpression', () => {
         const isVolumeAvailable = currentBlock.getAdVolumeAvailability();
@@ -63,7 +71,11 @@ export const startNextBlock = async ({
         // const { volume } = getState().volume;
         // currentBlock.setVolume(volume);
 
-        console.log('[TEST] AdPodImpression', { isVolumeAvailable, volume: currentBlock.getVolume() });
+        dispatch(
+          sendEvent({
+            type: 'AD_BLOCK_IMPRESSION',
+          })
+        );
 
         dispatch(
           sendEvent({
@@ -75,8 +87,6 @@ export const startNextBlock = async ({
         );
       })
       .on('AdVolumeChange', ({ volume }) => {
-        console.log('[TEST] AdVolumeChange', volume);
-
         dispatch(
           sendEvent({
             type: 'AD_BLOCK_VOLUME_CHANGE',

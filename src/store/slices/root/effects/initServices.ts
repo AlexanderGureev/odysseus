@@ -12,7 +12,7 @@ export const initServices = async (opts: EffectOpts) => {
   const {
     getState,
     dispatch,
-    services: { beholderService, streamService, localStorageService },
+    services: { beholderService, streamService, localStorageService, playerService },
   } = opts;
 
   try {
@@ -22,6 +22,15 @@ export const initServices = async (opts: EffectOpts) => {
     const data = getPlaylistItem(state);
 
     const history = localStorageService.getItem<THistoryStreams>(LS_KEY_STREAM) || [];
+    playerService.one('play', () => {
+      const { currentStream } = getState().root;
+      if (!currentStream) return;
+
+      const uniqKeys = new Set(history);
+      uniqKeys.add(streamService.createKey(currentStream));
+      localStorageService.setItem(LS_KEY_STREAM, [...uniqKeys]);
+    });
+
     const sources = previews || getSources(state) || [];
 
     await Promise.all([

@@ -30,9 +30,9 @@ export const updateLocalFavourites = async (
     };
 
     await services.favouritesService.putFavourites([data]);
-    dispatch(sendEvent({ type: 'UPDATE_LOCAL_FAVOURITES_RESOLVE' }));
+    dispatch(sendEvent({ type: 'UPDATE_LOCAL_FAVOURITES_RESOLVE', payload: { isFavourites } }));
   } catch (err) {
     logger.error('[update local favourites]', err?.message);
-    dispatch(sendEvent({ type: 'ROLLBACK_FAVOURITES_STATE', payload: { isFavourites: !isFavourites } }));
+    dispatch(sendEvent({ type: 'UPDATE_FAVOURITES_REJECT' }));
   }
 };

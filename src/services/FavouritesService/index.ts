@@ -31,10 +31,6 @@ const FavouritesService = () => {
     authService = authSvc;
   };
 
-  const sync = () => {
-    return;
-  };
-
   const fetchFavouriteById = async ({ id, ...rest }: GetFavouriteById) => {
     const response = await fetchFavouritesByPage({ externalId: id, ...rest });
     const [data] = response.data;
@@ -55,9 +51,9 @@ const FavouritesService = () => {
       },
     });
 
-    if (!response.ok) {
-      throw new Error(`delete favourite by id failed, status: ${response.status}, text: ${response.statusText}`);
-    }
+    if (response.ok || response.status === 404) return;
+
+    throw new Error(`delete favourite by id failed, status: ${response.status}, text: ${response.statusText}`);
   };
 
   const createFavourites = async ({ data }: CreateFavourite): Promise<FavouriteItem[]> => {
@@ -127,15 +123,6 @@ const FavouritesService = () => {
     return memoryStore.getByKey(projectId);
   };
 
-  const deleteFavouritesByIds = async (projectIds: number[]) => {
-    if (persistentStore) {
-      // const [data] = await persistentStore.getBy(Indexes.BY_PROJECT_ID, projectId);
-      // return data;
-    }
-
-    return memoryStore.deleteByKey(projectIds);
-  };
-
   const putFavourites = async (data: FavouriteStoreItem[]) => {
     if (persistentStore) {
       await persistentStore.put(data);
@@ -154,12 +141,13 @@ const FavouritesService = () => {
 
   return {
     init,
-    sync,
+
     createFavourites,
     fetchFavourites,
     fetchFavouriteById,
     deleteFavouriteById,
 
+    // local store
     getFavouritesByProjectId,
     getStagedFavourites,
     putFavourites,

@@ -45,7 +45,7 @@ const AdService = (tnsCounter: ITNSCounter, localStorageService: ILocalStorageSe
     isInitialized = Boolean(sdk);
 
     // TODO DELETE
-    throw new Error('test');
+    // throw new Error('test');
   };
 
   const isPreloadable = () => ADV_CACHE_LOOKAHEAD > 0;

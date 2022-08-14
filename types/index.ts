@@ -46,7 +46,8 @@ type DISCLAIMER_AGE_RESTRICTIONS = {
 
 export type TFeatureConfig = {
   ENABLE_FAVOURITES?: boolean;
-  FEATURE_FAVOURITES_CACHE_TTL?: number;
+
+  AUTH_URL?: string;
 
   CONTINUE_WATCHING_NOTIFY?: boolean;
   PREVIEW_TIMELINE?: 'PREVIEW' | 'TRACK';

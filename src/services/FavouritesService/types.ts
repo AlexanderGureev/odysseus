@@ -9,7 +9,7 @@ export type GetFavouritesByPageParams = {
 };
 
 export type GetFavouritesParams = {
-  //
+  externalId?: number;
 };
 
 export type GetFavouriteById = {

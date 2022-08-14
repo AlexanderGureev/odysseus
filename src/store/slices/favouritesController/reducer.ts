@@ -33,19 +33,19 @@ const config: FSMConfig<State, AppEvent> = {
     SET_FAVOURITES: 'UPDATE_FAVOURITES_PENDING',
     SET_LOCAL_FAVOURITES: 'UPDATE_LOCAL_FAVOURITES_PENDING',
     PARSE_CONFIG_RESOLVE: 'CHECK_TTL_FAVOURITES',
+    ROLLBACK_FAVOURITES_STATE: null,
   },
   UPDATE_FAVOURITES_PENDING: {
     START_SYNC_FAVOURITES: 'SYNC_FAVOURITES',
     UPDATE_FAVOURITES_RESOLVE: 'READY',
-    ROLLBACK_FAVOURITES_STATE: 'READY',
+    UPDATE_FAVOURITES_REJECT: 'READY',
   },
   UPDATE_LOCAL_FAVOURITES_PENDING: {
     UPDATE_LOCAL_FAVOURITES_RESOLVE: 'READY',
-    ROLLBACK_FAVOURITES_STATE: 'READY',
+    UPDATE_FAVOURITES_REJECT: 'READY',
   },
   SYNC_FAVOURITES: {
     SYNC_FAVOURITES_RESOLVE: 'READY',
-    SYNC_FAVOURITES_REJECT: 'ERROR',
   },
   ERROR: {},
 };
@@ -101,8 +101,29 @@ const addMiddleware = () =>
       const handler: { [key in State]?: () => Promise<void> | void } = {
         INITIAL_SYNC_FAVOURITES: () => initialSync(opts),
         GET_FAVOURITES_STATUS: () => getFavouritesStatus(opts),
-        UPDATE_FAVOURITES_PENDING: () => updateFavourites(opts),
-        SYNC_FAVOURITES: () => syncFavourites(opts),
+        UPDATE_FAVOURITES_PENDING: () => {
+          const { isFavourites: currentState } = getState().favouritesController;
+
+          const {
+            payload: {
+              meta: { isFavourites: newState },
+            },
+          } = action as PayloadAction<{ meta: { isFavourites: boolean } }>;
+
+          updateFavourites(currentState, newState, opts);
+        },
+        SYNC_FAVOURITES: () => {
+          const {
+            payload: { payload, meta },
+          } = action as PayloadAction<{
+            payload: { isFavourites: boolean };
+            meta: {
+              prevState: boolean;
+            };
+          }>;
+
+          syncFavourites(meta.prevState, payload.isFavourites, opts);
+        },
         CHECK_TTL_FAVOURITES: () => {
           dispatch(sendEvent({ type: 'CHECK_TTL_FAVOURITES_RESOLVE' }));
         },

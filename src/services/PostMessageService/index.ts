@@ -19,8 +19,12 @@ const PostMessageService = () => {
     const { event: eventName, method = '', cmd: command, callback, ...rest } = event?.data ?? {};
 
     const name = eventName || method;
-    if (name) {
+    if (!name) return;
+
+    if (window.parent && window.location !== window.parent.location) {
       mediator.emit(name, rest);
+    } else {
+      logger.log('[PostMessageService]', 'event:', { name, ...rest });
     }
   };
 
