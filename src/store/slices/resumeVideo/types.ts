@@ -13,10 +13,14 @@ export type State =
   | 'RESUME_VIDEO_END';
 
 export type EventsWithPayload =
-  | WithoutPayload<
-      'RESUME_VIDEO_RESOLVE' | 'RESUME_VIDEO' | 'LOAD_META_RESOLVE' | 'INIT_RESUME_VIDEO' | 'LAUNCH_SETUP_RESOLVE'
-    >
-  | ErrorPayload<'LOAD_META_REJECT'>;
+  | WithoutPayload<'RESUME_VIDEO_RESOLVE' | 'RESUME_VIDEO' | 'LOAD_META_RESOLVE' | 'INIT_RESUME_VIDEO'>
+  | ErrorPayload<'LOAD_META_REJECT'>
+  | {
+      type: 'LAUNCH_SETUP_RESOLVE';
+      meta: {
+        startPosition: number;
+      };
+    };
 
 export type Event = EventsWithPayload['type'];
 
@@ -24,4 +28,5 @@ export type ActionPayload = DefaultPayload<Event> & EventsWithPayload;
 
 export type FSMState = {
   step: State;
+  startPosition: number;
 };

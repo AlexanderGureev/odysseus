@@ -174,3 +174,9 @@ export const ParamsByEventName: Record<HorusEventName, HorusParamName[]> = {
   [HorusEventName.HORUS_AUTO_SWITCH_CLICK_NEXT_TRACK]: [...params],
   [HorusEventName.HORUS_AUTO_SWITCH_SWITCH_NEXT_TRACK]: [...params],
 };
+
+export type ParamsSelector = { [key in keyof TParameters]: () => TParameters[key] | null };
+
+export type HorusInitOpts = {
+  paramsSelector: ParamsSelector;
+};

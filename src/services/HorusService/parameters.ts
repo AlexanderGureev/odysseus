@@ -1,17 +1,6 @@
 // https://confluence.more.tv/display/ARCH/TABLE.EVENTS.PARAMETERS
 
-export enum CONNECTIONS_TYPES {
-  WIFI = 'wifi',
-  CELLULAR = 'cellular',
-  ETHERNET = 'ethernet',
-  BLUETHOTH = 'bluetooth',
-  NONE = 'none',
-  WIMAX = 'wimax',
-  OTHER = 'other',
-  MOBILE = 'mobile',
-  LAN = 'lan',
-  UNKNOWN = 'unknown',
-}
+import { SubscriptionType } from 'types/UserSubscription';
 
 export enum STREAM_LOWER_CASE {
   HLS = 'hls',
@@ -61,15 +50,15 @@ export type TParameters = {
   device_model: string; // Информация о модели устройства
   device_timezone: string; // Таймзона на пользовательском устройстве
   device_timestamp: number; // Дата и время на пользовательском устройстве в момент события
-  hacks_detected: 'adblock' | 'root' | 'jailbreak';
+  hacks_detected: string[]; //'adblock' | 'root' | 'jailbreak'
   sauron_id: string; // Sauron ID, GUID
-  network_type: CONNECTIONS_TYPES; // Тип подключения клиентского устройства к сети
+  network_type: string | null; // Тип подключения клиентского устройства к сети
   event_num: number; // Порядковый номер события, совершенного клиентом в рамках сессии (videosession_id). Нумерация начинается с 1.
-  ym_client_id: number; // client_id из Я.Метрики
+  ym_client_id: string | null; // client_id из Я.Метрики
   videosession_id: string; // ID видеосессии
   debug_info: string; // отладочная информация
   ad_roll_type_puid3: number; // Значение в параметре puid3 вызываемого рекламного url.
   video_business_model: VIDEO_BUSSINESS_MODEL_TYPES; // Тип монетизации воспроизводимого видео
-  user_subscription: 'none' | 'trial' | 'introductory_price' | 'full_price' | 'promocode'; // Способ приобретения подписки пользователем
+  user_subscription: SubscriptionType; // Способ приобретения подписки пользователем
   partner_id: number; // id партнера
 };

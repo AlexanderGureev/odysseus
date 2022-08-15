@@ -158,6 +158,7 @@ const config: FSMConfig<State, AppEvent> = {
 
   // 3 PHASE вопроизведение
   READY: {
+    START_PLAYBACK: null,
     UPDATE_MANIFEST: null,
     UPDATE_TOKEN: null,
     RESUME_VIDEO: 'RESUME_VIDEO_PENDING',
@@ -201,8 +202,8 @@ const initialState: FSMState = {
     mute: true,
   },
 
-  isFirstRun: false,
   isShowPlayerUI: false,
+  isFirstStartPlayback: true,
 
   deviceInfo: {
     isMobile: false,
@@ -240,8 +241,8 @@ const root = createSlice({
         case 'PARSE_CONFIG_RESOLVE':
           return {
             ...initialState,
-            isFirstRun: state.isFirstRun,
             isShowPlayerUI: state.isShowPlayerUI,
+            isFirstStartPlayback: true,
             capabilities: state.capabilities,
             deviceInfo: state.deviceInfo,
             step,
@@ -264,6 +265,9 @@ const root = createSlice({
           state.config.playlist.items[0].linked_tracks = linked_tracks;
           break;
         }
+        case 'START_PLAYBACK':
+          state.isFirstStartPlayback = false;
+          break;
         default:
           return { ...state, step, ...payload };
       }
@@ -397,6 +401,13 @@ const addMiddleware = () =>
 
           services.localStorageService.setItemByDomain(STORAGE_SETTINGS.USER_ID, config.config?.user_id || null);
           startPlayback(opts);
+        },
+        PAYWALL: () => {
+          dispatch(
+            sendEvent({
+              type: 'PAYWALL_SHOWN',
+            })
+          );
         },
       };
 

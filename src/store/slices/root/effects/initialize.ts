@@ -1,6 +1,7 @@
 import { EffectOpts } from 'interfaces';
 import platform from 'platform';
 import { browserVersion, engineName, engineVersion, isMobile, isSafari, osName, osVersion } from 'react-device-detect';
+import { createParamsSelector } from 'services/HorusService/selectors';
 import { APP_DB_NAME, CollectionName, Indexes } from 'services/IDBService/types';
 import { sendEvent } from 'store/actions';
 import { ERROR_CODES } from 'types/errors';
@@ -106,7 +107,9 @@ export const initialize = async (opts: EffectOpts) => {
       embeddedCheckService.getEmbededStatus(),
       postMessageService.init(),
       sauronService.init(),
-      horusService.init(),
+      horusService.init({
+        paramsSelector: createParamsSelector(opts),
+      }),
       youboraService.init(),
       favouritesService.init(dbService, {
         getToken: () => getState().root.meta.userToken,

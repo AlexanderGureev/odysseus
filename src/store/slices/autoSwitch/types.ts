@@ -23,4 +23,5 @@ export type FSMState = {
   cancelButtonText: string | null;
 
   previousTime: number | null;
+  auto: boolean;
 };

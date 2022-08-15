@@ -71,6 +71,10 @@ export type EventsWithPayload =
       payload: {
         value: number;
       };
+    }
+  | {
+      type: 'SET_ADFOX_PARAMS';
+      payload: { adFoxParams: Record<string, any> };
     };
 
 export type Event = EventsWithPayload['type'];
@@ -92,4 +96,6 @@ export type FSMState = {
   currentTime: number | null;
   duration: number | null;
   remainingTime: number | null;
+
+  adFoxParams: Record<string, any>;
 };

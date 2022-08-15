@@ -3,10 +3,21 @@ import { sendEvent } from 'store/actions';
 import { TAdPointConfig } from 'types/ad';
 import { logger } from 'utils/logger';
 
-export const preloadAdBlock = (point: TAdPointConfig, { getState, dispatch, services: { adService } }: EffectOpts) => {
+export const preloadAdBlock = async (
+  point: TAdPointConfig,
+  { getState, dispatch, services: { adService, embeddedCheckService } }: EffectOpts
+) => {
   try {
     const {
-      root: { adConfig },
+      root: {
+        adConfig,
+        meta,
+        session,
+        deviceInfo,
+        config: {
+          config: { puid12, user_id },
+        },
+      },
     } = getState();
 
     const config = adConfig?.[point.category];
@@ -18,6 +29,16 @@ export const preloadAdBlock = (point: TAdPointConfig, { getState, dispatch, serv
       index: 0,
       limit: config.limit,
       isPromo: false,
+      creativeOpts: {
+        isEmbedded: meta.isEmbedded,
+        isMobile: deviceInfo.isMobile,
+        outerHost: embeddedCheckService.getState().location,
+        puid12,
+        sauronId: session.sid,
+        ssid: session.id,
+        videosessionId: session.videosession_id,
+        userId: user_id,
+      },
     });
 
     block

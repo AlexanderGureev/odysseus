@@ -260,7 +260,9 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
   };
 
   const play = async () => {
-    await playVideo();
+    try {
+      await playVideo();
+    } catch (e) {}
   };
 
   const pause = () => {

@@ -24,7 +24,6 @@ export type EventsWithPayload =
       | 'DO_PLAY_REJECT'
       | 'DO_PAUSE_REJECT'
       | 'VIDEO_END'
-      | 'START_PLAYBACK'
       | 'RESET_RESOLVE'
       | 'PLAYBACK_INIT_RESOLVE'
       | 'SET_PAUSED'
@@ -41,6 +40,10 @@ export type EventsWithPayload =
     }
   | {
       type: 'DO_PLAY_RESOLVE';
+    }
+  | {
+      type: 'START_PLAYBACK';
+      meta: { isFirst: boolean };
     };
 
 export type Event = EventsWithPayload['type'];

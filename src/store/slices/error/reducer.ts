@@ -1,5 +1,5 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
-import { FSM_EVENT } from 'store/actions';
+import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { RawPlayerError } from 'types/errors';
@@ -86,7 +86,10 @@ const addMiddleware = () =>
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         ERROR: () => {
-          return;
+          dispatch(sendEvent({ type: 'ERROR_SHOWN' }));
+        },
+        NETWORK_ERROR: () => {
+          dispatch(sendEvent({ type: 'ERROR_SHOWN' }));
         },
       };
 

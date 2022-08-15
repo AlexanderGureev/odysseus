@@ -6,12 +6,13 @@ import { retry, runInterval, sleep } from 'utils/retryUtils';
 import { IDBService } from '../../services/IDBService';
 import { CollectionName, Indexes } from '../IDBService/types';
 import { WindowController } from '../WindowController';
-import { PARAMS_SELECTOR } from './selectors';
 import {
   EventStatus,
   HORUS_EVENT,
   HorusEventName,
+  HorusInitOpts,
   ParamsByEventName,
+  ParamsSelector,
   TDBEvent,
   TEventParams,
   THorusConfig,
@@ -39,8 +40,10 @@ const HorusService = () => {
   let isStopSending = false;
   let config = DEFAULT_CONFIG;
   let isInitialized = false;
+  let paramsSelector: ParamsSelector;
+  let eventNum = 0;
 
-  const init = async () => {
+  const init = async (opts: HorusInitOpts) => {
     if (isInitialized) return;
 
     if (!HORUS_SRC || !HORUS_ENABLED) {
@@ -49,7 +52,7 @@ const HorusService = () => {
     }
 
     blacklist = createBlackList();
-
+    paramsSelector = opts.paramsSelector;
     // ping запрос раз в N секунд
     // mediator.subscribe(M_EVENTS.PROGRESS_NOTIFIER_NOTIFY, () => {
     //   heartbeatHandler();
@@ -249,7 +252,7 @@ const HorusService = () => {
 
   const selectParams = (event: HorusEventName) => {
     return ParamsByEventName[event].reduce<Partial<TEventParams>>((acc, paramName) => {
-      const paramValue = PARAMS_SELECTOR[paramName]?.({});
+      const paramValue = paramsSelector[paramName]?.();
 
       return isNil(paramValue)
         ? acc
@@ -260,9 +263,12 @@ const HorusService = () => {
     }, {});
   };
 
-  const createPayload = (eventName: HorusEventName): THorusEvent => ({
+  const createPayload = (eventName: HorusEventName, eventNum: number): THorusEvent => ({
     event_name: eventName,
-    event_params: selectParams(eventName),
+    event_params: {
+      ...selectParams(eventName),
+      event_num: eventNum,
+    },
   });
 
   const routeEvent = async (event: HORUS_EVENT) => {
@@ -271,9 +277,8 @@ const HorusService = () => {
     try {
       if (blacklist.includes(eventName)) return;
 
-      // dispatchEventNum();
-
-      const payload = createPayload(eventName);
+      eventNum += 1;
+      const payload = createPayload(eventName, eventNum);
 
       logger.log('[HorusService]', `routeEvent >>> ${eventName}, ${payload}`);
 

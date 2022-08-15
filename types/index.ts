@@ -28,6 +28,37 @@ export enum SkinClass {
   DEFAULT = 'DEFAULT',
 }
 
+export const APP_CLASSNAME = {
+  [SkinClass.VIDEOMORE]: 'moretv',
+  [SkinClass.CTC]: 'ctc',
+  [SkinClass.CTC_LOVE]: 'ctc_love',
+  [SkinClass.MORE_TV]: 'moretv',
+  [SkinClass.DOMASHNIY]: 'domashniy',
+  [SkinClass.CHE]: 'che',
+  [SkinClass.CTC_KIDS]: 'ctc_kids',
+  [SkinClass.DEFAULT]: 'default',
+};
+
+export enum DOMAINS {
+  MORE_TV = 'more.tv',
+  VIDEOMORE = 'videomore.ru',
+  CHE_TV = 'chetv.ru',
+  CTC = 'ctc.ru',
+  CTC_KIDS = 'ctckids.ru',
+  CTC_LOVE = 'ctclove.ru',
+  DOMASHNIY = 'domashniy.ru',
+}
+
+export const MAP_HOST_TO_SKIN = {
+  [DOMAINS.MORE_TV]: SkinClass.MORE_TV,
+  [DOMAINS.VIDEOMORE]: SkinClass.VIDEOMORE,
+  [DOMAINS.CHE_TV]: SkinClass.CHE,
+  [DOMAINS.CTC]: SkinClass.CTC,
+  [DOMAINS.CTC_KIDS]: SkinClass.CTC_KIDS,
+  [DOMAINS.CTC_LOVE]: SkinClass.CTC_LOVE,
+  [DOMAINS.DOMASHNIY]: SkinClass.DOMASHNIY,
+};
+
 export const SERVICE_GROUP_ID: { [key in SkinClass]?: number } = {
   [SkinClass.MORE_TV]: 1,
   [SkinClass.CTC]: 2,
@@ -46,6 +77,7 @@ type DISCLAIMER_AGE_RESTRICTIONS = {
 
 export type TFeatureConfig = {
   ENABLE_FAVOURITES?: boolean;
+  MEDIASCOPE_WATCHING_COUNTER?: boolean;
 
   AUTH_URL?: string;
 
@@ -141,15 +173,17 @@ export type TScrobbling = {
   serviceId: Nullable<number>;
 };
 
+export type Puid12 = {
+  site: number;
+  embed: number;
+};
+
 export type TRawConfig = {
   ad?: TRawAdConfig;
   post_image: string;
   pre_image: string;
   project_id: number;
-  puid12?: {
-    site: number;
-    embed: number;
-  };
+  puid12?: Puid12;
   ref: string;
   scrobbling?: TScrobbling;
   sid: string;

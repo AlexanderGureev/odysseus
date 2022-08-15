@@ -7,8 +7,10 @@ import { DemonInitOpts, PlayerStats } from './types';
 
 const DemonService = () => {
   let params: DemonInitOpts | null = null;
+  let prevBufferTime = 0;
 
   const init = (opts: DemonInitOpts) => {
+    prevBufferTime = 0;
     params = {
       ...opts,
     };
@@ -31,13 +33,16 @@ const DemonService = () => {
 
     const { statURL, trackId, referrer, projectId, configLoadingTime, skinId, userId, transactionId, sid } = params;
 
+    const diff = Math.abs(prevBufferTime - toFixed(bufferTime / 60));
+    prevBufferTime = toFixed(bufferTime / 60);
+
     if (statURL && trackId && referrer && projectId) {
       let url = `${statURL}
                 ?t=${trackId}
                 &ssid=&m=${toFixed(currentTime / 60)}
                 &r=${referrer}
                 &b0=${configLoadingTime}
-                &b=${toFixed(bufferTime / 60)}
+                &b=${diff}
                 &b1=${toFixed(initialBufferTime || 0) / 60}
                 &p=${projectId}
                 &lqs=${toFixed(playTimeByQuality[QUALITY_MARKS.LD] || 0) / 60}

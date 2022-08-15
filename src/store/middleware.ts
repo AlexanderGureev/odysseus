@@ -12,6 +12,7 @@ import {
   IDBService,
   LocalStorageService,
   ManifestParser,
+  MediascopeCounter,
   PlayerService,
   PostMessageService,
   SauronService,
@@ -60,6 +61,7 @@ const opts: CreateListenerMiddlewareOptions<MiddlewareDeps> = {
       qualityService: StreamQualityManager,
       demonService: DemonService,
       favouritesService: FavouritesService,
+      mediascopeCounter: MediascopeCounter,
     },
   },
 };

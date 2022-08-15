@@ -1,4 +1,4 @@
-import { createAction, createSlice } from '@reduxjs/toolkit';
+import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
@@ -108,6 +108,10 @@ const addMiddleware = () =>
         services,
       };
 
+      const {
+        payload: { type },
+      } = action as PayloadAction<EventPayload>;
+
       const handler: { [key in State]?: () => Promise<void> | void } = {
         CHECK_HEARBEAT_PENDING: () => {
           const {
@@ -119,16 +123,18 @@ const addMiddleware = () =>
             PLAIN: { ...progress.PLAIN },
           };
 
+          const videoType = type === 'AD_BLOCK_TIME_UPDATE' ? 'AD' : 'PLAIN';
+
           const heartbeatPoints = heartbeats.reduce((acc: number[], p) => {
-            return progress.PLAIN[p] >= p ? [...acc, p] : acc;
+            return progress[videoType][p] >= p ? [...acc, p] : acc;
           }, []);
 
           heartbeatPoints.forEach((point) => {
-            newProgress.PLAIN[point] = 0;
+            newProgress[videoType][point] = 0;
 
             dispatch(
               sendEvent({
-                type: 'HEARTBEAT_VIDEO',
+                type: videoType === 'PLAIN' ? 'HEARTBEAT_VIDEO' : 'HEARTBEAT_AD',
                 payload: {
                   value: point,
                 },

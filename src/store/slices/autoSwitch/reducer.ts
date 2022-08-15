@@ -20,6 +20,8 @@ const initialState: FSMState = {
   buttonText: null,
   cancelButtonText: null,
   previousTime: null,
+
+  auto: true,
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -62,6 +64,14 @@ const autoSwitch = createSlice({
       logger.log('[FSM]', 'autoSwitch', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
+        case 'VIDEO_END':
+          state.auto = true;
+          state.step = step;
+          break;
+        case 'START_AUTOSWITCH':
+          state.auto = false;
+          state.step = step;
+          break;
         case 'PARSE_CONFIG_RESOLVE': {
           const { NEXT_EPISODE_AUTOPLAY, NEXT_EPISODE_AUTOPLAY_SUGGEST } = payload.features;
           const skin = payload.meta.skin;
@@ -156,7 +166,17 @@ const addMiddleware = () =>
           dispatch(sendEvent({ type: 'AUTOSWITCH_NOTIFY_SHOWN' }));
         },
         AUTOSWITCH_PENDING: () => {
-          dispatch(sendEvent({ type: 'GO_TO_NEXT_TRACK', payload: { params: { startAt: 0 } } }));
+          const { auto } = getState().autoSwitch;
+
+          dispatch(
+            sendEvent({
+              type: 'GO_TO_NEXT_TRACK',
+              payload: { params: { startAt: 0 } },
+              meta: {
+                auto,
+              },
+            })
+          );
         },
       };
 

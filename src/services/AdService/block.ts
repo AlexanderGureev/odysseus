@@ -4,6 +4,7 @@ import { Mediator } from 'services/MediatorService';
 import { Nullable } from 'types';
 import { AdPlaybackController, AdViewer } from 'types/yasdk';
 import { logger } from 'utils/logger';
+import { randomUnit32 } from 'utils/randomHash';
 import { sleep } from 'utils/retryUtils';
 
 import { AdPodError, PreloadTimeoutExpired } from './errors';
@@ -16,6 +17,7 @@ export const AdBlock = ({
   videoSlot,
   controlsSlot,
   features: { ADV_CACHE_TIMEOUT, ADV_PLAY_WAIT_TIMEOUT },
+  creativeOpts,
 }: BlockOpts): TAdBlock => {
   const mediator = Mediator<Events>();
   const state = (isPromo ? promo : no_type).map((link) => ({ ...link }));
@@ -29,12 +31,16 @@ export const AdBlock = ({
   let isYaCreative = false;
   let isDisposed = false;
   let isImpression = false;
+  const blockId = randomUnit32();
+
   let meta: BlockMeta = {
     id: null,
     extensions: {},
     type: null,
     vpaidURL: null,
   };
+
+  let adFoxParams: Record<string, string> = {};
 
   const filterLinks = (links: TAdLinkItem[]) => {
     return links
@@ -63,8 +69,20 @@ export const AdBlock = ({
       window.ya.videoAd
         .loadModule('AdLoader')
         .then((module) => {
+          const { link, ...adFoxParameters } = getAdFoxParameters({
+            blockId,
+            link: item.link,
+            ...creativeOpts,
+          });
+
+          adFoxParams = {
+            ...adFoxParameters.params,
+          };
+
+          mediator.emit('AdFoxParams', { link, ...adFoxParameters });
+
           return module.AdLoader.create({
-            adFoxParameters: getAdFoxParameters(item.link),
+            adFoxParameters,
           });
         })
         .then((adLoader) => {
@@ -285,7 +303,9 @@ export const AdBlock = ({
   const setVolume = (value: number) => {
     adPlaybackController?.setAdVolume(value);
   };
+
   const getVolume = () => adPlaybackController?.getAdVolume();
+  const getAdFoxParams = () => ({ ...adFoxParams });
 
   return {
     resumeAd,
@@ -307,5 +327,6 @@ export const AdBlock = ({
     getAdVolumeAvailability,
     setVolume,
     getVolume,
+    getAdFoxParams,
   };
 };

@@ -11,6 +11,7 @@ import { ActionPayload, FSMState, State } from './types';
 
 const initialState: FSMState = {
   step: 'IDLE',
+  startPosition: 0,
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -49,14 +50,22 @@ const resumeVideo = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(createAction<ActionPayload>(FSM_EVENT), (state, action) => {
-      const { type, payload } = action.payload;
+      const { type, payload, meta } = action.payload;
 
       const next = config[state.step]?.[type];
       if (next === undefined) return state;
+      const step = next || state.step;
 
       logger.log('[FSM]', 'resumeVideo', `${state.step} -> ${type} -> ${next}`);
 
-      return next ? { ...state, step: next, ...payload } : { ...state, ...payload };
+      switch (type) {
+        case 'LAUNCH_SETUP_RESOLVE':
+          state.startPosition = meta.startPosition;
+          state.step = step;
+          break;
+        default:
+          return { ...state, step, ...payload };
+      }
     });
   },
 });
@@ -124,6 +133,9 @@ const addMiddleware = () =>
           dispatch(
             sendEvent({
               type: 'LAUNCH_SETUP_RESOLVE',
+              meta: {
+                startPosition,
+              },
             })
           );
         },

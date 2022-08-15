@@ -1,7 +1,9 @@
 import { Subscribe, Unsubscribe } from 'services/MediatorService/types';
-import { TParsedFeatures } from 'types';
+import { Puid12, TParsedFeatures } from 'types';
 import { AdLinkType, TAdPointConfig, TAdPointsConfig } from 'types/ad';
 import { AdViewer } from 'types/yasdk';
+
+import { TAdFoxConfig } from './utils';
 
 export enum AD_BLOCK_STATUS {
   UNITIALIZED = 'UNITIALIZED',
@@ -28,6 +30,7 @@ export type AdLinksByType = {
 };
 
 export type Events = {
+  AdFoxParams: (params: TAdFoxConfig) => void;
   AdInitialized: (payload: TAdLinkItem) => void;
   AdClickThru: () => void;
   AdPlayingStateChange: () => void;
@@ -68,6 +71,9 @@ export type TAdBlock = {
   getAdVolumeAvailability: () => boolean;
   setVolume: (value: number) => void;
   getVolume: () => number | undefined;
+  getAdFoxParams: () => {
+    [x: string]: any;
+  };
 };
 
 export type InitOpts = {
@@ -81,6 +87,7 @@ export type NewBlockOpts = {
   index: number;
   limit: number;
   isPromo: boolean;
+  creativeOpts: CreativeOpts;
 };
 
 export type BlockOpts = {
@@ -92,6 +99,18 @@ export type BlockOpts = {
     ADV_CACHE_TIMEOUT: number;
   };
   isPromo: boolean;
+  creativeOpts: CreativeOpts;
+};
+
+export type CreativeOpts = {
+  isMobile: boolean;
+  sauronId: string | null;
+  ssid: string;
+  videosessionId: string;
+  userId: number | null;
+  outerHost: string | null;
+  isEmbedded: boolean;
+  puid12: Puid12 | undefined;
 };
 
 export type AdService = {

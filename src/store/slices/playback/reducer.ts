@@ -138,8 +138,14 @@ const addMiddleware = () => {
               })
             );
           });
-
           services.playerService.on('play', () => {
+            const {
+              playback: { step },
+            } = getState();
+
+            const next = config[step]?.['SET_PLAYING']; // TODO refactor
+            if (next === undefined) return;
+
             dispatch(
               sendEvent({
                 type: 'SET_PLAYING',
@@ -147,6 +153,13 @@ const addMiddleware = () => {
             );
           });
           services.playerService.on('pause', () => {
+            const {
+              playback: { step },
+            } = getState();
+
+            const next = config[step]?.['SET_PAUSED'];
+            if (next === undefined) return;
+
             dispatch(
               sendEvent({
                 type: 'SET_PAUSED',
@@ -193,7 +206,6 @@ const addMiddleware = () => {
               })
             );
           });
-
           services.playerService.on('ended', () => {
             dispatch(
               sendEvent({
@@ -210,8 +222,8 @@ const addMiddleware = () => {
         },
         CHECK_TOKEN_PENDING: () => checkToken(opts),
         CHECK_MANIFEST_PENDING: () => checkManifest(opts),
-        PLAY_PENDING: async () => {
-          await opts.services.playerService.play();
+        PLAY_PENDING: () => {
+          opts.services.playerService.play();
           dispatch(
             sendEvent({
               type: 'DO_PLAY_RESOLVE',
@@ -237,7 +249,6 @@ const addMiddleware = () => {
           } = getState();
 
           if (trackId) {
-            console.log('[TEST] end');
             services.localStorageService.setItemByProject(trackId, STORAGE_SETTINGS.CURRENT_TIME, 0);
           }
 

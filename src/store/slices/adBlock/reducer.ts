@@ -26,6 +26,8 @@ const initialState: FSMState = {
   currentTime: null,
   duration: null,
   remainingTime: null,
+
+  adFoxParams: {},
 };
 
 const config: FSMConfig<State, AppEvent> = {

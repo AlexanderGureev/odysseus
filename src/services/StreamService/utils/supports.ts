@@ -109,7 +109,7 @@ export type TCapabilities = {
   playready: boolean;
 };
 
-type TKey = keyof TCapabilities;
+export type TKey = keyof TCapabilities;
 
 export const getCapabilities = async (): Promise<TKey[]> => {
   const widevine = await checkEMESupport(KEY_SYSTEMS.WIDEVINE);

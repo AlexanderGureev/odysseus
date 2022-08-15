@@ -5,7 +5,7 @@ export type State = 'IDLE' | 'CHECK_HEARBEAT_PENDING';
 
 export type EventsWithPayload =
   | {
-      type: 'HEARTBEAT_VIDEO';
+      type: 'HEARTBEAT_VIDEO' | 'HEARTBEAT_AD';
       payload: {
         value: number;
       };

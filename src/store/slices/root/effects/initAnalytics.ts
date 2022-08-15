@@ -11,15 +11,25 @@ export const initAnalytics = async (opts: EffectOpts) => {
   const {
     getState,
     dispatch,
-    services: { ymService, gaService, amberdataService, vigoService, tnsCounter, demonService },
+    services: {
+      ymService,
+      gaService,
+      amberdataService,
+      vigoService,
+      tnsCounter,
+      demonService,
+      embeddedCheckService,
+      mediascopeCounter,
+    },
   } = opts;
 
   try {
-    const { session, deviceInfo, meta, config, adConfig } = getState().root;
+    const { session, deviceInfo, meta, config, adConfig, features } = getState().root;
 
     const data = getPlaylistItem(getState());
 
     await Promise.all([
+      embeddedCheckService.getIframeLocation(),
       demonService.init({
         configLoadingTime: 0,
         projectId: config.config.project_id,
@@ -60,6 +70,10 @@ export const initAnalytics = async (opts: EffectOpts) => {
           userId: config.config.user_id,
         },
         referrer: config.config.ref,
+      }),
+      mediascopeCounter.init({
+        isEnabled: Boolean(features.MEDIASCOPE_WATCHING_COUNTER),
+        params: config.mediascopeCounter?.mediascope_counter_watching || null,
       }),
     ]);
 

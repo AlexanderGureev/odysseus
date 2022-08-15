@@ -50,8 +50,11 @@ const AdService = (tnsCounter: ITNSCounter, localStorageService: ILocalStorageSe
 
   const isPreloadable = () => ADV_CACHE_LOOKAHEAD > 0;
 
-  const addListeners = (block: TAdBlock, { config, index, limit }: NewBlockOpts) => {
+  const addListeners = (block: TAdBlock, { config, index, limit, creativeOpts }: NewBlockOpts) => {
     block
+      .on('AdFoxParams', (data) => {
+        logger.log('[AdService]', 'AdFoxParams', data);
+      })
       .on('AdInitialized', (data) => {
         if (data.tnsInitEvent) {
           tnsCounter.sendEvent('load_ad_start');
@@ -72,6 +75,7 @@ const AdService = (tnsCounter: ITNSCounter, localStorageService: ILocalStorageSe
             index: index + 1,
             isPromo: isExclusive,
             limit,
+            creativeOpts,
           });
 
           nextBlock.preload().catch((err) => {
@@ -91,6 +95,7 @@ const AdService = (tnsCounter: ITNSCounter, localStorageService: ILocalStorageSe
         ADV_PLAY_WAIT_TIMEOUT,
         ADV_CACHE_TIMEOUT,
       },
+      creativeOpts: opts.creativeOpts,
     });
 
     addListeners(block, opts);

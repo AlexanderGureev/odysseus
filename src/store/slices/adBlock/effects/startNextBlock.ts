@@ -4,20 +4,30 @@ import { createFakeSource } from 'services/StreamService/utils';
 import { sendEvent } from 'store/actions';
 import { logger } from 'utils/logger';
 
-export const startNextBlock = async ({
-  getState,
-  dispatch,
-  services: { adService, playerService, vigoService },
-}: EffectOpts) => {
-  const { point, index } = getState().adBlock;
+export const startNextBlock = async ({ getState, dispatch, services: { adService, playerService } }: EffectOpts) => {
+  const {
+    adBlock: { point, index },
+    adController: { isStarted },
+  } = getState();
   const currentBlock = adService.getBlock(point, index);
   let error = null;
 
   try {
     await currentBlock.preload();
+    if (!isStarted) {
+      dispatch(
+        sendEvent({
+          type: 'AD_BREAK_STARTED',
+        })
+      );
+    }
+
     dispatch(
       sendEvent({
-        type: 'AD_BREAK_STARTED',
+        type: 'SET_ADFOX_PARAMS',
+        payload: {
+          adFoxParams: currentBlock.getAdFoxParams(),
+        },
       })
     );
 
@@ -110,8 +120,6 @@ export const startNextBlock = async ({
           })
         );
       });
-
-    vigoService.sendStat({ type: 'suspendStats' });
 
     await playerService.setSource(createFakeSource(), { type: VIDEO_TYPE.FAKE_VIDEO });
     await currentBlock.play();

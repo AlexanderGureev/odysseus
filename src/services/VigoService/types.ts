@@ -1,5 +1,7 @@
 import { Nullable, SkinClass } from 'types';
 
+import { QUALITY_MARKS } from '.';
+
 export type TVigoParams = {
   playerId: string;
   sid: string;
@@ -25,6 +27,7 @@ export type VigoSDK = {
   suspendStats: () => void;
   resumeStats: () => void;
   updateHost: (host: string) => void;
+  bitrateChange: (quality: number) => void;
 };
 
 export type VigoEvent =
@@ -40,6 +43,10 @@ export type VigoEvent =
   | {
       type: 'updateHost';
       payload: string;
+    }
+  | {
+      type: 'bitrateChange';
+      payload: QUALITY_MARKS;
     };
 
 export type TVigoService = {

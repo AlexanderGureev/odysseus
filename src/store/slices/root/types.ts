@@ -58,6 +58,7 @@ export type EventsWithPayload =
       | 'SETUP_INITIAL_VOLUME_RESOLVE'
       | 'CLICK_PAYWALL_BUTTON'
       | 'BEFORE_UNLOAD'
+      | 'PAYWALL_SHOWN'
     >
   | ErrorPayload<
       | 'CHECK_ERROR_REJECT'
@@ -225,8 +226,8 @@ export type FSMState = {
   capabilities: Array<keyof TCapabilities>;
   permissions: Permissions;
 
-  isFirstRun: boolean;
   isShowPlayerUI: boolean;
+  isFirstStartPlayback: boolean;
 
   deviceInfo: DeviceInfo;
 };

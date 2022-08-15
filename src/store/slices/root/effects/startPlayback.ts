@@ -1,23 +1,15 @@
 import { EffectOpts } from 'interfaces';
 import { sendEvent } from 'store/actions';
 
-export const startPlayback = (opts: EffectOpts) => {
-  const {
-    getState,
-    dispatch,
-    services: { vigoService },
-  } = opts;
-
-  const { manifestData } = getState().root;
-  if (manifestData?.responseUrl) {
-    vigoService.sendStat({ type: 'updateHost', payload: manifestData.responseUrl });
-  }
-
-  vigoService.sendStat({ type: 'resumeStats' });
+export const startPlayback = ({ getState, dispatch }: EffectOpts) => {
+  const { isFirstStartPlayback } = getState().root;
 
   dispatch(
     sendEvent({
       type: 'START_PLAYBACK',
+      meta: {
+        isFirst: isFirstStartPlayback,
+      },
     })
   );
 };

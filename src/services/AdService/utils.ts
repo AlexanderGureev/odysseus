@@ -1,11 +1,10 @@
 import { XMLParser } from 'fast-xml-parser';
-import { isMobile, isSafari } from 'react-device-detect';
+import { isSafari } from 'react-device-detect';
+import { getCookie } from 'utils/cookie';
 import { logger } from 'utils/logger';
-import { v4 } from 'uuid';
 
-import { BlockMeta, ExtensionItem, Extensions } from './types';
+import { BlockMeta, CreativeOpts, ExtensionItem, Extensions } from './types';
 
-const AD_FOX_OWNER_ID = window.ENV.AD_FOX_OWNER_ID;
 export const ADV_DESKTOP_PLID = 229103;
 export const ADV_OTHER_PLID = 229104;
 
@@ -48,38 +47,60 @@ export function getAdfoxQueryParameterForSafari() {
   const ADFOX_QUERY_PARAMETER = 'extid';
   const ADFOX_ID_TAG = 'extid_tag=adfox';
 
-  const id = null; //getCookie(ADFOX_COOKIE_PARAMETER);
-
+  const id = getCookie(ADFOX_COOKIE_PARAMETER);
   return id ? `${ADFOX_ID_TAG}&${ADFOX_QUERY_PARAMETER}=${id}` : '';
 }
 
 export type TAdFoxConfig = {
+  link: string;
   ownerId: string;
   params: Record<string, string>;
 };
 
-export const getAdFoxParameters = (link: string): TAdFoxConfig => {
+export type CreateAdFoxParams = CreativeOpts & {
+  link: string;
+  blockId: number;
+};
+
+export const getAdFoxParameters = ({
+  link,
+  blockId,
+  isEmbedded,
+  isMobile,
+  outerHost,
+  puid12,
+  sauronId,
+  ssid,
+  userId,
+  videosessionId,
+}: CreateAdFoxParams): TAdFoxConfig => {
   const plid = isMobile ? ADV_OTHER_PLID : ADV_DESKTOP_PLID;
-  const eid1 = v4();
-  const blockId = '123123';
-  const authorizedUserId = null;
+  const webVersion = null;
 
   let formattedUrl = link;
-  formattedUrl = formattedUrl.replace(/\${3}eid1\${3}/g, `${eid1}`);
+  formattedUrl = formattedUrl.replace(/\${3}eid1\${3}/g, `${ssid}`);
   formattedUrl = formattedUrl.replace(/\${3}pr\${3}/g, `${blockId}`);
   formattedUrl = formattedUrl.replace(/\${3}plid\${3}/g, `${plid}`);
+  formattedUrl = formattedUrl.replace(/\${3}sauronid\${3}/g, `${sauronId}`);
+
   const adfoxSafariQueryParam = isSafari ? getAdfoxQueryParameterForSafari() : '';
   formattedUrl = `${formattedUrl}&${adfoxSafariQueryParam}`;
+  formattedUrl = `${formattedUrl}&eid6=${userId || null}&eid7=${sauronId || ssid || null}&eid8=${
+    videosessionId || null
+  }`;
 
-  formattedUrl = `${formattedUrl}&eid6=${authorizedUserId || null}&eid7=${v4()}&eid8=${v4()}`;
-
+  formattedUrl = `${formattedUrl}&dl=${outerHost}`;
   formattedUrl = formattedUrl.replace(/&+/g, '&').replace(/&+$/g, '');
-
   const adFoxParams = getQueryParams(formattedUrl);
 
-  logger.log('[getAdFoxParameters]', adFoxParams);
+  if (isEmbedded && puid12?.embed) adFoxParams.puid12 = puid12.embed;
+  if (!isEmbedded && puid12?.site) adFoxParams.puid12 = puid12.site;
+
+  if (webVersion) adFoxParams.puid40 = webVersion;
+
   return {
-    ownerId: AD_FOX_OWNER_ID,
+    link: formattedUrl,
+    ownerId: window.ENV.AD_FOX_OWNER_ID,
     params: { ...adFoxParams },
   };
 };

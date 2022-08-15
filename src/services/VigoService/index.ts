@@ -60,6 +60,10 @@ const VigoService = (playerService: IPlayerService): TVigoService => {
           const { hostname } = new URL(event.payload);
           vigoStat[event.type](hostname);
           break;
+        case 'bitrateChange':
+          const idx = VIGO_QUALITY_INDEX[event.payload];
+          vigoStat[event.type](idx);
+          break;
         default:
           vigoStat[event.type]();
       }

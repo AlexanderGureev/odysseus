@@ -2,8 +2,18 @@
 import { EffectOpts } from 'interfaces';
 import { sendEvent } from 'store/actions';
 
-export const getNext = ({ getState, dispatch, services: { adService } }: EffectOpts) => {
-  const { links, point, limit, index, isExclusive, isPromo } = getState().adBlock;
+export const getNext = ({ getState, dispatch, services: { adService, embeddedCheckService } }: EffectOpts) => {
+  const {
+    adBlock: { links, point, limit, index, isExclusive, isPromo },
+    root: {
+      meta,
+      session,
+      deviceInfo,
+      config: {
+        config: { puid12, user_id },
+      },
+    },
+  } = getState();
 
   let currentLinks = links;
   const idx = index + 1;
@@ -17,6 +27,16 @@ export const getNext = ({ getState, dispatch, services: { adService } }: EffectO
         index: idx,
         limit,
         isPromo: isExclusive,
+        creativeOpts: {
+          isEmbedded: meta.isEmbedded,
+          isMobile: deviceInfo.isMobile,
+          outerHost: embeddedCheckService.getState().location,
+          puid12,
+          sauronId: session.sid,
+          ssid: session.id,
+          videosessionId: session.videosession_id,
+          userId: user_id,
+        },
       });
     }
 

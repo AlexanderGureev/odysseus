@@ -12,15 +12,17 @@ import {
   FavouriteStoreItem,
   GetFavouritesParams,
 } from 'services/FavouritesService/types';
-import { HORUS_EVENT } from 'services/HorusService/types';
+import { HORUS_EVENT, HorusInitOpts } from 'services/HorusService/types';
 import { TQuery, TStoresConfig } from 'services/IDBService/types';
 import { TManifestData, TParsedManifest } from 'services/ManifestParser/types';
+import { MEDIASCOPE_EVENT } from 'services/MediascopeCounter';
+import { MediascopeEventParams, MediascopeInitOpts } from 'services/MediascopeCounter/types';
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
 import { Events, Hooks, HookType, SetSourceOpts } from 'services/PlayerService/types';
 import { INPUT_PLAYER_POST_MESSAGE, OutputEvents } from 'services/PostMessageService/types';
 import { TMeta, TQualityItem, TQualityList, TQualityRecord } from 'services/StreamQualityManager/types';
 import { TSource } from 'services/StreamService/types';
-import { TNSEvent } from 'services/TNSCounter/types';
+import { HeartBeatTnsEvent, TNSEvent } from 'services/TNSCounter/types';
 import { Params } from 'services/UTMService/types';
 import { QUALITY_MARKS } from 'services/VigoService';
 import { TVigoParams, VigoEvent } from 'services/VigoService/types';
@@ -119,7 +121,7 @@ export interface IBeholderService {
 }
 
 export interface IHorusService {
-  init: () => Promise<void>;
+  init: (opts: HorusInitOpts) => Promise<void>;
   routeEvent: (event: HORUS_EVENT) => Promise<void>;
 }
 
@@ -181,6 +183,7 @@ export interface ITNSCounter {
     deviceInfo: DeviceInfo
   ) => void;
   sendEvent: (event: TNSEvent) => void;
+  sendTnsHeartBeatStat: (param: HeartBeatTnsEvent, currentTime: number) => void;
 }
 
 export interface IManifestService {
@@ -226,6 +229,11 @@ export interface IFavouritesService {
   clearFavourites: () => Promise<void>;
 }
 
+export interface IMediascopeCounter {
+  init: (opts: MediascopeInitOpts) => void;
+  sendEvent: (event: keyof typeof MEDIASCOPE_EVENT, params: MediascopeEventParams) => void;
+}
+
 export interface IServices {
   embeddedCheckService: IEmbeddedCheckService;
   dbService: IDBService;
@@ -249,6 +257,7 @@ export interface IServices {
   qualityService: IQualityService;
   demonService: IDemonService;
   favouritesService: IFavouritesService;
+  mediascopeCounter: IMediascopeCounter;
 }
 
 export type EffectOpts = {

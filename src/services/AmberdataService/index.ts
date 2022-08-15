@@ -7,14 +7,7 @@ import { logger } from 'utils/logger';
 import { randomUnit32 } from 'utils/randomHash';
 import { sendStat } from 'utils/statistics';
 
-import {
-  AmberdataEvent,
-  AmberdataEventPayload,
-  CrashEventPayload,
-  PARAMS,
-  TAmberdataInitParams,
-  TAmberdataParams,
-} from './types';
+import { AmberdataEventPayload, CrashEventPayload, PARAMS, TAmberdataInitParams, TAmberdataParams } from './types';
 
 export const AMBERDATA_CODE_BY_SKIN_NAME: { [key in SkinClass]?: number } = {
   MORE_TV: 6334,
@@ -39,7 +32,7 @@ const QUERY_PARAMS = {
   TIMEZONE: 'tz',
   EVENT_TYPE: 'event_type',
   EVENT_POSITION: 'event_position',
-  EVENT_ORIGIN: 'event_manual',
+  EVENT_MANUAL: 'event_manual',
   EVENT_VALUE: 'event_value',
   EVENT_NUMBER: 'event_number',
   VIDEO_SESSION_ID: 'videosession_id',
@@ -55,7 +48,7 @@ const PARAMS_MAP: Record<string, string> = {
   timezone: QUERY_PARAMS.TIMEZONE,
   eventType: QUERY_PARAMS.EVENT_TYPE,
   eventPosition: QUERY_PARAMS.EVENT_POSITION,
-  eventOrigin: QUERY_PARAMS.EVENT_ORIGIN,
+  eventManual: QUERY_PARAMS.EVENT_MANUAL,
   eventValue: QUERY_PARAMS.EVENT_VALUE,
   videosessionId: QUERY_PARAMS.VIDEO_SESSION_ID,
   userId: QUERY_PARAMS.USER_ID,
@@ -85,17 +78,22 @@ const AmberdataService = () => {
   };
 
   const sendAmberdataInitStat = (paid: boolean, adFoxPartner: number | undefined, adFoxSeason: number | undefined) => {
+    logger.log('[AmberdataService]', 'send init event');
+
     const resultedParams: { [key in PARAMS]?: Nullable<string | number> } = {
       [PARAMS.ADFOX_PARTNER]: !paid && adFoxPartner ? adFoxPartner : null,
       [PARAMS.SEASON]: !paid && adFoxSeason ? adFoxSeason : null,
-      [PARAMS.EVENT_TYPE]: AmberdataEvent.OPEN,
+      [PARAMS.EVENT_TYPE]: 'open',
       [PARAMS.PAID_CONTENT]: paid ? 1 : 0,
     };
 
     let queryString = '';
 
     Object.entries(resultedParams).forEach(([key, value]) => {
-      queryString += queryString === '' ? `${initQueryParams[key]}__${value}` : ` ${initQueryParams[key]}__${value}`;
+      if (!isNil(value)) {
+        const params = `${initQueryParams[key]}__${value}`;
+        queryString += queryString === '' ? `${params}` : ` ${params}`;
+      }
     });
 
     const url = createStatURL(queryString);
@@ -103,10 +101,15 @@ const AmberdataService = () => {
   };
 
   const sendAmberdataStat = ({ eventType, saveOrigin = false, ...opts }: AmberdataEventPayload) => {
+    logger.log('[AmberdataService]', 'send event', { eventType, ...opts });
+
     let queryString = '';
 
     Object.entries(opts).forEach(([key, value]) => {
-      queryString += queryString === '' ? `${PARAMS_MAP[key]}__${value}` : ` ${PARAMS_MAP[key]}__${value}`;
+      if (!isNil(value)) {
+        const params = `${PARAMS_MAP[key]}__${value}`;
+        queryString += queryString === '' ? `${params}` : ` ${params}`;
+      }
     });
 
     const url = createStatURL(queryString);

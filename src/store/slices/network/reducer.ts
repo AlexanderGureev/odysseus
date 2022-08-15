@@ -10,6 +10,7 @@ import { FSMState, State } from './types';
 
 const initialState: FSMState = {
   step: 'IDLE',
+  connectionType: null,
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -21,6 +22,7 @@ const config: FSMConfig<State, AppEvent> = {
   },
   ONLINE: {
     GO_OFFLINE: 'OFFLINE',
+    CHANGE_CONNECTION_TYPE: null,
   },
   OFFLINE: {
     GO_ONLINE: 'ONLINE',
@@ -84,7 +86,22 @@ const addMiddleware = () =>
             dispatch(sendEvent({ type: 'GO_OFFLINE' }));
           });
 
-          dispatch(sendEvent({ type: 'INITIALIZE_NETWORK_RESOLVE' }));
+          const type = navigator?.connection?.type ?? null;
+
+          if (type) {
+            navigator.connection.addEventListener('change', () => {
+              dispatch(
+                sendEvent({
+                  type: 'CHANGE_CONNECTION_TYPE',
+                  payload: {
+                    connectionType: navigator?.connection?.type ?? null,
+                  },
+                })
+              );
+            });
+          }
+
+          dispatch(sendEvent({ type: 'INITIALIZE_NETWORK_RESOLVE', payload: { connectionType: type } }));
         },
       };
 

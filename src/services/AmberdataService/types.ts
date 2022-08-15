@@ -1,4 +1,5 @@
 import { SkinClass } from 'types';
+import { ERROR_TYPE } from 'types/errors';
 
 export type TAmberdataParams = {
   skinName: SkinClass;
@@ -27,32 +28,28 @@ export type CrashEventPayload = {
   videosessionId: string;
 };
 
-export enum AmberdataEvent {
-  OPEN = 'open',
-  PLAY = 'play',
-  PAUSE = 'pause',
-  CLOSE = 'close',
-  STOP = 'stop',
-  ADSTART = 'adstart',
-  BUFFERING = 'buffering',
-  TIMEUPDATE = 'ping',
-  CRASH = 'crash',
-  MOVE = 'move',
-  PREV = 'prev',
-  NEXT = 'next',
-}
+export const AMBERDATA_BUFFERING_THRESHOLD = 2000;
 
-export enum EventOrigin {
-  AUTO = 0,
-  MANUAL = 1,
-}
+export type AmberdataEvent =
+  | 'open'
+  | 'play'
+  | 'pause'
+  | 'close'
+  | 'stop'
+  | 'adstart'
+  | 'buffering'
+  | 'ping'
+  | 'crash'
+  | 'move'
+  | 'prev'
+  | 'next';
 
 export type AmberdataEventPayload = {
   eventType: AmberdataEvent;
-  eventOrigin: EventOrigin;
+  eventManual: 1 | 0;
   eventPosition: number;
   saveOrigin?: boolean;
-  eventValue?: string;
+  eventValue?: string | null;
 };
 
 export enum PARAMS {
@@ -75,4 +72,19 @@ export const AmberdataEventValue = {
     NO_DATA: 'error-no-data',
     ONLY_SUBSCRIPTION: 'error-only-subscription',
   },
+};
+
+export const mapAmberDataError: { [key in ERROR_TYPE]?: string } = {
+  [ERROR_TYPE.DATA_LOADING]: AmberdataEventValue.ERROR.GENERAL,
+  [ERROR_TYPE.EMBED_ERROR]: AmberdataEventValue.ERROR.BROWSER_NOT_SUPPORTED,
+  [ERROR_TYPE.NOT_AVAILABLE]: AmberdataEventValue.ERROR.NO_DATA,
+  [ERROR_TYPE.SRC_NOT_SUPPORTED]: AmberdataEventValue.ERROR.BROWSER_NOT_SUPPORTED,
+  [ERROR_TYPE.NETWORK]: AmberdataEventValue.ERROR.GENERAL,
+  [ERROR_TYPE.INVALID_STREAMS]: AmberdataEventValue.ERROR.GENERAL,
+  [ERROR_TYPE.PARTNER_ERROR]: AmberdataEventValue.ERROR.DOMAIN_RESTRICTION,
+  [ERROR_TYPE.GEOBLOCK_ERROR]: AmberdataEventValue.ERROR.IP_RESTRICTION,
+  [ERROR_TYPE.ENCRYPTED]: AmberdataEventValue.ERROR.VIDEO_ENCRYPTED,
+  [ERROR_TYPE.ABORTED]: AmberdataEventValue.ERROR.NO_DATA,
+  [ERROR_TYPE.CUSTOM]: AmberdataEventValue.ERROR.GENERAL,
+  [ERROR_TYPE.DECODE]: AmberdataEventValue.ERROR.ENCODING,
 };
