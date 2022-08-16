@@ -1,20 +1,28 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { ILocalStorageService, ITNSCounter } from 'interfaces';
+import { ILocalStorageService } from 'interfaces';
 import { LocalStorageService } from 'services/LocalStorageService';
 import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
-import { TNSCounter } from 'services/TNSCounter';
 import { AdCategory, AdLinkType, TAdConfig, TAdPointConfig, TAdPointsConfig } from 'types/ad';
 import { logger } from 'utils/logger';
 
 import { AdBlock } from './block';
-import { AD_BLOCK_STATUS, AdLinksByType, InitOpts, NewBlockOpts, TAdBlock } from './types';
+import {
+  AD_BLOCK_STATUS,
+  AdControllerHooks,
+  AdHookType,
+  AdLinksByType,
+  AdServiceHooks,
+  InitOpts,
+  NewBlockOpts,
+  TAdBlock,
+} from './types';
 import { loadYaSdk } from './yaSdkLoader';
 
 const STAT_ADV_CATEGORY = [AdCategory.PRE_ROLL, AdCategory.PAUSE_ROLL, AdCategory.MID_ROLL, AdCategory.POST_ROLL];
 const TNS_COUNTER_ADV_CALL_MAX_COUNT = 2;
 
-const AdService = (tnsCounter: ITNSCounter, localStorageService: ILocalStorageService) => {
+const AdService = (localStorageService: ILocalStorageService) => {
   let ADV_CACHE_LOOKAHEAD: number;
   let ADV_CACHE_TIMEOUT: number;
   let ADV_MAX_TIMELINE_OFFSET: number;
@@ -27,6 +35,17 @@ const AdService = (tnsCounter: ITNSCounter, localStorageService: ILocalStorageSe
   let isInitialized = false;
   let preloaded: Record<string, TAdBlock> = {};
 
+  let hooks: AdControllerHooks = {
+    adBlockCreated: [],
+  };
+
+  const addHook = <T extends AdHookType, C extends AdServiceHooks[T]>(type: T, hook: C) => {
+    hooks = {
+      ...hooks,
+      [type]: [...hooks[type], hook],
+    };
+  };
+
   const init = async ({ playerId, controlsId, features }: InitOpts) => {
     videoSlot = document.getElementById(playerId) as HTMLVideoElement;
     controlsSlot = document.getElementById(controlsId) as HTMLDivElement;
@@ -34,7 +53,7 @@ const AdService = (tnsCounter: ITNSCounter, localStorageService: ILocalStorageSe
 
     if (!videoSlot || !controlsSlot) throw new Error('videoSlot or controlsSlot is not found');
 
-    ADV_CACHE_LOOKAHEAD = 0; //features.ADV_CACHE_LOOKAHEAD || 10000;
+    ADV_CACHE_LOOKAHEAD = features.ADV_CACHE_LOOKAHEAD || 10000;
     ADV_CACHE_TIMEOUT = features.ADV_CACHE_TIMEOUT || 1000;
     ADV_MAX_TIMELINE_OFFSET = features.ADV_MAX_TIMELINE_OFFSET || 1000;
     ADV_PLAY_WAIT_TIMEOUT = features.ADV_PLAY_WAIT_TIMEOUT || 1000;
@@ -51,38 +70,26 @@ const AdService = (tnsCounter: ITNSCounter, localStorageService: ILocalStorageSe
   const isPreloadable = () => ADV_CACHE_LOOKAHEAD > 0;
 
   const addListeners = (block: TAdBlock, { config, index, limit, creativeOpts }: NewBlockOpts) => {
-    block
-      .on('AdFoxParams', (data) => {
-        logger.log('[AdService]', 'AdFoxParams', data);
-      })
-      .on('AdInitialized', (data) => {
-        if (data.tnsInitEvent) {
-          tnsCounter.sendEvent('load_ad_start');
-        }
-      })
-      .on('AdPodImpression', () => {
-        // updateTimeout();
-      })
-      .on('AdStarted', () => {
-        if (!isPreloadable() || block.isPromo) return;
+    block.on('AdStarted', () => {
+      if (!isPreloadable() || block.isPromo) return;
 
-        if (index + 1 < limit) {
-          logger.log('[AdService]', 'preload next');
+      if (index + 1 < limit) {
+        logger.log('[AdService]', 'preload next');
 
-          const isExclusive = index === 0 && block.isExclusive();
-          const nextBlock = createBlock(block.getLinks(), {
-            config,
-            index: index + 1,
-            isPromo: isExclusive,
-            limit,
-            creativeOpts,
-          });
+        const isExclusive = index === 0 && block.isExclusive();
+        const nextBlock = createBlock(block.getLinks(), {
+          config,
+          index: index + 1,
+          isPromo: isExclusive,
+          limit,
+          creativeOpts,
+        });
 
-          nextBlock.preload().catch((err) => {
-            logger.error('[AdService]', 'preload next block failed', err?.message);
-          });
-        }
-      });
+        nextBlock.preload().catch((err) => {
+          logger.error('[AdService]', 'preload next block failed', err?.message);
+        });
+      }
+    });
   };
 
   const createBlock = (links: AdLinksByType, opts: NewBlockOpts) => {
@@ -100,6 +107,8 @@ const AdService = (tnsCounter: ITNSCounter, localStorageService: ILocalStorageSe
 
     addListeners(block, opts);
     saveBlock(block, opts.config, opts.index);
+    for (const hook of hooks.adBlockCreated) hook(block);
+
     return block;
   };
 
@@ -218,8 +227,9 @@ const AdService = (tnsCounter: ITNSCounter, localStorageService: ILocalStorageSe
     canPlayAd,
     updateTimeout,
     isPreloadable,
+    addHook,
   };
 };
 
-const instance = AdService(TNSCounter, LocalStorageService);
+const instance = AdService(LocalStorageService);
 export { instance as AdService };

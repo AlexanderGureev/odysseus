@@ -6,7 +6,7 @@ import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 import { request } from 'utils/request';
 
-import { amberdataStats, demonStat, mediascopeStats, tnsStats, vigoStats } from './effects';
+import { amberdataStats, demonStat, horusStat, mediascopeStats, tnsStats, vigoStats } from './effects';
 import { FSMState, State } from './types';
 
 const initialState: FSMState = {
@@ -128,6 +128,7 @@ const addMiddleware = () => {
       tnsStats(event, opts);
       mediascopeStats(event, opts);
       demonStat(event, opts);
+      horusStat(event, opts);
     },
   });
 };

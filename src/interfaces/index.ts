@@ -1,5 +1,4 @@
-import { VIDEO_TYPE } from 'components/Player/types';
-import { AdLinksByType, InitOpts, NewBlockOpts, TAdBlock } from 'services/AdService/types';
+import { AdHookType, AdLinksByType, AdServiceHooks, InitOpts, NewBlockOpts, TAdBlock } from 'services/AdService/types';
 import { AmberdataEventPayload, CrashEventPayload, TAmberdataParams } from 'services/AmberdataService/types';
 import { TBeholderParams } from 'services/BeholderService/types';
 import { DemonInitOpts, PlayerStats } from 'services/DemonService/types';
@@ -12,7 +11,7 @@ import {
   FavouriteStoreItem,
   GetFavouritesParams,
 } from 'services/FavouritesService/types';
-import { HORUS_EVENT, HorusInitOpts } from 'services/HorusService/types';
+import { DebugInfo, HORUS_EVENT, HorusInitOpts } from 'services/HorusService/types';
 import { TQuery, TStoresConfig } from 'services/IDBService/types';
 import { TManifestData, TParsedManifest } from 'services/ManifestParser/types';
 import { MEDIASCOPE_EVENT } from 'services/MediascopeCounter';
@@ -122,7 +121,7 @@ export interface IBeholderService {
 
 export interface IHorusService {
   init: (opts: HorusInitOpts) => Promise<void>;
-  routeEvent: (event: HORUS_EVENT) => Promise<void>;
+  routeEvent: (event: HORUS_EVENT, debugInfo?: DebugInfo) => Promise<void>;
 }
 
 export interface IPlayerService {
@@ -174,6 +173,7 @@ export interface IAdService {
   canPlayAd: () => boolean;
   updateTimeout: () => void;
   isPreloadable: () => boolean;
+  addHook: <T extends AdHookType, C extends AdServiceHooks[T]>(type: T, hook: C) => void;
 }
 
 export interface ITNSCounter {

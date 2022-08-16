@@ -19,6 +19,7 @@ const config: FSMConfig<State, AppEvent> = {
   },
   READY: {
     SEEK: 'SEEK_START',
+    SET_SEEKING: 'SEEKING',
     AD_BREAK_STARTED: 'DISABLED',
   },
   SEEK_START: {
@@ -42,11 +43,12 @@ const rewind = createSlice({
       const { type, payload } = action.payload;
 
       const next = config[state.step]?.[type];
+      const step = next || state.step;
+
+      if (['CHANGE_TRACK'].includes(type)) return { ...initialState, step: 'DISABLED' };
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'rewind', `${state.step} -> ${type} -> ${next}`);
-
-      const step = next || state.step;
 
       switch (type) {
         default:
@@ -80,6 +82,16 @@ const addMiddleware = () =>
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         REWIND_INIT: () => {
+          services.playerService.on('seeking', () => {
+            if (getState().rewind.step === 'READY') {
+              dispatch(
+                sendEvent({
+                  type: 'SET_SEEKING',
+                })
+              );
+            }
+          });
+
           services.playerService.on('seeked', () => {
             if (getState().rewind.step === 'DISABLED') return; // TODO FIX
 

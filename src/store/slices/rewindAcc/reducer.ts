@@ -38,11 +38,12 @@ const rewindAcc = createSlice({
       const { type, payload } = action.payload;
 
       const next = config[state.step]?.[type];
+      const step = next || state.step;
+
+      if (['CHANGE_TRACK'].includes(type)) return { ...initialState, step: 'READY' };
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'rewindAcc', `${state.step} -> ${type} -> ${next}`);
-
-      const step = next || state.step;
 
       switch (type) {
         case 'SEEK':

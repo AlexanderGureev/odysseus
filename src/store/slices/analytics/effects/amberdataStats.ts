@@ -86,6 +86,13 @@ export const amberdataStats = async (
         });
       }
       break;
+    case 'SET_SEEKING':
+      amberdataService.sendAmberdataStat({
+        eventType: 'move',
+        eventPosition: currentTime,
+        eventManual: 1,
+      });
+      break;
     case 'SEEK_STARTED':
       amberdataService.sendAmberdataStat({
         eventType: 'move',
@@ -93,6 +100,7 @@ export const amberdataStats = async (
         eventManual: 1,
       });
       break;
+
     case 'BUFFERING_START':
       timer = setTimeout(() => {
         if (getState().buffering.step !== 'BUFFERING') return;

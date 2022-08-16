@@ -5,6 +5,7 @@ import { TCapabilities } from 'services/StreamService/utils/supports';
 import { DefaultPayload, ErrorPayload, WithoutPayload } from 'store/types';
 import { SkinClass, TConfig, TExtendedConfig, TParsedFeatures, TStreamItem } from 'types';
 import { TAdConfigByCategory, TAdPointsConfig } from 'types/ad';
+import { RawPlayerError } from 'types/errors';
 
 export type State =
   | 'IDLE'
@@ -38,6 +39,16 @@ export type State =
   | 'SELECT_MANIFEST_PENDING'
   | 'SETUP_INITIAL_VOLUME';
 
+export type ParsedConfigData = {
+  config: TExtendedConfig;
+  features: TParsedFeatures;
+  meta: Meta;
+  session: SessionState;
+  adConfig: TAdConfigByCategory | null;
+  adPoints: TAdPointsConfig;
+  params: TrackParams;
+};
+
 export type EventsWithPayload =
   | WithoutPayload<
       | 'CHECK_ERROR_RESOLVE'
@@ -62,7 +73,6 @@ export type EventsWithPayload =
     >
   | ErrorPayload<
       | 'CHECK_ERROR_REJECT'
-      | 'PARSE_CONFIG_REJECT'
       | 'INIT_SERVICES_REJECT'
       | 'INIT_ANALYTICS_REJECT'
       | 'INIT_REJECT'
@@ -78,14 +88,13 @@ export type EventsWithPayload =
     }
   | {
       type: 'PARSE_CONFIG_RESOLVE';
-      payload: {
-        config: TExtendedConfig;
-        features: TParsedFeatures;
-        meta: Meta;
-        session: SessionState;
-        adConfig: TAdConfigByCategory | null;
-        adPoints: TAdPointsConfig;
-        params: TrackParams;
+      payload: ParsedConfigData;
+    }
+  | {
+      type: 'PARSE_CONFIG_REJECT';
+      payload: ParsedConfigData;
+      meta: {
+        error: RawPlayerError;
       };
     }
   | {

@@ -3,6 +3,7 @@ import { isIOS, isMobile } from 'react-device-detect';
 import { Device, FavouritesItemMeta } from 'services/FavouritesService/types';
 import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { AppState } from 'store';
+import { TConfig } from 'types';
 import { AppliedTariffModifiers, SubscriptionStatus, SubscriptionType, UserSubscription } from 'types/UserSubscription';
 import { pad } from 'utils';
 
@@ -123,4 +124,14 @@ export const getFavouritesMeta = (state: AppState): FavouritesItemMeta => {
     timezone: String(timezone),
     subscribe: SubscriptionTypeMap[type],
   };
+};
+
+export const featuresSelector = (isEmbedded: boolean) => {
+  const { base = {}, embedded = {} } = window?.ODYSSEUS_PLAYER_CONFIG?.features || {};
+  return isEmbedded ? { ...base, ...embedded } : base;
+};
+
+export const getPlaylistError = (config: TConfig) => {
+  const [error = null] = config?.playlist?.items?.[0]?.errors || [];
+  return error;
 };

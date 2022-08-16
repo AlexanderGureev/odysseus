@@ -10,8 +10,6 @@ const initialState: FSMState = {
   step: 'IDLE',
 };
 
-const IOS_PLAY_TIMEOUT = 500;
-
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
     DO_INIT: 'INIT_FULLSCREEN_SUBSCRIBERS',
@@ -80,15 +78,6 @@ const addMiddleware = () =>
       const handler: { [key in State]?: () => Promise<void> | void } = {
         INIT_FULLSCREEN_SUBSCRIBERS: () => {
           services.playerService.on('fullscreenchange', (isFullscreen) => {
-            const { step } = getState().playback;
-
-            //  после выхода из нативного фулскрина на ios видео встает на паузу
-            // if (isIOS && !isFullscreen && step === 'PLAYING') {
-            //   setTimeout(() => {
-            //     services.playerService.play();
-            //   }, IOS_PLAY_TIMEOUT);
-            // }
-
             dispatch(sendEvent({ type: isFullscreen ? 'EVENT_SET_FULLSCREEN' : 'EVENT_SET_DEFAULT' }));
           });
 

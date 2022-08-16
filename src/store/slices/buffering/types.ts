@@ -3,7 +3,7 @@ import { DefaultPayload, WithoutPayload } from 'store/types';
 export type State = 'IDLE' | 'REBUFFERING_INIT' | 'READY' | 'BUFFERING' | 'DISABLED';
 
 export type EventsWithPayload =
-  | WithoutPayload<'BUFFERING_END' | 'REBUFFERING_INIT_RESOLVE'>
+  | WithoutPayload<'REBUFFERING_INIT_RESOLVE'>
   | {
       type: 'BUFFERING_START';
     }
@@ -12,6 +12,18 @@ export type EventsWithPayload =
       payload: {
         loadedPercent: number;
         bufferedEnd: number;
+      };
+    }
+  | {
+      type: 'BUFFERING_END';
+      payload: {
+        bufferingTime: number;
+      };
+    }
+  | {
+      type: 'SET_INITIAL_BUFFERING_TIME';
+      payload: {
+        initialBufferTime: number;
       };
     };
 

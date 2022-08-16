@@ -12,10 +12,7 @@ export const mediascopeStats = async (
     playback,
     root: {
       meta: { trackId, skin },
-      config: {
-        config: { user_id },
-        trackInfo,
-      },
+      config,
     },
   } = getState();
 
@@ -24,8 +21,8 @@ export const mediascopeStats = async (
 
   const eventParams = {
     currentTime,
-    trackId: skin === 'MORE_TV' ? trackInfo?.track.morpheusId : trackId,
-    userId: user_id,
+    trackId: skin === 'MORE_TV' ? config?.trackInfo?.track.morpheusId : trackId,
+    userId: config?.config?.user_id,
   };
 
   switch (payload.type) {
@@ -51,6 +48,13 @@ export const mediascopeStats = async (
           videoType: VIDEO_TYPE.PLAIN,
         });
       }
+      break;
+    case 'SET_SEEKING':
+      mediascopeCounter.sendEvent('VIDEO_END', {
+        ...eventParams,
+        currentTime,
+        videoType: VIDEO_TYPE.PLAIN,
+      });
       break;
     case 'SEEK_STARTED':
       const { from } = payload.meta;

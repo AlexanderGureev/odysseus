@@ -1,7 +1,7 @@
 import { EffectOpts } from 'interfaces';
-import { TParams } from 'server/utils';
-import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
+import { toNumber, TParams } from 'server/utils';
 import { sendEvent } from 'store/actions';
+import { getPlaylistError } from 'store/selectors';
 import { TConfig, THydraResponse, TParsedFeatures, TRawPlaylist } from 'types';
 import {
   AdCategory,
@@ -15,7 +15,6 @@ import {
 import { ERROR_CODES } from 'types/errors';
 import { toNum } from 'utils';
 import { PlayerError } from 'utils/errors';
-import { logger } from 'utils/logger';
 import { getTokenExpiredTime } from 'utils/token';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -96,64 +95,61 @@ export const parseConfig = async (
   rawConfig: TConfig,
   ctx: TParams | null,
   params: TrackParams | undefined,
-  opts: EffectOpts
+  { getState, dispatch }: EffectOpts
 ) => {
-  const { getState, dispatch, services } = opts;
+  const { meta, session } = getState().root;
 
-  try {
-    if (!rawConfig) throw new Error('rawConfig is undefined');
+  const config = {
+    ...rawConfig,
+    context: ctx,
+  };
 
-    const { meta, session } = getState().root;
+  const features = config.features ? createFeaturesConfig(meta.isEmbedded, config.features) : {};
+  const { adConfig = null, adPoints = [] } = config.config?.ad ? createAdConfig(config.config.ad, config.playlist) : {};
 
-    const config = {
-      ...rawConfig,
-      context: ctx,
-    };
+  const queryParams = parseQueryParams(features || {});
 
-    const features = createFeaturesConfig(meta.isEmbedded, config.features);
-    const { adConfig = null, adPoints = [] } = config.config.ad
-      ? createAdConfig(config.config.ad, config.playlist)
-      : {};
+  const payload = {
+    config,
+    features,
+    adConfig,
+    adPoints,
+    params: {
+      ...queryParams,
+      ...params,
+    },
+    meta: {
+      ...meta,
+      partnerId: toNumber(config.context?.partner_id || config.features?.partner_id),
+      skin: config.features?.skin_theme_class ?? null,
+      trackId: toNumber(config.context?.track_id ?? config.playlist?.items[0]?.track_id),
+      userToken: config.context?.user_token ?? null,
+      tokenExpiredAt: config.context?.user_token ? getTokenExpiredTime(config.context.user_token) : null,
+    },
+    session: {
+      ...session,
+      id: uuidv4(),
+    },
+  };
 
-    const queryParams = parseQueryParams(features);
+  const error = getPlaylistError(config);
 
-    const payload = {
-      config,
-      features,
-      adConfig,
-      adPoints,
-      params: {
-        ...queryParams,
-        ...params,
-      },
-      meta: {
-        ...meta,
-        partnerId: config.features.partner_id,
-        skin: config.features.skin_theme_class,
-        trackId: config.playlist?.items[0]?.track_id ?? null,
-        userToken: config.context?.user_token ?? null,
-        tokenExpiredAt: config.context?.user_token ? getTokenExpiredTime(config.context.user_token) : null,
-      },
-      session: {
-        ...session,
-        id: uuidv4(),
-      },
-    };
-
+  if (!error) {
     dispatch(
       sendEvent({
         type: 'PARSE_CONFIG_RESOLVE',
         payload,
       })
     );
-  } catch (err) {
-    logger.error('[parseConfig]', err);
+  } else {
+    const err = error || new PlayerError(ERROR_CODES.ERROR_NOT_AVAILABLE, 'parse config error').serialize();
 
     dispatch(
       sendEvent({
         type: 'PARSE_CONFIG_REJECT',
+        payload,
         meta: {
-          error: new PlayerError(ERROR_CODES.ERROR_NOT_AVAILABLE, err?.message).serialize(),
+          error: err,
         },
       })
     );

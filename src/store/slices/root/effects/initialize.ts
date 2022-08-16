@@ -4,6 +4,7 @@ import { browserVersion, engineName, engineVersion, isMobile, isSafari, osName, 
 import { createParamsSelector } from 'services/HorusService/selectors';
 import { APP_DB_NAME, CollectionName, Indexes } from 'services/IDBService/types';
 import { sendEvent } from 'store/actions';
+import { featuresSelector } from 'store/selectors';
 import { ERROR_CODES } from 'types/errors';
 import { on } from 'utils';
 import { PlayerError } from 'utils/errors';
@@ -107,9 +108,6 @@ export const initialize = async (opts: EffectOpts) => {
       embeddedCheckService.getEmbededStatus(),
       postMessageService.init(),
       sauronService.init(),
-      horusService.init({
-        paramsSelector: createParamsSelector(opts),
-      }),
       youboraService.init(),
       favouritesService.init(dbService, {
         getToken: () => getState().root.meta.userToken,
@@ -117,6 +115,12 @@ export const initialize = async (opts: EffectOpts) => {
     ]);
 
     const { hostname } = embeddedCheckService.getState();
+    const { HORUS_ENABLED = false } = featuresSelector(isEmbedded);
+
+    await horusService.init({
+      paramsSelector: createParamsSelector(opts),
+      isEnabled: HORUS_ENABLED,
+    });
 
     localStorageService.init(hostname);
 

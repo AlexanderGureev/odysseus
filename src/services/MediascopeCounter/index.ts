@@ -33,6 +33,8 @@ const MediascopeCounter = () => {
   };
 
   const sendEvent = (event: keyof typeof MEDIASCOPE_EVENT, params: MediascopeEventParams) => {
+    if (!isInitialized) return;
+
     const link = createLink(MEDIASCOPE_EVENT[event], params);
     send(link);
   };

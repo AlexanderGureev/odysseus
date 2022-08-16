@@ -73,7 +73,11 @@ const quality = createSlice({
       const next = config[state.step]?.[type];
       const step = next || state.step;
 
-      if (type === 'CHANGE_TRACK') return { ...state, step: 'IDLE' };
+      if (type === 'CHANGE_TRACK') {
+        const { currentQualityMark } = state;
+        return { ...initialState, currentQualityMark, step: 'IDLE' };
+      }
+
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'quality', `${state.step} -> ${type} -> ${next}`);

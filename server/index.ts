@@ -1,3 +1,9 @@
+import { request } from '../src/utils/request';
+
+request.setup({
+  networkCheck: false,
+});
+
 import { bootstrap } from './server';
 
 ['PAK_HOST', 'HYDRA_HOST', 'BE_ENDPOINT', 'HORUS_SRC', 'SIREN_HOST', 'SIREN_CTC_HOST'].forEach((key) => {

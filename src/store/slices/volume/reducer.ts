@@ -207,6 +207,7 @@ const addMiddleware = () =>
               type: 'CHANGE_AD_VOLUME_STATE_RESOLVE',
               payload: {
                 muted,
+                volume: meta.value,
               },
             })
           );

@@ -1,8 +1,10 @@
+import { TAdLinkItem } from 'services/AdService/types';
 import { DefaultPayload, WithoutPayload } from 'store/types';
 import { TAdConfig, TAdPointConfig } from 'types/ad';
 
 export type State =
   | 'IDLE'
+  | 'INIT_AD_SERVICE'
   | 'END'
   | 'INIT_AD_PENDING'
   | 'AD_BREAK'
@@ -25,6 +27,7 @@ export type EventsWithPayload =
       | 'CHECK_PAUSE_ROLL_RESOLVE'
       | 'CHECK_POST_ROLL_RESOLVE'
       | 'AD_BREAK_STARTED'
+      | 'INIT_AD_SERVICE_RESOLVE'
     >
   | {
       type: 'INIT_AD_RESOLVE';
@@ -37,6 +40,10 @@ export type EventsWithPayload =
   | {
       type: 'PRELOAD_AD_BLOCK';
       meta: TAdPointConfig;
+    }
+  | {
+      type: 'AD_CREATIVE_INITIALIZED';
+      meta: TAdLinkItem;
     }
   | {
       type: 'INIT_AD_BREAK';

@@ -1,3 +1,5 @@
+import { Nullable } from 'types';
+
 import { TParameters } from './parameters';
 
 export type HorusParamName = keyof TParameters;
@@ -28,39 +30,34 @@ export enum EventStatus {
   PENDING = 'PENDING',
 }
 
-export enum HORUS_EVENT {
-  HEARTBEAT = 'HEARTBEAT',
-  HORUS_VIDEO_ERROR = 'HORUS_VIDEO_ERROR',
-  HORUS_VIDEO_STARTED = 'HORUS_VIDEO_STARTED',
-  HORUS_CLICK_PLAY = 'HORUS_CLICK_PLAY',
-  HORUS_AUTO_PLAY = 'HORUS_AUTO_PLAY',
-  HORUS_CLICK_PAUSE = 'HORUS_CLICK_PAUSE',
-  HORUS_AUTO_PAUSE = 'HORUS_AUTO_PAUSE',
-  HORUS_SESSION_FINISHED = 'HORUS_SESSION_FINISHED',
-  HORUS_SESSION_STARTED = 'HORUS_SESSION_STARTED',
-  HORUS_CLOSE = 'HORUS_CLOSE',
-  HORUS_GOTO = 'HORUS_GOTO',
-  HORUS_CHANGE_QUALITY = 'HORUS_CHANGE_QUALITY',
-  HORUS_BITRATE_ADOPTION = 'HORUS_BITRATE_ADOPTION',
-  HORUS_REBUFFER = 'HORUS_REBUFFER',
-
-  HORUS_AD_SHOW_START = 'HORUS_AD_SHOW_START',
-  HORUS_AD_SHOW_END = 'HORUS_AD_SHOW_END',
-  HORUS_AD_REQUEST = 'HORUS_AD_REQUEST',
-  HORUS_AD_ERROR = 'HORUS_AD_ERROR',
-
-  HORUS_AUTO_SWITCH_START = 'HORUS_AUTO_SWITCH_START',
-  HORUS_AUTO_SWITCH_CLICK_CANCEL = 'HORUS_AUTO_SWITCH_CLICK_CANCEL',
-  HORUS_AUTO_SWITCH_CLICK_NEXT_TRACK = 'HORUS_AUTO_SWITCH_CLICK_NEXT_TRACK',
-  HORUS_AUTO_SWITCH_SWITCH_NEXT_TRACK = 'HORUS_AUTO_SWITCH_SWITCH_NEXT_TRACK',
-
-  HORUS_CUSTOM_EVENT = 'HORUS_CUSTOM_EVENT',
-
-  HORUS_ERROR_RESPONSE = 'HORUS_ERROR_RESPONSE',
-  HORUS_ERROR_RESPONSE_SEND = 'HORUS_ERROR_RESPONSE_SEND',
-  HORUS_ERROR_RESPONSE_OK = 'HORUS_ERROR_RESPONSE_OK',
-  HORUS_ERROR_CLOSE = 'HORUS_ERROR_CLOSE',
-}
+export type HORUS_EVENT =
+  | 'HEARTBEAT'
+  | 'HORUS_VIDEO_ERROR'
+  | 'HORUS_VIDEO_STARTED'
+  | 'HORUS_CLICK_PLAY'
+  | 'HORUS_AUTO_PLAY'
+  | 'HORUS_CLICK_PAUSE'
+  | 'HORUS_AUTO_PAUSE'
+  | 'HORUS_SESSION_FINISHED'
+  | 'HORUS_SESSION_STARTED'
+  | 'HORUS_CLOSE'
+  | 'HORUS_GOTO'
+  | 'HORUS_CHANGE_QUALITY'
+  | 'HORUS_BITRATE_ADOPTION'
+  | 'HORUS_REBUFFER'
+  | 'HORUS_AD_SHOW_START'
+  | 'HORUS_AD_SHOW_END'
+  | 'HORUS_AD_REQUEST'
+  | 'HORUS_AD_ERROR'
+  | 'HORUS_AUTO_SWITCH_START'
+  | 'HORUS_AUTO_SWITCH_CLICK_CANCEL'
+  | 'HORUS_AUTO_SWITCH_CLICK_NEXT_TRACK'
+  | 'HORUS_AUTO_SWITCH_SWITCH_NEXT_TRACK'
+  | 'HORUS_CUSTOM_EVENT'
+  | 'HORUS_ERROR_RESPONSE'
+  | 'HORUS_ERROR_RESPONSE_SEND'
+  | 'HORUS_ERROR_RESPONSE_OK'
+  | 'HORUS_ERROR_CLOSE';
 
 export enum HorusEventName {
   HEARTBEAT = 'heartbeat',
@@ -179,4 +176,23 @@ export type ParamsSelector = { [key in keyof TParameters]: () => TParameters[key
 
 export type HorusInitOpts = {
   paramsSelector: ParamsSelector;
+  isEnabled: boolean;
+};
+
+export type DebugInfo = Record<string, any> & {
+  type?: 'persistent_error' | 'rebuffer';
+  duration?: number;
+  additional?: {
+    hint?: string;
+    location?: string;
+    video_type?: string;
+    is_yandex_creative?: boolean;
+  };
+  currentStream?: Nullable<{
+    ls_url?: string | null;
+    url: string;
+    manifest_expires_at?: number | null;
+    history?: string[];
+  }>;
+  stream_src?: string | null;
 };

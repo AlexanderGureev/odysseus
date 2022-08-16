@@ -17,6 +17,7 @@ const config: FSMConfig<State, AppEvent> = {
     PRELOAD_AD_BLOCK_RESOLVE: null,
     TIME_UPDATE: null,
     AD_BREAK_END: null,
+    CHANGE_TRACK: null,
     INIT_AD_REJECT: 'DISABLED',
   },
   DISABLED: {
@@ -42,6 +43,8 @@ const adTimeNotify = createSlice({
       logger.log('[FSM]', 'adTimeNotify', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
+        case 'CHANGE_TRACK':
+          return initialState;
         case 'PRELOAD_AD_BLOCK_RESOLVE':
           return { ...state, points: [...state.points, payload.preloadedPoint] };
         case 'TIME_UPDATE': {

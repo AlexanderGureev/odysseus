@@ -1,7 +1,7 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
-import type { AppEvent, FSMConfig } from 'store/types';
+import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { toFixed } from 'utils';
 import { logger } from 'utils/logger';
 
@@ -35,6 +35,7 @@ const config: FSMConfig<State, AppEvent> = {
   },
   DISABLED: {
     START_PLAYBACK: 'READY',
+    SET_INITIAL_BUFFERING_TIME: null,
   },
 };
 
@@ -43,28 +44,29 @@ const buffering = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(createAction<ActionPayload>(FSM_EVENT), (state, action) => {
+    builder.addCase(createAction<EventPayload>(FSM_EVENT), (state, action) => {
       const { type, payload } = action.payload;
 
       const next = config[state.step]?.[type];
+      const step = next || state.step;
+
+      if (['CHANGE_TRACK'].includes(type)) return { ...initialState, step: 'DISABLED' };
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'buffering', `${state.step} -> ${type} -> ${next}`);
-
-      const step = next || state.step;
 
       switch (type) {
         case 'BUFFERING_START':
           return { ...state, step, startAt: Date.now() };
         case 'BUFFERING_END':
-          const diff = state.startAt ? (Date.now() - state.startAt) / 1000 : 0;
+          const { bufferingTime } = payload;
 
           return {
             ...state,
             step,
             startAt: null,
-            initialBufferTime: state.initialBufferTime === null ? diff : state.initialBufferTime,
-            bufferingTime: toFixed(state.bufferingTime + diff),
+            initialBufferTime: state.initialBufferTime === null ? bufferingTime : state.initialBufferTime,
+            bufferingTime: toFixed(state.bufferingTime + bufferingTime),
           };
         default:
           return { ...state, step, ...payload };
@@ -98,34 +100,53 @@ const addMiddleware = () =>
       const handler: { [key in State]?: () => Promise<void> | void } = {
         REBUFFERING_INIT: () => {
           services.playerService.on('progress', (payload) => {
-            if (getState().buffering.step === 'DISABLED') return; // TODO FIX
-
-            dispatch(
-              sendEvent({
-                type: 'BUFFER_UPDATE',
-                payload,
-              })
-            );
+            if (getState().buffering.step === 'READY') {
+              dispatch(
+                sendEvent({
+                  type: 'BUFFER_UPDATE',
+                  payload,
+                })
+              );
+            }
           });
 
           services.playerService.on('waiting', () => {
-            if (getState().buffering.step === 'DISABLED') return;
-
-            dispatch(
-              sendEvent({
-                type: 'BUFFERING_START',
-              })
-            );
+            if (getState().buffering.step === 'READY') {
+              dispatch(
+                sendEvent({
+                  type: 'BUFFERING_START',
+                })
+              );
+            }
           });
 
           services.playerService.on('canplay', () => {
-            if (getState().buffering.step === 'DISABLED') return;
+            const { step, startAt, initialBufferTime } = getState().buffering;
 
-            dispatch(
-              sendEvent({
-                type: 'BUFFERING_END',
-              })
-            );
+            // при старте нет буферизации, первый ивент сразу canplay
+            if (!startAt && initialBufferTime === null) {
+              dispatch(
+                sendEvent({
+                  type: 'SET_INITIAL_BUFFERING_TIME',
+                  payload: {
+                    initialBufferTime: 0,
+                  },
+                })
+              );
+            }
+
+            if (step === 'BUFFERING') {
+              const diff = startAt ? (Date.now() - startAt) / 1000 : 0;
+
+              dispatch(
+                sendEvent({
+                  type: 'BUFFERING_END',
+                  payload: {
+                    bufferingTime: diff,
+                  },
+                })
+              );
+            }
           });
 
           dispatch(

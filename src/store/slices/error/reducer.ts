@@ -42,7 +42,7 @@ const error = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(createAction<EventPayload>(FSM_EVENT), (state, action) => {
-      const { type, payload, meta } = action.payload;
+      const { type, meta } = action.payload;
 
       const next = config[state.step]?.[type];
       if (next === undefined) return state;
@@ -56,7 +56,7 @@ const error = createSlice({
           return initialState;
         default:
           const { error } = meta as { error: RawPlayerError };
-          return { ...state, step, error, ...payload };
+          return { ...state, step, error };
       }
     });
   },

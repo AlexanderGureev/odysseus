@@ -78,6 +78,7 @@ type DISCLAIMER_AGE_RESTRICTIONS = {
 export type TFeatureConfig = {
   ENABLE_FAVOURITES?: boolean;
   MEDIASCOPE_WATCHING_COUNTER?: boolean;
+  HORUS_ENABLED?: boolean;
 
   AUTH_URL?: string;
 

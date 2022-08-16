@@ -19,6 +19,7 @@ export const loadMeta = async ({ getState, dispatch, services: { playerService }
     const source = createSource({ ...currentStream, url: currentURL });
     logger.log('[loadMeta]', { source, timeout: features.LOADING_SOURCE_TIMEOUT });
 
+    // TODO нужно ли перебирать потоки при таймауте
     await playerService.setSource(source, {
       timeout: features.LOADING_SOURCE_TIMEOUT,
     });

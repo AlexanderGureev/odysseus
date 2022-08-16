@@ -281,6 +281,7 @@ export const AdBlock = ({
 
         throw new Error('play block failed (not found link');
       } catch (err) {
+        // TODO CUSTOM ERROR CLASS
         reject(err);
       } finally {
         dispose();

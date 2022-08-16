@@ -30,6 +30,10 @@ type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS';
 
 export type RawHeaders = { [k: string]: string[] | undefined };
 
+export type RequestOpts = {
+  networkCheck?: boolean;
+};
+
 export type ReqInit = Omit<RequestInit, 'headers'> & {
   json?: unknown;
   params?: Record<string, any>;
@@ -51,6 +55,17 @@ export type RequestHooks = {
 const request = () => {
   let hooks: RequestHooks = {
     networkError: [],
+  };
+
+  let requestOpts: RequestOpts = {
+    networkCheck: true,
+  };
+
+  const setup = (params: RequestOpts) => {
+    requestOpts = {
+      ...requestOpts,
+      ...params,
+    };
   };
 
   const addHook = <T extends HookType, C extends Hooks[T]>(type: T, hook: C) => {
@@ -81,7 +96,10 @@ const request = () => {
 
   const createRequest =
     (method: HTTPMethod) =>
-    async (url: string, { json, params = {}, headers = {}, networkCheck = true, ...opts }: ReqInit = {}) => {
+    async (
+      url: string,
+      { json, params = {}, headers = {}, networkCheck = requestOpts.networkCheck, ...opts }: ReqInit = {}
+    ) => {
       try {
         logger.log('[http request]', 'before request', { method, url, params, headers });
 
@@ -126,6 +144,7 @@ const request = () => {
     delete: createRequest('DELETE'),
     options: createRequest('OPTIONS'),
     addHook,
+    setup,
   };
 };
 

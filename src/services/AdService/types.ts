@@ -56,6 +56,16 @@ export type Events = {
   AllAdPodVideoComplete: () => void;
 };
 
+export type AdServiceHooks = {
+  adBlockCreated: (block: TAdBlock) => void;
+};
+
+export type AdHookType = keyof AdServiceHooks;
+
+export type AdControllerHooks = {
+  [key in AdHookType]: AdServiceHooks[key][];
+};
+
 export type TAdBlock = {
   resumeAd: () => void;
   pauseAd: () => void;

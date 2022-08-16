@@ -126,6 +126,11 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
   } catch (err) {
     logger.error('[ad play pending]', { index }, err?.message);
     error = err?.message;
+    dispatch(
+      sendEvent({
+        type: 'AD_BLOCK_ERROR',
+      })
+    );
   } finally {
     dispatch(
       sendEvent({

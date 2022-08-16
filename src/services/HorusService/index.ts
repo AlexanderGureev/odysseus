@@ -1,12 +1,14 @@
 import { isNil } from 'lodash';
 import { Nullable } from 'types';
 import { logger } from 'utils/logger';
+import { request as httpRequest } from 'utils/request';
 import { retry, runInterval, sleep } from 'utils/retryUtils';
 
 import { IDBService } from '../../services/IDBService';
 import { CollectionName, Indexes } from '../IDBService/types';
 import { WindowController } from '../WindowController';
 import {
+  DebugInfo,
   EventStatus,
   HORUS_EVENT,
   HorusEventName,
@@ -46,7 +48,7 @@ const HorusService = () => {
   const init = async (opts: HorusInitOpts) => {
     if (isInitialized) return;
 
-    if (!HORUS_SRC || !HORUS_ENABLED) {
+    if (!HORUS_SRC || !HORUS_ENABLED || !opts.isEnabled) {
       logger.error('[HorusService]', 'horus endpoint is undefined or horus disabled');
       return;
     }
@@ -114,7 +116,7 @@ const HorusService = () => {
     }
 
     if (heartBeatTime >= config.heartbeat_period) {
-      routeEvent(HORUS_EVENT.HEARTBEAT);
+      routeEvent('HEARTBEAT');
       heartBeatTime = 0;
     }
   };
@@ -133,7 +135,7 @@ const HorusService = () => {
     try {
       logger.log('[HorusService]', 'fetchConfig');
 
-      const response = await fetch(CONFIG_PATH);
+      const response = await httpRequest.get(CONFIG_PATH);
       if (!response.ok) throw new Error('Failed to fetch horus config');
 
       const data = await response.json();
@@ -263,24 +265,32 @@ const HorusService = () => {
     }, {});
   };
 
-  const createPayload = (eventName: HorusEventName, eventNum: number): THorusEvent => ({
-    event_name: eventName,
-    event_params: {
-      ...selectParams(eventName),
-      event_num: eventNum,
-    },
-  });
+  const createPayload = (eventName: HorusEventName, eventNum: number, debugInfo?: DebugInfo): THorusEvent => {
+    const payload = {
+      event_name: eventName,
+      event_params: {
+        ...selectParams(eventName),
+        event_num: eventNum,
+      },
+    };
 
-  const routeEvent = async (event: HORUS_EVENT) => {
+    if (debugInfo) {
+      payload.event_params.debug_info = JSON.stringify(debugInfo);
+    }
+
+    return payload;
+  };
+
+  const routeEvent = async (event: HORUS_EVENT, debugInfo?: DebugInfo) => {
     const eventName = HorusEventName[event];
 
     try {
       if (blacklist.includes(eventName)) return;
 
       eventNum += 1;
-      const payload = createPayload(eventName, eventNum);
+      const payload = createPayload(eventName, eventNum, debugInfo);
 
-      logger.log('[HorusService]', `routeEvent >>> ${eventName}, ${payload}`);
+      logger.log('[HorusService]', `routeEvent >>> ${eventName}, ${eventNum}`);
 
       if (!isStopSending && (await WindowController.isMaster()) && (await isNeedToSend())) {
         await sendEvents();
@@ -301,12 +311,11 @@ const HorusService = () => {
   const request = async (url: string, events: THorusEvent[]) => {
     const response = await retry(
       () =>
-        fetch(url, {
-          method: 'POST',
+        httpRequest.post(url, {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ events }),
+          json: { events },
         }),
       {
         attempts: 3,
@@ -338,7 +347,7 @@ const HorusService = () => {
   };
 
   const sendRawEvents = async (events: THorusEvent[]) => {
-    if (HORUS_SRC && HORUS_ENABLED) {
+    if (isInitialized) {
       await send(events);
     }
   };

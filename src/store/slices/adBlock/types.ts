@@ -22,6 +22,7 @@ export type EventsWithPayload =
       | 'PAUSE_AD_BLOCK_RESOLVE'
       | 'RESET'
       | 'AD_BLOCK_IMPRESSION'
+      | 'AD_BLOCK_ERROR'
     >
   | {
       type: 'AD_BLOCK_TIME_UPDATE';

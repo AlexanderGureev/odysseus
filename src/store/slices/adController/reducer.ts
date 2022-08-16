@@ -31,10 +31,14 @@ const extend = (config: FSMConfig<State, Event>, transition: { [event in Event]?
 
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
+    DO_INIT: 'INIT_AD_SERVICE',
     AD_INIT: 'INIT_AD_PENDING',
     CHECK_TIME_POINT: 'CHECK_TIME_POINT_PENDING',
     DO_PLAY_RESOLVE: 'CHECK_PAUSE_ROLL',
     VIDEO_END: 'CHECK_POST_ROLL',
+  },
+  INIT_AD_SERVICE: {
+    INIT_AD_SERVICE_RESOLVE: 'IDLE',
   },
   CHECK_POST_ROLL: {
     CHECK_POST_ROLL_RESOLVE: 'IDLE',
@@ -120,6 +124,15 @@ const addMiddleware = () =>
       };
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
+        INIT_AD_SERVICE: () => {
+          services.adService.addHook('adBlockCreated', (block) => {
+            block.on('AdInitialized', (data) => {
+              dispatch(sendEvent({ type: 'AD_CREATIVE_INITIALIZED', meta: data }));
+            });
+          });
+
+          dispatch(sendEvent({ type: 'INIT_AD_SERVICE_RESOLVE' }));
+        },
         INIT_AD_PENDING: () => init(opts),
         CHECK_PAUSE_ROLL: () => checkPauseRoll(opts),
         CHECK_POST_ROLL: () => checkPostRoll(opts),

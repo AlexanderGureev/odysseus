@@ -16,7 +16,7 @@ export type EventsWithPayload =
         from: number;
       };
     }
-  | WithoutPayload<'SEEK_END' | 'REWIND_INIT_RESOLVE'>;
+  | WithoutPayload<'SEEK_END' | 'REWIND_INIT_RESOLVE' | 'SET_SEEKING'>;
 
 export type Event = EventsWithPayload['type'];
 
