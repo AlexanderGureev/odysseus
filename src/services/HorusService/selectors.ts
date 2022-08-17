@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { PLAYER_ID } from 'components/Player/types';
 import { EffectOpts } from 'interfaces';
+import { PLAYER_ID } from 'services/PlayerService/types';
 import { StreamProtocol } from 'services/StreamService/types';
 import { getPlaylistItem, getUserSubscriptionType } from 'store/selectors';
 import { APP_CLASSNAME, DOMAINS, MAP_HOST_TO_SKIN } from 'types';

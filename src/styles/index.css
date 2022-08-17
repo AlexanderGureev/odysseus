@@ -41,7 +41,7 @@ body {
 .auto-switch {
   position: absolute;
   right: 25px;
-  top: 25px;
+  top: 60px;
   z-index: 15;
 }
 

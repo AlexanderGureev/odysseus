@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { PLAYER_ID } from 'components/Player/types';
+
 import { EffectOpts } from 'interfaces';
+import { PLAYER_ID } from 'services/PlayerService/types';
 import { sendEvent } from 'store/actions';
 import { getPlaylistItem } from 'store/selectors';
 import { ERROR_CODES } from 'types/errors';

@@ -1,6 +1,6 @@
 import { PayloadAction } from '@reduxjs/toolkit';
-import { VIDEO_TYPE } from 'components/Player/types';
 import { EffectOpts } from 'interfaces';
+import { VIDEO_TYPE } from 'services/PlayerService/types';
 import { EventPayload } from 'store';
 
 export const mediascopeStats = async (

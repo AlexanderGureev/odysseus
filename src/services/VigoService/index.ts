@@ -1,8 +1,8 @@
-import { VIDEO_TYPE } from 'components/Player/types';
 import { IPlayerService } from 'interfaces';
 import md5 from 'md5';
 import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { PlayerService } from 'services/PlayerService';
+import { VIDEO_TYPE } from 'services/PlayerService/types';
 import { logger } from 'utils/logger';
 import { randomHash32 } from 'utils/randomHash';
 

@@ -1,5 +1,4 @@
 import { PayloadAction } from '@reduxjs/toolkit';
-import { VIDEO_TYPE } from 'components/Player/types';
 import { EffectOpts } from 'interfaces';
 import { LS_KEY_STREAM, THistoryStreams } from 'services/StreamService/types';
 import { QUALITY_MARKS } from 'services/VigoService';

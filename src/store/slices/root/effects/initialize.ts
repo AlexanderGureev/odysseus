@@ -93,7 +93,6 @@ export const initialize = async (opts: EffectOpts) => {
       sauronService,
       postMessageService,
       horusService,
-      youboraService,
       localStorageService,
       favouritesService,
       dbService,
@@ -108,7 +107,6 @@ export const initialize = async (opts: EffectOpts) => {
       embeddedCheckService.getEmbededStatus(),
       postMessageService.init(),
       sauronService.init(),
-      youboraService.init(),
       favouritesService.init(dbService, {
         getToken: () => getState().root.meta.userToken,
       }),

@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
 import { Nullable, SkinClass } from 'types';
-import { isNil } from 'utils';
-import { createCounter } from 'utils/counter';
+import { createCounter, isNil } from 'utils';
 import { logger } from 'utils/logger';
 import { randomUnit32 } from 'utils/randomHash';
 import { sendStat } from 'utils/statistics';

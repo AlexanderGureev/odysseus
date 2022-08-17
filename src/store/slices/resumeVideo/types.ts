@@ -10,7 +10,8 @@ export type State =
   | 'CHECK_MANIFEST_PENDING'
   | 'FETCHING_MANIFEST'
   | 'SPLASH_SCREEN_PENDING'
-  | 'RESUME_VIDEO_END';
+  | 'RESUME_VIDEO_END'
+  | 'INITIALIZE_P2P';
 
 export type EventsWithPayload =
   | WithoutPayload<'RESUME_VIDEO_RESOLVE' | 'RESUME_VIDEO' | 'LOAD_META_RESOLVE' | 'INIT_RESUME_VIDEO'>
@@ -20,6 +21,9 @@ export type EventsWithPayload =
       meta: {
         startPosition: number;
       };
+    }
+  | {
+      type: 'INITIALIZE_P2P_RESOLVE';
     };
 
 export type Event = EventsWithPayload['type'];

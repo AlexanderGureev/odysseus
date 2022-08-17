@@ -1,6 +1,5 @@
 import { AdHookType, AdLinksByType, AdServiceHooks, InitOpts, NewBlockOpts, TAdBlock } from 'services/AdService/types';
 import { AmberdataEventPayload, CrashEventPayload, TAmberdataParams } from 'services/AmberdataService/types';
-import { TBeholderParams } from 'services/BeholderService/types';
 import { DemonInitOpts, PlayerStats } from 'services/DemonService/types';
 import { LocationState } from 'services/EmbeddedCheckService/types';
 import {
@@ -17,6 +16,7 @@ import { TManifestData, TParsedManifest } from 'services/ManifestParser/types';
 import { MEDIASCOPE_EVENT } from 'services/MediascopeCounter';
 import { MediascopeEventParams, MediascopeInitOpts } from 'services/MediascopeCounter/types';
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
+import { P2PInitOpts } from 'services/P2PManager/types';
 import { Events, Hooks, HookType, SetSourceOpts } from 'services/PlayerService/types';
 import { INPUT_PLAYER_POST_MESSAGE, OutputEvents } from 'services/PostMessageService/types';
 import { TMeta, TQualityItem, TQualityList, TQualityRecord } from 'services/StreamQualityManager/types';
@@ -26,7 +26,6 @@ import { Params } from 'services/UTMService/types';
 import { QUALITY_MARKS } from 'services/VigoService';
 import { TVigoParams, VigoEvent } from 'services/VigoService/types';
 import { YMQueryParams } from 'services/YmService/types';
-import { TOptions, TYouboraEvent } from 'services/YouboraService';
 import type { AppState } from 'store';
 import { SessionDispatch } from 'store/dispatch';
 import { DeviceInfo } from 'store/slices/root/types';
@@ -102,21 +101,8 @@ export interface IYMService {
   log: (payload?: Partial<YMQueryParams>) => void;
 }
 
-export interface IYouboraService {
-  init: () => void;
-  attachAdapter: (player: VideoJsPlayer, options?: TOptions) => void;
-  setOptions: (options: TOptions) => void;
-  emit: <T extends any[]>(event: TYouboraEvent, ...payload: T) => void;
-}
-
 export interface IGAService {
   init: () => Promise<void>;
-}
-
-export interface IBeholderService {
-  init: (params: TBeholderParams) => Promise<void>;
-  saveTime: (currentTime: number) => Promise<void>;
-  onTimeUpdate: (currentTime: number, seeking: boolean) => void;
 }
 
 export interface IHorusService {
@@ -234,6 +220,11 @@ export interface IMediascopeCounter {
   sendEvent: (event: keyof typeof MEDIASCOPE_EVENT, params: MediascopeEventParams) => void;
 }
 
+export interface IP2PService {
+  init: (params: P2PInitOpts) => Promise<void>;
+  dispose: () => void;
+}
+
 export interface IServices {
   embeddedCheckService: IEmbeddedCheckService;
   dbService: IDBService;
@@ -246,8 +237,6 @@ export interface IServices {
   vigoService: IVigoService;
   ymService: IYMService;
   gaService: IGAService;
-  youboraService: IYouboraService;
-  beholderService: IBeholderService;
   horusService: IHorusService;
   playerService: IPlayerService;
   localStorageService: ILocalStorageService;
@@ -258,6 +247,7 @@ export interface IServices {
   demonService: IDemonService;
   favouritesService: IFavouritesService;
   mediascopeCounter: IMediascopeCounter;
+  p2pService: IP2PService;
 }
 
 export type EffectOpts = {

@@ -1,5 +1,5 @@
-import { DEFAULT_PLAYER_ID } from 'components/Player/types';
 import { EffectOpts } from 'interfaces';
+import { DEFAULT_PLAYER_ID } from 'services/PlayerService/types';
 import { sendEvent } from 'store/actions';
 import { ERROR_CODES } from 'types/errors';
 import { PlayerError } from 'utils/errors';

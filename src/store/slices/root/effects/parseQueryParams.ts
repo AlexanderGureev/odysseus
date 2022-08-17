@@ -1,7 +1,6 @@
 import { isNil } from 'lodash';
 import { toNumber } from 'server/utils';
 import { TParsedFeatures } from 'types';
-import { toNum } from 'utils';
 
 export type TAutoplay = 'never' | 'always' | 'on' | 'off' | '1' | '0';
 

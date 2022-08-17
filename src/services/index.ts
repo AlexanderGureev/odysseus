@@ -1,7 +1,5 @@
 export { AdBannerManager } from './AdBannerManager';
 export { AmberdataService } from './AmberdataService';
-export { AnalyticsEventManagerService } from './AnalyticsEventManagerService';
-export { BeholderService } from './BeholderService';
 export { ChannelService } from './ChannelService';
 export { DemonService } from './DemonService';
 export { EmbeddedCheckService } from './EmbeddedCheckService';
@@ -24,4 +22,3 @@ export { UTMService } from './UTMService';
 export { VigoService } from './VigoService';
 export { WindowController } from './WindowController';
 export { YMService } from './YmService';
-export { YouboraService } from './YouboraService';

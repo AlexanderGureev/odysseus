@@ -24,9 +24,13 @@ const config: FSMConfig<State, AppEvent> = {
     CHECK_TOKEN_REJECT: 'CHECK_MANIFEST_PENDING',
   },
   CHECK_MANIFEST_PENDING: {
-    UPDATE_MANIFEST: 'LOADING_META_PENDING',
-    CHECK_MANIFEST_RESOLVE: 'LOADING_META_PENDING',
+    UPDATE_MANIFEST: 'INITIALIZE_P2P',
+    CHECK_MANIFEST_RESOLVE: 'INITIALIZE_P2P',
     CHECK_MANIFEST_REJECT: 'IDLE',
+  },
+  INITIALIZE_P2P: {
+    INITIALIZE_P2P_RESOLVE: 'LOADING_META_PENDING',
+    INITIALIZE_P2P_REJECT: 'LOADING_META_PENDING',
   },
   LOADING_META_PENDING: {
     LOAD_META_RESOLVE: 'LAUNCH_SETUP',
@@ -93,6 +97,13 @@ const addMiddleware = () =>
       };
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
+        INITIALIZE_P2P: () => {
+          dispatch(
+            sendEvent({
+              type: 'INIT_P2P',
+            })
+          );
+        },
         LOADING_META_PENDING: () => loadMeta(opts),
         LAUNCH_SETUP: () => {
           const {

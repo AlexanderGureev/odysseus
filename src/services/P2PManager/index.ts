@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import './index.css';
 
-import { getQueryParams } from 'components/Advertisement/utils';
+import { getQueryParams } from 'services/AdService/utils';
 import { logger } from 'utils/logger';
 import videojs from 'video.js';
 
-import { TeleportInstance } from './types';
+import { P2PInitOpts, TeleportInstance } from './types';
 
 const API_KEY = '857a5bde7fd44740';
 const DEV_TOOLS_CONTAINER_ID = 'teleport-devtools';
@@ -31,6 +31,7 @@ const P2PManager = () => {
   let promise: Promise<boolean[]> | null = null;
   let tlprt: TeleportInstance | null = null;
   let devtoolsContainer: HTMLElement | null = null;
+  let opts: P2PInitOpts;
 
   const getContainer = () => {
     const [head] = document.getElementsByTagName('head');
@@ -99,11 +100,10 @@ const P2PManager = () => {
 
   const urlCleaner = (url: string) => {
     try {
-      const path = new URL(url).pathname;
+      let path = new URL(url).pathname;
 
       if (['data:application/dash+xml;', 'data:application/x-mpegURL;'].some((s) => url.includes(s))) {
-        // const { currentStream } = store.getState().stream;
-        // path = new URL(currentStream.url).pathname; // TODO FIX
+        path = new URL(opts.currentStream.url).pathname;
       }
 
       if (NEW_MANIFEST_FORMAT_REGEXP.test(path)) {
@@ -126,9 +126,10 @@ const P2PManager = () => {
     return url;
   };
 
-  const init = async () => {
+  const init = async (params: P2PInitOpts) => {
     try {
       if (tlprt) return;
+      opts = params;
 
       const scripts = USE_DEVTOOLS && DEBUG_MODE ? [TELEPORT_SDK_SRC, TELEPORT_DEV_TOOLS_SRC] : [TELEPORT_SDK_SRC];
 
@@ -206,7 +207,6 @@ const P2PManager = () => {
   return {
     init,
     dispose,
-    isInitialized: () => Boolean(tlprt),
   };
 };
 

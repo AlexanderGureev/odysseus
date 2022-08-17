@@ -1,4 +1,3 @@
-import { PayloadAction } from '@reduxjs/toolkit';
 import { RawPlayerError } from 'types/errors';
 
 import * as adBlock from './slices/adBlock';
@@ -19,6 +18,7 @@ import * as hotkeys from './slices/hotkeys';
 import * as network from './slices/network';
 import * as networkRecovery from './slices/networkRecovery';
 import * as offlineMode from './slices/offlineMode';
+import * as p2p from './slices/p2p';
 import * as playback from './slices/playback';
 import * as playbackSpeed from './slices/playbackSpeed';
 import * as quality from './slices/quality';
@@ -85,7 +85,8 @@ export type EventPayload =
   | offlineMode.ActionPayload
   | favourites.ActionPayload
   | favouritesController.ActionPayload
-  | analytics.ActionPayload;
+  | analytics.ActionPayload
+  | p2p.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -118,4 +119,5 @@ export type AppEvent =
   | offlineMode.Event
   | favourites.Event
   | favouritesController.Event
-  | analytics.Event;
+  | analytics.Event
+  | p2p.Event;

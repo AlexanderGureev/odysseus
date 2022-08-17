@@ -1,6 +1,6 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PLAYER_ID } from 'components/Player/types';
 import { isMobile } from 'react-device-detect';
+import { PLAYER_ID } from 'services/PlayerService/types';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';

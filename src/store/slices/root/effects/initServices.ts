@@ -3,7 +3,7 @@
 import { EffectOpts } from 'interfaces';
 import { LS_KEY_STREAM, THistoryStreams } from 'services/StreamService/types';
 import { sendEvent } from 'store/actions';
-import { getPlaylistItem, getSources } from 'store/selectors';
+import { getSources } from 'store/selectors';
 import { ERROR_CODES } from 'types/errors';
 import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
@@ -12,14 +12,13 @@ export const initServices = async (opts: EffectOpts) => {
   const {
     getState,
     dispatch,
-    services: { beholderService, streamService, localStorageService, playerService },
+    services: { streamService, localStorageService, playerService },
   } = opts;
 
   try {
-    const { meta, config, features, capabilities, previews } = getState().root;
+    const { capabilities, previews } = getState().root;
 
     const state = getState();
-    const data = getPlaylistItem(state);
 
     const history = localStorageService.getItem<THistoryStreams>(LS_KEY_STREAM) || [];
     playerService.one('play', () => {
@@ -33,19 +32,7 @@ export const initServices = async (opts: EffectOpts) => {
 
     const sources = previews || getSources(state) || [];
 
-    await Promise.all([
-      streamService.init(sources, capabilities, history),
-      beholderService.init({
-        duration: data.duration,
-        seasonName: data.season_name,
-        trackId: data.track_id,
-        projectId: config.config.project_id,
-        scrobbling: config.config.scrobbling,
-        userId: config.config.user_id,
-        userToken: meta.userToken,
-        serviceDisabled: Boolean(features.DISABLE_BEHOLDER),
-      }),
-    ]);
+    await Promise.all([streamService.init(sources, capabilities, history)]);
 
     dispatch(
       sendEvent({

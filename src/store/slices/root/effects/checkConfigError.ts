@@ -1,7 +1,7 @@
 import { EffectOpts } from 'interfaces';
 import { sendEvent } from 'store';
 import { getPlaylistItem } from 'store/selectors';
-import { ERROR_CODES, ERROR_ITEM_MAP } from 'types/errors';
+import { ERROR_CODES } from 'types/errors';
 import { PlayerError } from 'utils/errors';
 
 export const checkConfigError = async ({ getState, dispatch, services: { amberdataService } }: EffectOpts) => {

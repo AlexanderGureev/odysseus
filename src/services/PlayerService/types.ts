@@ -1,10 +1,18 @@
-import { VIDEO_TYPE } from 'components/Player/types';
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
 import { Nullable } from 'types';
 import { PlayerError } from 'utils/errors';
 import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
 
 type TimeData = { currentTime: number; duration: number; remainingTime: number };
+
+export const DEFAULT_PLAYER_ID = 'video-player';
+export const PLAYER_ID = `${DEFAULT_PLAYER_ID}_html5_api`;
+
+export enum VIDEO_TYPE {
+  PLAIN = 'PLAIN',
+  AD = 'AD',
+  FAKE_VIDEO = 'FAKE_VIDEO',
+}
 
 export type Events = {
   timeupdate: (payload: TimeData) => void;

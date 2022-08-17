@@ -1,4 +1,4 @@
-import { VIDEO_TYPE } from 'components/Player/types';
+import { VIDEO_TYPE } from 'services/PlayerService/types';
 import { CounterWatchingOpts } from 'types/MediascopeCounter';
 
 export type MediascopeInitOpts = {

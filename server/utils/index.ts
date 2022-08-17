@@ -97,8 +97,6 @@ export const createEnv = (req: express.Request): TEnvConfig => ({
   SAURON_API_URL: process.env.SAURON_API_URL,
   CDN_HOSTNAME: process.env.CDN_HOSTNAME ? `//${process.env.CDN_HOSTNAME}` : '',
   FAIRPLAY_CERT_ENDPOINT: process.env.FAIRPLAY_CERT_ENDPOINT || 'https://static.more.tv/cert/fp/ctc.der',
-  YOUBORA_ACCOUNT_CODE: process.env.YOUBORA_ACCOUNT_CODE,
-  YOUBORA_SERVICE_ENABLED: toBool(process.env.YOUBORA_SERVICE_ENABLED),
   YMID: toNumber(process.env.YMID),
   PUBLIC_BE_ENDPOINT: process.env.PUBLIC_BE_ENDPOINT,
 });

@@ -3,11 +3,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import 'videojs-contrib-eme';
 
-import { PLAYER_ID, VIDEO_TYPE } from 'components/Player/types';
-import { isAndroid, isIOS } from 'react-device-detect';
-import { IMediator, OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
+import { isAndroid } from 'react-device-detect';
 import { createFakeSource } from 'services/StreamService/utils';
-import { Nullable } from 'types';
 import { ERROR_CODES, ERROR_ITEM_MAP, ERROR_TYPE } from 'types/errors';
 import { toFixed } from 'utils';
 import { PlayerError } from 'utils/errors';
@@ -15,7 +12,7 @@ import { logger } from 'utils/logger';
 import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
 
 import { Mediator } from '../MediatorService';
-import { Events, Hooks, HookType, PLAYER_TYPE, PlayerHooks, SetSourceOpts, TState } from './types';
+import { Events, Hooks, HookType, PLAYER_TYPE, PlayerHooks, SetSourceOpts, TState, VIDEO_TYPE } from './types';
 
 const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
   let player: VideoJsPlayer;

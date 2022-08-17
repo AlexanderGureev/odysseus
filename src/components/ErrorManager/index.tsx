@@ -2,9 +2,8 @@ import cn from 'classnames';
 import { useAppDispatch, useAppSelector } from 'hooks/store';
 import useMediaQuery from 'hooks/useMedia';
 import React, { useEffect } from 'react';
-import { sendEvent } from 'store';
 import { SkinClass } from 'types';
-import { ERROR_CODES, ERROR_TYPE, RawPlayerError } from 'types/errors';
+import { ERROR_CODES, RawPlayerError } from 'types/errors';
 
 import Styles from './index.module.css';
 import { ERROR_TEXT_BY_TYPE } from './templates';

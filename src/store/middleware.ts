@@ -3,7 +3,6 @@ import { addListener, createListenerMiddleware } from '@reduxjs/toolkit';
 import { IServices } from 'interfaces';
 import {
   AmberdataService,
-  BeholderService,
   DemonService,
   EmbeddedCheckService,
   FavouritesService,
@@ -13,6 +12,7 @@ import {
   LocalStorageService,
   ManifestParser,
   MediascopeCounter,
+  P2PManager,
   PlayerService,
   PostMessageService,
   SauronService,
@@ -23,7 +23,6 @@ import {
   VigoService,
   WindowController,
   YMService,
-  YouboraService,
 } from 'services';
 import { AdService } from 'services/AdService/controller';
 
@@ -50,8 +49,6 @@ const opts: CreateListenerMiddlewareOptions<MiddlewareDeps> = {
       vigoService: VigoService,
       ymService: YMService,
       gaService: GAService,
-      youboraService: YouboraService,
-      beholderService: BeholderService,
       horusService: HorusService,
       playerService: PlayerService,
       localStorageService: LocalStorageService,
@@ -62,6 +59,7 @@ const opts: CreateListenerMiddlewareOptions<MiddlewareDeps> = {
       demonService: DemonService,
       favouritesService: FavouritesService,
       mediascopeCounter: MediascopeCounter,
+      p2pService: P2PManager,
     },
   },
 };

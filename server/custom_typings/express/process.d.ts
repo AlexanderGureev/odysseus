@@ -33,8 +33,6 @@ export interface IProcessEnv {
   SAURON_API_URL?: string;
   CDN_HOSTNAME?: string;
   FAIRPLAY_CERT_ENDPOINT?: string;
-  YOUBORA_ACCOUNT_CODE?: string;
-  YOUBORA_SERVICE_ENABLED?: string;
   YMID?: string;
 }
 

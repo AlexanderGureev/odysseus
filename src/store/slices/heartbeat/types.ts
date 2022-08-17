@@ -1,4 +1,4 @@
-import { VIDEO_TYPE } from 'components/Player/types';
+import { VIDEO_TYPE } from 'services/PlayerService/types';
 import { DefaultPayload, WithoutPayload } from 'store/types';
 
 export type State = 'IDLE' | 'CHECK_HEARBEAT_PENDING';

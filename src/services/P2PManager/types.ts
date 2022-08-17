@@ -1,4 +1,7 @@
+import { TStreamItem } from 'types';
 import videojs from 'video.js';
+
+export type P2PInitOpts = { currentStream: TStreamItem };
 
 export type TeleportInstance = {
   onPeeringModeChanged: (mode: PeeringMode) => void;

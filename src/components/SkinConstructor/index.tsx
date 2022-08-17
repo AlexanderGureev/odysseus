@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { useAppSelector, useTheme } from 'hooks';
+import { useAppSelector } from 'hooks';
 import React from 'react';
 
 import Styles from './index.module.css';
@@ -7,7 +7,6 @@ import Styles from './index.module.css';
 const DEFAULT_SKIN_CONTROLS = 'skin-controls';
 
 const SkinConstructor = ({ children }: React.PropsWithChildren) => {
-  const theme = useTheme();
   const { step } = useAppSelector((state) => state.adController);
 
   return (

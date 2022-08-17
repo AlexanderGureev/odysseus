@@ -20,6 +20,7 @@ import hotkeys from './slices/hotkeys/reducer';
 import network from './slices/network/reducer';
 import networkRecovery from './slices/networkRecovery/reducer';
 import offlineMode from './slices/offlineMode/reducer';
+import p2p from './slices/p2p/reducer';
 import playback from './slices/playback/reducer';
 import playbackSpeed from './slices/playbackSpeed/reducer';
 import quality from './slices/quality/reducer';
@@ -32,6 +33,7 @@ import splashscreen from './slices/splashscreen/reducer';
 import visibility from './slices/visibility/reducer';
 import volume from './slices/volume/reducer';
 import watchpoint from './slices/watchpoint/reducer';
+
 /*
 Ограничения для системы:
 1) плоский конфиг fsm
@@ -112,6 +114,8 @@ const rootReducer = combineReducers({
   favourites: favourites.reducer,
   // обработка избранного и синхронизация
   favouritesController: favouritesController.reducer,
+  // управление пирингом
+  p2p: p2p.reducer,
   // модуль сбора ошибок
   error: error.reducer,
 });
@@ -145,6 +149,7 @@ splashscreen.addMiddleware();
 beholder.addMiddleware();
 favourites.addMiddleware();
 favouritesController.addMiddleware();
+p2p.addMiddleware();
 error.addMiddleware();
 
 // console.log(

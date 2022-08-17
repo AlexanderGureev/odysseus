@@ -1,4 +1,3 @@
-import { VIDEO_TYPE } from 'components/Player/types';
 import { DefaultPayload, WithoutPayload } from 'store/types';
 
 export type State =

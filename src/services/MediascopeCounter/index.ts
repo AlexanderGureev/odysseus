@@ -1,6 +1,6 @@
-import { VIDEO_TYPE } from 'components/Player/types';
 import { isNil } from 'lodash';
 import md5 from 'md5';
+import { VIDEO_TYPE } from 'services/PlayerService/types';
 import { CounterWatchingOpts } from 'types/MediascopeCounter';
 import { logger } from 'utils/logger';
 import { request } from 'utils/request';

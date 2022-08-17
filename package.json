@@ -53,9 +53,7 @@
     "request-ip": "^3.3.0",
     "uuid": "^8.3.2",
     "video.js": "^7.19.2",
-    "videojs-contrib-eme": "^4.0.1",
-    "youbora-adapter-videojs": "^6.8.9",
-    "youboralib": "^6.8.25"
+    "videojs-contrib-eme": "^4.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.18.6",

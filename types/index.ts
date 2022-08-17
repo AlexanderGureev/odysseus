@@ -152,8 +152,6 @@ export type TEnvConfig = {
   SAURON_API_URL?: string;
   CDN_HOSTNAME: string;
   FAIRPLAY_CERT_ENDPOINT: string;
-  YOUBORA_ACCOUNT_CODE?: string;
-  YOUBORA_SERVICE_ENABLED: boolean;
   YMID: number | null;
   PUBLIC_BE_ENDPOINT: string;
 };

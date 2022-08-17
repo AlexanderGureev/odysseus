@@ -1,5 +1,5 @@
-import { VIDEO_TYPE } from 'components/Player/types';
 import { EffectOpts } from 'interfaces';
+import { VIDEO_TYPE } from 'services/PlayerService/types';
 import { createFakeSource } from 'services/StreamService/utils';
 import { sendEvent } from 'store/actions';
 import { logger } from 'utils/logger';

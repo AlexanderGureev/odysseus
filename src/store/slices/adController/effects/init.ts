@@ -1,5 +1,5 @@
-import { PLAYER_ID } from 'components/Player/types';
 import { EffectOpts } from 'interfaces';
+import { PLAYER_ID } from 'services/PlayerService/types';
 import { sendEvent } from 'store';
 import { AdCategory } from 'types/ad';
 import { logger } from 'utils/logger';

@@ -53,3 +53,12 @@ export const toFixed = (num: number, fractionDigits = 3) => Number(num.toFixed(f
 
 export const toRecord = <T, K extends keyof T, R extends { [key in string]: T }>(arr: T[], key: K) =>
   arr.reduce((acc, item) => ({ ...acc, [`${item[key]}`]: item }), {} as R);
+
+export const createCounter = () => {
+  let counter = 0;
+
+  return () => {
+    counter++;
+    return counter;
+  };
+};
