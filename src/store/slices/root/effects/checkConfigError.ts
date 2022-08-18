@@ -4,20 +4,10 @@ import { getPlaylistItem } from 'store/selectors';
 import { ERROR_CODES } from 'types/errors';
 import { PlayerError } from 'utils/errors';
 
-export const checkConfigError = async ({ getState, dispatch, services: { amberdataService } }: EffectOpts) => {
-  const {
-    config,
-    meta,
-    session: { videosession_id },
-  } = getState().root;
+export const checkConfigError = async ({ getState, dispatch }: EffectOpts) => {
+  const { config } = getState().root;
 
   if (!config) {
-    amberdataService.sendAmberdataCrashEvent({
-      partnerId: meta.partnerId,
-      trackId: meta.trackId,
-      videosessionId: videosession_id,
-    });
-
     const error = new PlayerError(ERROR_CODES.ERROR_NOT_AVAILABLE, 'config is undefined');
     dispatch(sendEvent({ type: 'CHECK_ERROR_REJECT', meta: { error } }));
     return;

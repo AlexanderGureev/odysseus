@@ -10,6 +10,7 @@ export interface IProcessEnv {
   CTC_BE_ENDPOINT: string;
   HORUS_SRC: string;
   TURMS_ENDPOINT?: string;
+  MORPHEUS_ENDPOINT?: string;
 
   SIREN_HOST: string;
   SIREN_CTC_HOST: string;
@@ -34,6 +35,9 @@ export interface IProcessEnv {
   CDN_HOSTNAME?: string;
   FAIRPLAY_CERT_ENDPOINT?: string;
   YMID?: string;
+
+  SIREN_API_TOKEN?: string;
+  PAK_API_TOKEN?: string;
 }
 
 declare global {

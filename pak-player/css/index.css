@@ -1,0 +1,56 @@
+@import './base.css';
+
+.video-js .vjs-time-control {
+  display: block;
+}
+
+.vjs-control-bar {
+  display: flex !important;
+}
+
+.vjs-dock-description {
+  font-size: 16px;
+}
+
+.vjs-big-play-button {
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%);
+}
+
+.vjs-icon-cog:before {
+  font-size: 16px;
+}
+
+#image-buffer {
+  position: absolute;
+  left: 100%;
+  top: 0;
+}
+
+.error-wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: #000;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  flex-direction: column;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.error-type {
+  color: #fff;
+  text-align: center;
+}
+
+.error-message {
+  color: #c4c4c4;
+  text-align: center;
+  margin-top: 12px;
+}

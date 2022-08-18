@@ -1,5 +1,10 @@
 import { AdHookType, AdLinksByType, AdServiceHooks, InitOpts, NewBlockOpts, TAdBlock } from 'services/AdService/types';
-import { AmberdataEventPayload, CrashEventPayload, TAmberdataParams } from 'services/AmberdataService/types';
+import {
+  AmberdataEventPayload,
+  CrashEventPayload,
+  TAmberdataInitParams,
+  TAmberdataParams,
+} from 'services/AmberdataService/types';
 import { DemonInitOpts, PlayerStats } from 'services/DemonService/types';
 import { LocationState } from 'services/EmbeddedCheckService/types';
 import {
@@ -29,7 +34,7 @@ import { YMQueryParams } from 'services/YmService/types';
 import type { AppState } from 'store';
 import { SessionDispatch } from 'store/dispatch';
 import { DeviceInfo } from 'store/slices/root/types';
-import { Nullable, StreamProtocol, THeartBeatTnsCounterConfig, TnsCounter, TStreamItem } from 'types';
+import { Nullable, SkinClass, StreamProtocol, THeartBeatTnsCounterConfig, TnsCounter, TStreamItem } from 'types';
 import { TAdConfig, TAdPointConfig, TAdPointsConfig } from 'types/ad';
 import { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
 
@@ -62,8 +67,9 @@ export interface IWindowService {
 
 export interface IAmberdataService {
   init: (opts: TAmberdataParams) => void;
-  sendAmberdataCrashEvent: (payload: CrashEventPayload) => void;
+  sendAmberdataCrashEvent: (skinName: SkinClass, params: TAmberdataInitParams) => void;
   sendAmberdataStat: (payload: AmberdataEventPayload) => void;
+  isInitialized: () => boolean;
 }
 
 export interface IPostMessageService {

@@ -1,8 +1,8 @@
-import fetch from 'isomorphic-fetch';
+import fetch from 'cross-fetch';
 
 import { BaseError } from '../../server/utils/error';
 import { ERROR_CODES } from '../../types/errors';
-import { isNil } from '../utils';
+import { isNil } from '.';
 import { PlayerError } from './errors';
 import { logger } from './logger';
 
@@ -101,8 +101,6 @@ const request = () => {
       { json, params = {}, headers = {}, networkCheck = requestOpts.networkCheck, ...opts }: ReqInit = {}
     ) => {
       try {
-        logger.log('[http request]', 'before request', { method, url, params, headers });
-
         const s = new URLSearchParams();
         Object.keys(params).forEach((key) => {
           if (!isNil(params[key])) s.set(key, params[key]);
@@ -119,10 +117,13 @@ const request = () => {
           ? { ...opts, headers: { 'Content-Type': 'application/json', ...parsedHeaders }, body: JSON.stringify(json) }
           : { ...opts, headers: { ...parsedHeaders } };
 
+        logger.log('[http request]', 'before request', { method, url, params, extendedOpts });
+
         const response = await fetch(target, {
           method,
           ...extendedOpts,
         });
+
         checkStatus(response);
 
         logger.log('[http request]', 'before response', { method, url, status: response.status });

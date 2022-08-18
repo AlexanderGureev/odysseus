@@ -10,21 +10,12 @@ export class BaseError extends Error {
 }
 
 export class RequestError extends BaseError {
-  constructor(name: string, message?: string) {
+  constructor(name: string, status: number, message?: string) {
     super(message || name);
     this.name = name;
+    this.status = status;
   }
 }
-const STATUS_CODE_BY_ERROR: Record<ERROR, number> = {
-  [ERROR.INVALID_BODY]: 400,
-  [ERROR.NOT_FOUND]: 404,
-  [ERROR.INVALID_PARTNER_ID]: 400,
-  [ERROR.INVALID_TRACK_ID]: 400,
-  [ERROR.INVALID_BODY]: 400,
-  [ERROR.INVALID_CONFIG_SOURCE]: 400,
-  [ERROR.HYDRA_UNAVAILABLE]: 500,
-  [ERROR.SIREN_UNAVAILABLE]: 500,
-};
 
 export const SERVER_ERR_MAP: Record<ERROR, RawPlayerError> = {
   [ERROR.INVALID_BODY]: ERROR_ITEM_MAP[110],
@@ -44,7 +35,7 @@ export const createError = (e: RequestError): { status: number; errors: ConfigEr
   };
 
   return {
-    status: STATUS_CODE_BY_ERROR[e.name as ERROR] || 500,
+    status: e.status || 500,
     errors: [{ ...error, details: e.message }],
   };
 };

@@ -1,14 +1,19 @@
 import express from 'express';
-import { MediascopeCounterResponse } from 'types/MediascopeCounter';
-import { TrackInfoData } from 'types/TrackInfo';
-import { UserSubscription } from 'types/UserSubscription';
+import FormData from 'form-data';
 
 import { logger } from '../../src/utils/logger';
 import { ReqInit, request } from '../../src/utils/request';
 import { ApiResponse, SkinClass, TBaseConfig, TConfigSource, THydraResponse } from '../../types';
+import { Channels } from '../../types/channel';
+import { MediaFile } from '../../types/MediaFile';
+import { MediascopeCounterResponse } from '../../types/MediascopeCounter';
 import { SubscriptionTariffs } from '../../types/SubscriptionTariffs';
+import { TrackInfoData } from '../../types/TrackInfo';
+import { ResponseMany, ResponseOne, TrackMeta } from '../../types/TrackMeta';
+import { UserSubscription } from '../../types/UserSubscription';
 import { IS_DEV } from '../server';
 import { buildRequstByConfigSource, DATA_REQUEST_TIMEOUT, TParams } from '.';
+import { RequestError } from './error';
 
 type TOptions = ReqInit;
 
@@ -17,6 +22,8 @@ export const hydraRequest = async (partnerId: string, options: TOptions = {}) =>
     const response = await request.get(`${process.env.HYDRA_HOST}/features/player/${partnerId}`, {
       ...options,
     });
+
+    if (!response.ok) throw new RequestError(response.statusText, response.status);
 
     const data: THydraResponse = await response.json();
     return data;
@@ -40,12 +47,10 @@ export const configRequest = async (
     const ref = req.get('Referer');
     const origin = req.get('Origin');
     const host = `${req.protocol}://${req.get('host')}`;
-    const reqIp = IS_DEV ? '195.206.244.249' : req.clientIp; //'88.214.33.5' 95.165.136.7 IS_DEV ? '88.214.33.5' : req.clientIp;
+    const reqIp = IS_DEV ? '88.214.33.5' : req.clientIp; //'88.214.33.5' 95.165.136.7
 
     const finallyRef = xRef ?? ref ?? origin ?? host;
     const userAgent = req.get('User-Agent');
-
-    // if (reqIp) axios.defaults.headers.common.CLIENT_IP = reqIp;
 
     const headers = {
       'X-Real-Ip': reqIp,
@@ -61,6 +66,8 @@ export const configRequest = async (
       ...options,
       headers,
     });
+
+    if (!response.ok) throw new RequestError(response.statusText, response.status);
 
     const { data }: ApiResponse<TBaseConfig> = await response.json();
     return data;
@@ -93,6 +100,8 @@ export const serviceTariffsRequest = async (
       headers,
     });
 
+    if (!response.ok) throw new RequestError(response.statusText, response.status);
+
     const { data }: ApiResponse<SubscriptionTariffs> = await response.json();
     return data;
   } catch (err) {
@@ -120,6 +129,8 @@ export const trackInfoRequest = async (trackId: string, theme: SkinClass, option
       },
       headers,
     });
+
+    if (!response.ok) throw new RequestError(response.statusText, response.status);
 
     const { data }: ApiResponse<TrackInfoData> = await response.json();
     return data;
@@ -151,6 +162,8 @@ export const userSubscriptionRequest = async (
       headers,
     });
 
+    if (!response.ok) throw new RequestError(response.statusText, response.status);
+
     const { data }: ApiResponse<UserSubscription[]> = await response.json();
     return data;
   } catch (err) {
@@ -174,10 +187,83 @@ export const mediascopeCounterRequest = async (serviceId: number | undefined, op
       headers,
     });
 
+    if (!response.ok) throw new RequestError(response.statusText, response.status);
+
     const data: MediascopeCounterResponse = await response.json();
     return data;
   } catch (err) {
     logger.error('[mediascopeCounterRequest]', err);
     return null;
   }
+};
+
+export const getChannels = async (): Promise<Record<string, string> | null> => {
+  try {
+    const response = await request.get(`${process.env.BE_ENDPOINT}/web/channels`, {
+      timeout: DATA_REQUEST_TIMEOUT,
+    });
+
+    if (!response.ok) throw new RequestError(response.statusText, response.status);
+
+    const { data }: ApiResponse<Channels> = await response.json();
+    return data.reduce((acc, { id, playerURI }) => ({ ...acc, [id]: playerURI }), {});
+  } catch (err) {
+    logger.error('[getChannels]', err);
+    return null;
+  }
+};
+
+export const getInspectStreams = async (trackId: number): Promise<ResponseOne<MediaFile>> => {
+  try {
+    const response = await request.get(`${process.env.SIREN_HOST}/private/v1/tracks/${trackId}/stream_inspect`, {
+      headers: {
+        'X-Auth-Token': process.env.SIREN_API_TOKEN,
+      },
+    });
+
+    if (!response.ok) throw new RequestError(response.statusText, response.status);
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    throw {
+      name: 'RequestError',
+      status: err.status || 503,
+      message: err?.message,
+    };
+  }
+};
+
+export const getTrackMeta = async (trackId: number): Promise<ResponseMany<TrackMeta>> => {
+  try {
+    const response = await request.get(`${process.env.MORPHEUS_ENDPOINT}/v1/private/tracks?pak_id=${trackId}`);
+    if (!response.ok) throw new RequestError(response.statusText, response.status);
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    throw {
+      name: 'RequestError',
+      status: err.status || 503,
+      message: err?.message,
+    };
+  }
+};
+
+export const uploadScreenshotToPAK = async (endpoint: string, image: Buffer) => {
+  const formData = new FormData();
+  formData.append('screenshot[thumb]', image, { contentType: 'image/jpeg', filename: 'screenshot.jpg' });
+
+  const response = await request.post(endpoint, {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    body: formData,
+    headers: {
+      ...formData.getHeaders(),
+      'X-Auth-Token': process.env.PAK_API_TOKEN,
+    },
+  });
+
+  const data = await response.json();
+  return data;
 };

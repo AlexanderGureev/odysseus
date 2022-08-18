@@ -6,7 +6,14 @@ import { logger } from 'utils/logger';
 import { randomUnit32 } from 'utils/randomHash';
 import { sendStat } from 'utils/statistics';
 
-import { AmberdataEventPayload, CrashEventPayload, PARAMS, TAmberdataInitParams, TAmberdataParams } from './types';
+import {
+  AmberdataEventPayload,
+  AmberdataEventValue,
+  CrashEventPayload,
+  PARAMS,
+  TAmberdataInitParams,
+  TAmberdataParams,
+} from './types';
 
 export const AMBERDATA_CODE_BY_SKIN_NAME: { [key in SkinClass]?: number } = {
   MORE_TV: 6334,
@@ -65,6 +72,7 @@ const AmberdataService = () => {
   let loaded = false;
   let baseLink = '';
   let statURL = '';
+  let isInitialized = false;
 
   const createStatURL = (baseStr: string) => {
     baseStr += ` ${baseLink}`;
@@ -115,8 +123,15 @@ const AmberdataService = () => {
     sendStat(url);
   };
 
-  const sendAmberdataCrashEvent = (payload: CrashEventPayload) => {
-    // sendAmberdataStat();
+  const sendAmberdataCrashEvent = (skinName: SkinClass, params: TAmberdataInitParams) => {
+    statURL = getBaseStatURL(skinName);
+    baseLink = createBaseLink(params);
+    sendAmberdataStat({
+      eventType: 'crash',
+      eventManual: 0,
+      eventPosition: 0,
+      eventValue: AmberdataEventValue.ERROR.NO_DATA,
+    });
   };
 
   const createBaseLink = (options: TAmberdataInitParams) => {
@@ -139,6 +154,7 @@ const AmberdataService = () => {
     statURL = getBaseStatURL(skinName);
     baseLink = createBaseLink(params);
     sendAmberdataInitStat(paid, adFoxPartner, adFoxSeason);
+    isInitialized = true;
   };
 
   const createAdcm = ({
@@ -173,7 +189,7 @@ const AmberdataService = () => {
     document.head.appendChild(amberdata);
   };
 
-  return { init, sendAmberdataCrashEvent, sendAmberdataStat };
+  return { init, sendAmberdataCrashEvent, sendAmberdataStat, isInitialized: () => isInitialized };
 };
 
 const instance = AmberdataService();

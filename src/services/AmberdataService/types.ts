@@ -13,10 +13,10 @@ export type TAmberdataParams = {
 };
 
 export type TAmberdataInitParams = {
-  projectId: number;
-  videoId: number;
-  skinId: number;
-  partnerId: number;
+  projectId?: number;
+  videoId: number | null;
+  skinId?: number;
+  partnerId: number | null;
   videosessionId: string;
   sid: string | null;
   userId: number | null;

@@ -6,12 +6,29 @@ import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 import { ModifySrcPlugin } from './plugins/ModifySrcPlugin';
 
+const minify = {
+  removeComments: true,
+  collapseWhitespace: true,
+  removeRedundantAttributes: true,
+  useShortDoctype: true,
+  removeEmptyAttributes: true,
+  removeStyleLinkTypeAttributes: true,
+  keepClosingSlash: true,
+  minifyJS: true,
+  minifyCSS: true,
+  minifyURLs: true,
+};
+
 const config: webpack.Configuration = {
   mode: 'production',
-  entry: './src/index.tsx',
+  entry: {
+    app: ['./src/index.tsx'],
+    private: ['./pak-player/index.ts'],
+  },
   output: {
     path: path.resolve('build', 'client'),
     filename: 'static/js/[name].[contenthash:8].player.js',
@@ -105,21 +122,20 @@ const config: webpack.Configuration = {
     plugins: [new TsconfigPathsPlugin()],
   },
   plugins: [
+    // new BundleAnalyzerPlugin({}),
     new HtmlWebpackPlugin({
+      inject: 'body',
       template: path.resolve('server', 'templates', 'index.pug'),
       filename: path.resolve('build', 'server', 'views', 'index.ejs'),
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        keepClosingSlash: true,
-        minifyJS: true,
-        minifyCSS: true,
-        minifyURLs: true,
-      },
+      chunks: ['app'],
+      minify,
+    }),
+    new HtmlWebpackPlugin({
+      inject: 'body',
+      template: path.resolve('server', 'templates', 'pak_player.pug'),
+      filename: path.resolve('build', 'server', 'views', 'pak_player.ejs'),
+      chunks: ['private'],
+      minify,
     }),
     new MiniCssExtractPlugin({
       filename: 'static/css/[name].[contenthash:8].css',

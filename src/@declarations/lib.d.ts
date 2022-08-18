@@ -34,6 +34,9 @@ interface Window {
   mozIndexedDB?: any;
   webkitIndexedDB?: any;
   msIndexedDB?: any;
+
+  meta: import('../../types/TrackMeta').TrackMeta | null;
+  mediaFile: import('../../types/MediaFile').MediaFile;
 }
 
 declare interface HTMLVideoElement {

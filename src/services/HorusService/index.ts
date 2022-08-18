@@ -35,9 +35,6 @@ const EVENTS_PATH = `${HORUS_SRC}/v1/events`;
 const CONFIG_PATH = `${HORUS_SRC}/v1/config`;
 
 const HorusService = () => {
-  // let mediator: TMediatorHandlers = Mediator();
-  let previousTime: Nullable<number> = null;
-  let heartBeatTime = 0;
   let blacklist: string[] = [];
   let isStopSending = false;
   let config = DEFAULT_CONFIG;
@@ -55,18 +52,6 @@ const HorusService = () => {
 
     blacklist = createBlackList();
     paramsSelector = opts.paramsSelector;
-    // ping запрос раз в N секунд
-    // mediator.subscribe(M_EVENTS.PROGRESS_NOTIFIER_NOTIFY, () => {
-    //   heartbeatHandler();
-    // });
-
-    // подписка на ивенты плеера (старт видео, плей/пауза...)
-    // Object.values(HORUS_EVENT).forEach((type) => {
-    //   mediator.subscribe(type, () => {
-    //     routeEvent(type);
-    //   });
-    // });
-
     isInitialized = true;
 
     logger.log(
@@ -106,20 +91,6 @@ const HorusService = () => {
   const isServerError = (response: Response) => response.status === 503;
   const isSuccess = (response: Response) => response.status === 202;
   const mapEvents = (events: TDBEvent[]) => events.map((ev) => ev.payload);
-
-  const heartbeatHandler = () => {
-    const currentTime = Math.round(Date.now() / 1000);
-
-    if (previousTime !== currentTime) {
-      heartBeatTime += 1;
-      previousTime = currentTime;
-    }
-
-    if (heartBeatTime >= config.heartbeat_period) {
-      routeEvent('HEARTBEAT');
-      heartBeatTime = 0;
-    }
-  };
 
   const createBlackList = () => {
     if (!HORUS_BLACKLIST) return [];
@@ -282,6 +253,8 @@ const HorusService = () => {
   };
 
   const routeEvent = async (event: HORUS_EVENT, debugInfo?: DebugInfo) => {
+    if (!isInitialized) return;
+
     const eventName = HorusEventName[event];
 
     try {
@@ -346,12 +319,6 @@ const HorusService = () => {
     }
   };
 
-  const sendRawEvents = async (events: THorusEvent[]) => {
-    if (isInitialized) {
-      await send(events);
-    }
-  };
-
   const sendEvents = async () => {
     try {
       const events = await selectAndUpdateEvents(EventStatus.IDLE, { status: EventStatus.PENDING });
@@ -376,8 +343,6 @@ const HorusService = () => {
   return {
     init,
     routeEvent,
-    sendRawEvents,
-    isInitialized,
   };
 };
 

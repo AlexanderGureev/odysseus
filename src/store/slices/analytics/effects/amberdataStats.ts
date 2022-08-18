@@ -2,7 +2,7 @@ import { PayloadAction } from '@reduxjs/toolkit';
 import { EffectOpts } from 'interfaces';
 import { AMBERDATA_BUFFERING_THRESHOLD, AmberdataEventValue, mapAmberDataError } from 'services/AmberdataService/types';
 import { EventPayload } from 'store';
-import { Nullable } from 'types';
+import { Nullable, SkinClass } from 'types';
 
 let timer: Nullable<NodeJS.Timeout> = null;
 
@@ -21,6 +21,7 @@ export const amberdataStats = async (
     playback,
     error: { error },
     adController,
+    root: { meta, session },
   } = getState();
 
   const currentTime = playback.currentTime || 0;
@@ -138,19 +139,31 @@ export const amberdataStats = async (
       });
       break;
     case 'ERROR_SHOWN':
-      amberdataService.sendAmberdataStat({
-        eventType: 'crash',
-        eventPosition: currentTime,
-        eventManual: 0,
-        eventValue: error?.title ? mapAmberDataError[error.title] : null,
-      });
+      if (amberdataService.isInitialized()) {
+        amberdataService.sendAmberdataStat({
+          eventType: 'crash',
+          eventPosition: currentTime,
+          eventManual: 0,
+          eventValue: error?.title ? mapAmberDataError[error.title] : null,
+        });
+      } else {
+        amberdataService.sendAmberdataCrashEvent(meta.skin || SkinClass.DEFAULT, {
+          userId: null,
+          partnerId: meta.partnerId,
+          videoId: meta.trackId,
+          sid: session.sid,
+          videosessionId: session.videosession_id,
+        });
+      }
       break;
     case 'BEFORE_UNLOAD':
-      amberdataService.sendAmberdataStat({
-        eventType: 'close',
-        eventPosition: currentTime,
-        eventManual: 1,
-      });
+      if (amberdataService.isInitialized()) {
+        amberdataService.sendAmberdataStat({
+          eventType: 'close',
+          eventPosition: currentTime,
+          eventManual: 1,
+        });
+      }
       break;
     case 'AD_BREAK_STARTED':
       amberdataService.sendAmberdataStat({

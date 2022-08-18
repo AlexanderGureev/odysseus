@@ -20,6 +20,7 @@ const config: webpack.Configuration = {
   },
   entry: {
     app: ['./src/index.tsx'],
+    private: ['./pak-player/index.ts'],
   },
   module: {
     rules: [
@@ -94,6 +95,13 @@ const config: webpack.Configuration = {
       template: path.resolve('server', 'templates', 'index.pug'),
       filename: path.resolve('build', 'server', 'views', 'index.ejs'),
       inject: 'body',
+      chunks: ['app'],
+    }),
+    new HtmlWebpackPlugin({
+      inject: 'body',
+      template: path.resolve('server', 'templates', 'pak_player.pug'),
+      filename: path.resolve('build', 'server', 'views', 'pak_player.ejs'),
+      chunks: ['private'],
     }),
     new ForkTsCheckerWebpackPlugin({
       async: false,
