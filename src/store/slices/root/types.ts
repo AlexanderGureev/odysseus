@@ -6,10 +6,12 @@ import { DefaultPayload, ErrorPayload, WithoutPayload } from 'store/types';
 import { SkinClass, TConfig, TExtendedConfig, TParsedFeatures, TStreamItem } from 'types';
 import { TAdConfigByCategory, TAdPointsConfig } from 'types/ad';
 import { RawPlayerError } from 'types/errors';
+import { UserSubscription } from 'types/UserSubscription';
 
 export type State =
   | 'IDLE'
   | 'RENDER'
+  | 'SELECTING_PLAYER_THEME'
   | 'PAYWALL'
   | 'CHECK_ERROR_PENDING'
   | 'INIT_ANALYTICS_PENDING'
@@ -42,12 +44,15 @@ export type State =
 export type ParsedConfigData = {
   config: TExtendedConfig;
   features: TParsedFeatures;
+  subscription: UserSubscriptionsState;
   meta: Meta;
   session: SessionState;
   adConfig: TAdConfigByCategory | null;
   adPoints: TAdPointsConfig;
   params: TrackParams;
 };
+
+export type PlayerTheme = 'DEFAULT' | 'TRAILER';
 
 export type EventsWithPayload =
   | WithoutPayload<
@@ -85,6 +90,12 @@ export type EventsWithPayload =
   | {
       type: 'INIT_RESOLVE';
       payload: { meta: Meta; session: SessionState; deviceInfo: DeviceInfo };
+    }
+  | {
+      type: 'SELECTING_PLAYER_THEME_RESOLVE';
+      payload: {
+        theme: PlayerTheme;
+      };
     }
   | {
       type: 'PARSE_CONFIG_RESOLVE';
@@ -216,6 +227,14 @@ export type TrackParams = {
   isVkApp?: boolean;
 };
 
+export enum SubscriptionState {
+  'ACTIVE' = 'ACTIVE',
+  'DEFFERED' = 'DEFFERED',
+  // 'EXPIRED' = 'EXPIRED',
+}
+
+export type UserSubscriptionsState = { [key in SubscriptionState]: UserSubscription | null };
+
 export type FSMState = {
   step: State;
   meta: Meta;
@@ -231,10 +250,12 @@ export type FSMState = {
   features: TParsedFeatures;
   previews: TStreamItem[] | null;
   previewDuration: number | null;
+  subscription: UserSubscriptionsState;
 
   capabilities: Array<keyof TCapabilities>;
   permissions: Permissions;
 
+  theme: PlayerTheme;
   isShowPlayerUI: boolean;
   isFirstStartPlayback: boolean;
 

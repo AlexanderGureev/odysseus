@@ -37,7 +37,7 @@ const config: FSMConfig<State, AppEvent> = {
     HIDE_AUTOSWITCH_NOTIFY: 'AUTOSWITCH_WAITING',
   },
   AUTOSWITCH_WAITING: {
-    VIDEO_END: 'AUTOSWITCH_PENDING',
+    START_VIDEO_END_AUTOSWITCH: 'AUTOSWITCH_PENDING',
   },
   AUTOSWITCH_PENDING: {
     CHANGE_TRACK: 'IDLE',
@@ -58,13 +58,14 @@ const autoSwitch = createSlice({
       const next = config[state.step]?.[type];
       const step = next || state.step;
 
+      if (type === 'CHECK_PREVIEW_RESOLVE') return { ...initialState, step: 'DISABLED' };
       if (type === 'CHANGE_TRACK') return initialState;
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'autoSwitch', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
-        case 'VIDEO_END':
+        case 'START_VIDEO_END_AUTOSWITCH':
           state.auto = true;
           state.step = step;
           break;
@@ -174,6 +175,7 @@ const addMiddleware = () =>
               payload: { params: { startAt: 0 } },
               meta: {
                 auto,
+                overlay: true,
               },
             })
           );

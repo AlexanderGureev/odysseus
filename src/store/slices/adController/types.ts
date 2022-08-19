@@ -11,8 +11,8 @@ export type State =
   | 'PRELOAD_AD_BLOCK_PENDING'
   | 'CHECK_TIME_POINT_PENDING'
   | 'DISABLED'
-  | 'CHECK_PAUSE_ROLL'
-  | 'CHECK_POST_ROLL';
+  | 'CHECK_PAUSE_ROLL_PENDING'
+  | 'CHECK_POST_ROLL_PENDING';
 
 export type EventsWithPayload =
   | WithoutPayload<
@@ -28,6 +28,7 @@ export type EventsWithPayload =
       | 'CHECK_POST_ROLL_RESOLVE'
       | 'AD_BREAK_STARTED'
       | 'INIT_AD_SERVICE_RESOLVE'
+      | 'CHECK_POST_ROLL'
     >
   | {
       type: 'INIT_AD_RESOLVE';

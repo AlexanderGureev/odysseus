@@ -13,6 +13,7 @@ export const checkTimePoint = ({ currentTime }: Opts, { getState, dispatch, serv
   adService.updatePreloadedBlocks(currentTime);
 
   if (!adService.canPlayAd() || step === 'AUTOSWITCH_NOTIFY') {
+    //  TODO расширить canPlayAd через хук
     return dispatch(
       sendEvent({
         type: 'CHECK_TIME_POINT_RESOLVE',

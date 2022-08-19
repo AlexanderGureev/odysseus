@@ -50,6 +50,7 @@ const buffering = createSlice({
       const next = config[state.step]?.[type];
       const step = next || state.step;
 
+      if (['RESET_PLAYBACK_RESOLVE'].includes(type)) return { ...initialState, step: 'READY' };
       if (['CHANGE_TRACK'].includes(type)) return { ...initialState, step: 'DISABLED' };
       if (next === undefined) return state;
 

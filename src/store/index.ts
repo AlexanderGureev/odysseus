@@ -23,6 +23,7 @@ import offlineMode from './slices/offlineMode/reducer';
 import p2p from './slices/p2p/reducer';
 import playback from './slices/playback/reducer';
 import playbackSpeed from './slices/playbackSpeed/reducer';
+import postMessages from './slices/postMessages/reducer';
 import quality from './slices/quality/reducer';
 import resumeVideo from './slices/resumeVideo/reducer';
 import resumeVideoNotify from './slices/resumeVideoNotify/reducer';
@@ -53,6 +54,8 @@ sendEvent(type: "DO_INIT", payload: {}, meta: {})
 
 const rootReducer = combineReducers({
   analytics: analytics.reducer,
+  // отправка и обработка postmessages
+  postMessages: postMessages.reducer,
   /* 
   корневой автомат, точка входа в приложение:
   1) парсинг конфига
@@ -121,6 +124,7 @@ const rootReducer = combineReducers({
 });
 
 analytics.addMiddleware();
+postMessages.addMiddleware();
 root.addMiddleware();
 resumeVideo.addMiddleware();
 adController.addMiddleware();

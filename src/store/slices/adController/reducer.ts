@@ -34,17 +34,17 @@ const config: FSMConfig<State, AppEvent> = {
     DO_INIT: 'INIT_AD_SERVICE',
     AD_INIT: 'INIT_AD_PENDING',
     CHECK_TIME_POINT: 'CHECK_TIME_POINT_PENDING',
-    DO_PLAY_RESOLVE: 'CHECK_PAUSE_ROLL',
-    VIDEO_END: 'CHECK_POST_ROLL',
+    DO_PLAY_RESOLVE: 'CHECK_PAUSE_ROLL_PENDING',
+    CHECK_POST_ROLL: 'CHECK_POST_ROLL_PENDING',
   },
   INIT_AD_SERVICE: {
     INIT_AD_SERVICE_RESOLVE: 'IDLE',
   },
-  CHECK_POST_ROLL: {
+  CHECK_POST_ROLL_PENDING: {
     CHECK_POST_ROLL_RESOLVE: 'IDLE',
     INIT_AD_BREAK: 'AD_BREAK',
   },
-  CHECK_PAUSE_ROLL: {
+  CHECK_PAUSE_ROLL_PENDING: {
     CHECK_PAUSE_ROLL_RESOLVE: 'IDLE',
     INIT_AD_BREAK: 'AD_BREAK',
   },
@@ -125,6 +125,17 @@ const addMiddleware = () =>
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         INIT_AD_SERVICE: () => {
+          services.playerService.on('timeupdate', ({ currentTime }) => {
+            dispatch(
+              sendEvent({
+                type: 'CHECK_TIME_POINT',
+                meta: {
+                  currentTime,
+                },
+              })
+            );
+          });
+
           services.adService.addHook('adBlockCreated', (block) => {
             block.on('AdInitialized', (data) => {
               dispatch(sendEvent({ type: 'AD_CREATIVE_INITIALIZED', meta: data }));
@@ -134,8 +145,8 @@ const addMiddleware = () =>
           dispatch(sendEvent({ type: 'INIT_AD_SERVICE_RESOLVE' }));
         },
         INIT_AD_PENDING: () => init(opts),
-        CHECK_PAUSE_ROLL: () => checkPauseRoll(opts),
-        CHECK_POST_ROLL: () => checkPostRoll(opts),
+        CHECK_PAUSE_ROLL_PENDING: () => checkPauseRoll(opts),
+        CHECK_POST_ROLL_PENDING: () => checkPostRoll(opts),
         CHECK_TIME_POINT_PENDING: () => {
           const {
             payload: { meta },

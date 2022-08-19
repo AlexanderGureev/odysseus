@@ -73,7 +73,7 @@ export const createParamsSelector = ({
     const list = getState().analytics.hacks_detected;
     return list.length ? list : null;
   },
-  user_subscription: () => getUserSubscriptionType(getState().root?.config?.subscription?.[0] || null),
+  user_subscription: () => getUserSubscriptionType(getState().root?.subscription?.ACTIVE || null),
   device_timestamp: () => calcTime(3),
   device_timezone: () => getTimeZone(),
   viewport_height: () => getViewportWidth(),

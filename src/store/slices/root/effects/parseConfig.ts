@@ -2,7 +2,7 @@ import { EffectOpts } from 'interfaces';
 import { toNumber, TParams } from 'server/utils';
 import { sendEvent } from 'store/actions';
 import { getPlaylistError } from 'store/selectors';
-import { TConfig, THydraResponse, TParsedFeatures, TRawPlaylist } from 'types';
+import { TConfig, TExtendedConfig, THydraResponse, TParsedFeatures, TRawPlaylist } from 'types';
 import {
   AdCategory,
   TAdConfigByCategory,
@@ -13,6 +13,7 @@ import {
   TRawAdConfig,
 } from 'types/ad';
 import { ERROR_CODES } from 'types/errors';
+import { UserSubscription } from 'types/UserSubscription';
 import { toNum } from 'utils';
 import { PlayerError } from 'utils/errors';
 import { getTokenExpiredTime } from 'utils/token';
@@ -91,6 +92,14 @@ const createFeaturesConfig = (isEmbedded: boolean, { base, embedded }: THydraRes
   );
 };
 
+export const adapterUserSubsciptions = (payload: UserSubscription[]) => {
+  const [ACTIVE = null, DEFFERED = null] = payload.sort((a: UserSubscription, b: UserSubscription) => {
+    return Number(new Date(a.beginAt)) - Number(new Date(b.beginAt));
+  });
+
+  return { ACTIVE, DEFFERED };
+};
+
 export const parseConfig = async (
   rawConfig: TConfig,
   ctx: TParams | null,
@@ -98,9 +107,10 @@ export const parseConfig = async (
   { getState, dispatch }: EffectOpts
 ) => {
   const { meta, session } = getState().root;
+  const { subscription, ...rest } = rawConfig;
 
-  const config = {
-    ...rawConfig,
+  const config: TExtendedConfig = {
+    ...rest,
     context: ctx,
   };
 
@@ -108,10 +118,12 @@ export const parseConfig = async (
   const { adConfig = null, adPoints = [] } = config.config?.ad ? createAdConfig(config.config.ad, config.playlist) : {};
 
   const queryParams = parseQueryParams(features || {});
+  const subscriptionState = adapterUserSubsciptions(subscription || []);
 
   const payload = {
     config,
     features,
+    subscription: subscriptionState,
     adConfig,
     adPoints,
     params: {

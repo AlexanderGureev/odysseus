@@ -101,7 +101,6 @@ export const amberdataStats = async (
         eventManual: 1,
       });
       break;
-
     case 'BUFFERING_START':
       timer = setTimeout(() => {
         if (getState().buffering.step !== 'BUFFERING') return;
@@ -116,7 +115,8 @@ export const amberdataStats = async (
     case 'BUFFERING_END':
       clearTimer();
       break;
-    case 'RESET_RESOLVE':
+
+    case 'VIDEO_END':
       amberdataService.sendAmberdataStat({
         eventType: 'stop',
         eventPosition: currentTime,

@@ -3,9 +3,10 @@ import { isIOS, isMobile } from 'react-device-detect';
 import { Device, FavouritesItemMeta } from 'services/FavouritesService/types';
 import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { AppState } from 'store';
-import { TConfig } from 'types';
+import { TConfig, TExtendedConfig } from 'types';
 import { AppliedTariffModifiers, SubscriptionStatus, SubscriptionType, UserSubscription } from 'types/UserSubscription';
 import { pad } from 'utils';
+import { logger } from 'utils/logger';
 
 export const getPlaylistItem = (state: AppState) => state.root.config.playlist.items[0];
 
@@ -109,15 +110,13 @@ const SubscriptionTypeMap: Record<SubscriptionType, SubscriptionStatus> = {
 
 export const getFavouritesMeta = (state: AppState): FavouritesItemMeta => {
   const {
-    root: {
-      config: { subscription },
-    },
+    root: { subscription },
   } = state;
 
   const timezoneOffset = -new Date().getTimezoneOffset();
   const mark = timezoneOffset >= 0 ? '+' : '-';
   const timezone = `${mark}${pad(Math.floor(Math.abs(timezoneOffset) / 60))}:${pad(Math.abs(timezoneOffset) % 60)}`;
-  const type = getUserSubscriptionType(subscription?.[0] || null);
+  const type = getUserSubscriptionType(subscription?.ACTIVE);
 
   return {
     device: isIOS ? Device.WEB_MOBILE_IOS : isMobile ? Device.WEB_MOBILE_ANDROID : Device.WEB_DESKTOP,
@@ -131,7 +130,7 @@ export const featuresSelector = (isEmbedded: boolean) => {
   return isEmbedded ? { ...base, ...embedded } : base;
 };
 
-export const getPlaylistError = (config: TConfig) => {
+export const getPlaylistError = (config: TExtendedConfig) => {
   const [error = null] = config?.playlist?.items?.[0]?.errors || [];
   return error;
 };

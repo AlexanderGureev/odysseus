@@ -20,7 +20,6 @@ const config: FSMConfig<State, AppEvent> = {
   CHECK_PLAIN_WATCHPOINT_PENDING: {
     CHECK_PLAIN_WATCHPOINT_RESOLVE: 'IDLE',
   },
-  CHECK_AD_WATCHPOINT_PENDING: {},
 };
 
 const watchpoint = createSlice({
@@ -35,6 +34,10 @@ const watchpoint = createSlice({
       const step = next || state.step;
 
       if (type === 'CHANGE_TRACK') return initialState;
+      if (type === 'RESET_PLAYBACK_RESOLVE') {
+        return { ...initialState, points: state.points };
+      }
+
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'watchpoint', `${state.step} -> ${type} -> ${next}`);
@@ -96,22 +99,7 @@ const addMiddleware = () =>
           const {
             watchpoint: { points, previousTime },
             playback: { currentTime, duration },
-            quality: { qualityStats },
-            buffering: { bufferingTime, initialBufferTime },
           } = getState();
-
-          // const demonStatPayload = {
-          //   bufferTime: bufferingTime,
-          //   currentTime,
-          //   initialBufferTime,
-          //   playTimeByQuality: qualityStats,
-          // };
-
-          // if (currentTime === 0) {
-          //   opts.services.demonService.sendStat(demonStatPayload);
-          // }
-
-          // opts.services.demonService.sendStat(demonStatPayload);
 
           const time = Math.floor(currentTime || 0);
 

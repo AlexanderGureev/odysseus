@@ -21,6 +21,7 @@ import * as offlineMode from './slices/offlineMode';
 import * as p2p from './slices/p2p';
 import * as playback from './slices/playback';
 import * as playbackSpeed from './slices/playbackSpeed';
+import * as postMessages from './slices/postMessages';
 import * as quality from './slices/quality';
 import * as resumeVideo from './slices/resumeVideo';
 import * as resumeVideoNotify from './slices/resumeVideoNotify';
@@ -86,7 +87,8 @@ export type EventPayload =
   | favourites.ActionPayload
   | favouritesController.ActionPayload
   | analytics.ActionPayload
-  | p2p.ActionPayload;
+  | p2p.ActionPayload
+  | postMessages.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -120,4 +122,5 @@ export type AppEvent =
   | favourites.Event
   | favouritesController.Event
   | analytics.Event
-  | p2p.Event;
+  | p2p.Event
+  | postMessages.Event;

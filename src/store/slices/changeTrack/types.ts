@@ -9,7 +9,7 @@ export type EventsWithPayload =
   | {
       type: 'GO_TO_NEXT_TRACK' | 'GO_TO_PREV_TRACK';
       payload?: { params: TrackParams };
-      meta?: { auto: boolean };
+      meta?: { auto: boolean; overlay: boolean };
     }
   | ErrorPayload<'FETCH_TRACK_CONFIG_REJECT'>
   | {

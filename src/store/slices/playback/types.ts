@@ -12,8 +12,10 @@ export type State =
   | 'PAUSED'
   | 'END'
   | 'AD_BREAK'
-  | 'RESET'
-  | 'PLAYBACK_INIT';
+  | 'RESET_PLAYBACK'
+  | 'PLAYBACK_INIT'
+  | 'CHECK_AD_PENDING'
+  | 'CHECK_AUTOSWITCH_PENDING';
 
 export type EventsWithPayload =
   | WithoutPayload<
@@ -22,12 +24,13 @@ export type EventsWithPayload =
       | 'DO_PAUSE'
       | 'DO_PLAY_REJECT'
       | 'DO_PAUSE_REJECT'
-      | 'VIDEO_END'
-      | 'RESET_RESOLVE'
+      | 'RESET_PLAYBACK_RESOLVE'
       | 'PLAYBACK_INIT_RESOLVE'
-      | 'SET_PAUSED'
       | 'SET_PLAYING'
       | 'ENDED'
+      | 'START_END_FLOW'
+      | 'AD_DISABLED'
+      | 'AUTOSWITCH_DISABLED'
     >
   | {
       type: 'TIME_UPDATE';
@@ -39,11 +42,17 @@ export type EventsWithPayload =
     }
   | {
       type: 'DO_PLAY_RESOLVE';
+      meta: { isFirstPlay: boolean };
     }
   | {
       type: 'START_PLAYBACK';
       meta: { isFirst: boolean };
-    };
+    }
+  | {
+      type: 'DO_END_PLAYBACK';
+    }
+  | { type: 'VIDEO_END'; meta?: { beforeAutoswitch: boolean } }
+  | { type: 'SET_PAUSED'; meta: { isEnded: boolean } };
 
 export type Event = EventsWithPayload['type'];
 
@@ -57,4 +66,6 @@ export type FSMState = {
   remainingTime: number | null;
 
   pausedAt: number | null;
+  ended: boolean;
+  isFirstPlay: boolean;
 };

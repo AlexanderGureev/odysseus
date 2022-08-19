@@ -136,6 +136,7 @@ export interface IPlayerService {
   setVolume: (value: number) => void;
   enterFullcreen: () => Promise<void>;
   exitFullcreen: () => Promise<void>;
+  isEnded: () => boolean;
 }
 
 export interface ILocalStorageService {

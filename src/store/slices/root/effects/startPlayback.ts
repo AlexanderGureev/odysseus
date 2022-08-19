@@ -2,14 +2,25 @@ import { EffectOpts } from 'interfaces';
 import { sendEvent } from 'store/actions';
 
 export const startPlayback = ({ getState, dispatch }: EffectOpts) => {
-  const { isFirstStartPlayback } = getState().root;
+  const {
+    root: { isFirstStartPlayback },
+    playback: { ended },
+  } = getState();
 
-  dispatch(
-    sendEvent({
-      type: 'START_PLAYBACK',
-      meta: {
-        isFirst: isFirstStartPlayback,
-      },
-    })
-  );
+  if (ended) {
+    dispatch(
+      sendEvent({
+        type: 'DO_END_PLAYBACK',
+      })
+    );
+  } else {
+    dispatch(
+      sendEvent({
+        type: 'START_PLAYBACK',
+        meta: {
+          isFirst: isFirstStartPlayback,
+        },
+      })
+    );
+  }
 };

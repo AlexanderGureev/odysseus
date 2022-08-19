@@ -281,6 +281,7 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
     await player.exitFullscreen();
   };
   const isFullscreen = () => player.isFullscreen();
+  const isEnded = () => player.ended();
   const isMuted = () => player.muted();
   const getVolume = () => player.volume();
   const setVolume = (value: number) => {
@@ -318,6 +319,7 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
     getPlaybackRate,
     enterFullcreen,
     exitFullcreen,
+    isEnded,
   };
 };
 

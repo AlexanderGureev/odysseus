@@ -3,7 +3,7 @@ import { DefaultPayload, WithoutPayload } from 'store/types';
 export type State = 'IDLE' | 'READY' | 'AUTOSWITCH_NOTIFY' | 'AUTOSWITCH_WAITING' | 'AUTOSWITCH_PENDING' | 'DISABLED';
 
 export type EventsWithPayload = {
-  type: 'HIDE_AUTOSWITCH_NOTIFY' | 'START_AUTOSWITCH' | 'AUTOSWITCH_NOTIFY_SHOWN';
+  type: 'HIDE_AUTOSWITCH_NOTIFY' | 'START_AUTOSWITCH' | 'AUTOSWITCH_NOTIFY_SHOWN' | 'START_VIDEO_END_AUTOSWITCH';
 };
 
 export type Event = EventsWithPayload['type'];

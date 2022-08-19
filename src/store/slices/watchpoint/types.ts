@@ -1,6 +1,6 @@
 import { DefaultPayload } from 'store/types';
 
-export type State = 'IDLE' | 'CHECK_AD_WATCHPOINT_PENDING' | 'CHECK_PLAIN_WATCHPOINT_PENDING';
+export type State = 'IDLE' | 'CHECK_PLAIN_WATCHPOINT_PENDING';
 
 export type EventsWithPayload =
   | {

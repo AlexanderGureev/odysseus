@@ -19,12 +19,9 @@ export const tnsStats = async (
         tnsCounter.sendEvent('load_ad_start');
       }
       break;
-    case 'START_PLAYBACK':
-      const { isFirst } = payload.meta;
-      if (isFirst) tnsCounter.sendEvent('video_start');
-      tnsCounter.sendTnsHeartBeatStat('play', currentTime);
-      break;
-    case 'DO_PLAY':
+    case 'DO_PLAY_RESOLVE':
+      const { isFirstPlay } = payload.meta;
+      if (isFirstPlay) tnsCounter.sendEvent('video_start');
     case 'SET_PLAYING':
       tnsCounter.sendTnsHeartBeatStat('play', currentTime);
       break;
@@ -41,7 +38,7 @@ export const tnsStats = async (
     case 'SEEK_STARTED':
       tnsCounter.sendTnsHeartBeatStat('jump', currentTime);
       break;
-    case 'RESET_RESOLVE':
+    case 'VIDEO_END':
       tnsCounter.sendTnsHeartBeatStat('stop', currentTime);
       tnsCounter.sendEvent('video_end');
       break;

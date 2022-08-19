@@ -265,10 +265,10 @@ const HorusService = () => {
 
       logger.log('[HorusService]', `routeEvent >>> ${eventName}, ${eventNum}`);
 
+      await pushToBuffer(payload);
+
       if (!isStopSending && (await WindowController.isMaster()) && (await isNeedToSend())) {
         await sendEvents();
-      } else {
-        await pushToBuffer(payload);
       }
     } catch (e) {
       logger.error('[HorusService]', `routeEvent error >>> ${eventName} `, e?.message);

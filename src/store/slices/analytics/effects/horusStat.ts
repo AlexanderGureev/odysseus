@@ -17,6 +17,7 @@ export const horusStat = async (
   } = getState();
 
   switch (payload.type) {
+    case 'RESET_PLAYBACK_RESOLVE':
     case 'PARSE_CONFIG_RESOLVE':
       horusService.routeEvent('HORUS_SESSION_STARTED');
       break;
@@ -36,7 +37,8 @@ export const horusStat = async (
       horusService.routeEvent('HORUS_VIDEO_STARTED');
       break;
     case 'SET_PAUSED':
-      horusService.routeEvent('HORUS_CLICK_PAUSE');
+      const { isEnded } = payload.meta;
+      horusService.routeEvent(isEnded ? 'HORUS_AUTO_PAUSE' : 'HORUS_CLICK_PAUSE');
       break;
     case 'SET_SEEKING':
     case 'SEEK':
@@ -86,7 +88,9 @@ export const horusStat = async (
       horusService.routeEvent('HORUS_AD_REQUEST');
       break;
     case 'AD_BREAK_STARTED':
-      if (adController.point?.point === 0 && adController.point?.category === AdCategory.PRE_ROLL) return;
+      const { point, category } = adController.point || {};
+      if ((point === 0 && category === AdCategory.PRE_ROLL) || category === AdCategory.POST_ROLL) return;
+
       horusService.routeEvent('HORUS_AUTO_PAUSE');
       break;
     case 'AD_BLOCK_IMPRESSION':
@@ -135,8 +139,12 @@ export const horusStat = async (
       break;
 
     case 'CHANGE_TRACK':
-    case 'RESET_RESOLVE':
       horusService.routeEvent('HORUS_SESSION_FINISHED');
+      break;
+
+    case 'VIDEO_END':
+      const { beforeAutoswitch } = payload.meta || {};
+      if (!beforeAutoswitch) horusService.routeEvent('HORUS_SESSION_FINISHED');
       break;
   }
 };

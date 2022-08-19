@@ -26,8 +26,7 @@ export const mediascopeStats = async (
   };
 
   switch (payload.type) {
-    case 'START_PLAYBACK':
-    case 'DO_PLAY':
+    case 'DO_PLAY_RESOLVE':
     case 'SET_PLAYING':
       mediascopeCounter.sendEvent('VIDEO_START', {
         ...eventParams,
@@ -71,8 +70,17 @@ export const mediascopeStats = async (
       });
       break;
 
-    case 'RESET_RESOLVE':
-    case 'CHANGE_TRACK':
+    case 'VIDEO_END':
+      const { beforeAutoswitch } = payload.meta || {};
+      if (!beforeAutoswitch) {
+        mediascopeCounter.sendEvent('VIDEO_END', {
+          ...eventParams,
+          videoType: VIDEO_TYPE.PLAIN,
+        });
+      }
+      break;
+    case 'GO_TO_PREV_TRACK':
+    case 'GO_TO_NEXT_TRACK':
       mediascopeCounter.sendEvent('VIDEO_END', {
         ...eventParams,
         videoType: VIDEO_TYPE.PLAIN,

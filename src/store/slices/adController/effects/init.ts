@@ -6,30 +6,19 @@ import { logger } from 'utils/logger';
 
 const DEFAULT_ADV_CONTROLS_ID = 'adv-controls';
 
-export const init = async ({ getState, dispatch, services: { adService, playerService } }: EffectOpts) => {
+export const init = async ({ getState, dispatch, services: { adService } }: EffectOpts) => {
   try {
     const {
-      root: { adConfig, adPoints, features },
+      root: { adConfig, adPoints, features, previews },
     } = getState();
 
-    playerService.on('timeupdate', ({ currentTime }) => {
-      dispatch(
-        sendEvent({
-          type: 'CHECK_TIME_POINT',
-          meta: {
-            currentTime,
-          },
-        })
-      );
-    });
+    if (!adConfig || previews) throw new Error('adConfig is undefined or preview video');
 
     await adService.init({
       playerId: PLAYER_ID,
       controlsId: DEFAULT_ADV_CONTROLS_ID,
       features,
     });
-
-    if (!adConfig) throw new Error('adConfig is undefined');
 
     const delayedPreroll = adPoints.find((p) => p.category === AdCategory.PRE_ROLL);
 

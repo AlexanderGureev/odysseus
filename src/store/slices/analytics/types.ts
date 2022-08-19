@@ -11,6 +11,7 @@ export type EventsWithPayload =
       payload: {
         ym_client_id?: string | null;
         hacks_detected?: string[];
+        isViewSent?: boolean;
       };
     };
 
@@ -23,4 +24,5 @@ export type FSMState = {
 
   ym_client_id: string | null;
   hacks_detected: string[];
+  isViewSent: boolean;
 };

@@ -6,7 +6,7 @@ import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 import { request } from 'utils/request';
 
-import { amberdataStats, demonStat, horusStat, mediascopeStats, tnsStats, vigoStats } from './effects';
+import { amberdataStats, demonStat, horusStat, mediascopeStats, tnsStats, vigoStats, ymStats } from './effects';
 import { FSMState, State } from './types';
 
 const initialState: FSMState = {
@@ -14,12 +14,14 @@ const initialState: FSMState = {
 
   ym_client_id: null,
   hacks_detected: [],
+  isViewSent: false,
 };
 
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
     DO_INIT: 'INIT_ANALYTICS_SUBCRIBERS',
     SET_ANALYTICS_DATA: null,
+    CHANGE_TRACK: null,
   },
   INIT_ANALYTICS_SUBCRIBERS: {
     INIT_ANALYTICS_SUBCRIBERS_RESOLVE: 'IDLE',
@@ -35,11 +37,18 @@ const analytics = createSlice({
       const { type, payload } = action.payload;
 
       const next = config[state.step]?.[type];
+      const step = next || state.step;
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'analytics', `${state.step} -> ${type} -> ${next}`);
 
-      return next ? { ...state, step: next, ...payload } : { ...state, ...payload };
+      switch (type) {
+        case 'CHANGE_TRACK':
+          state.isViewSent = false;
+          break;
+        default:
+          return { ...state, step, ...payload };
+      }
     });
   },
 });
@@ -62,17 +71,15 @@ const addMiddleware = () => {
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         INIT_ANALYTICS_SUBCRIBERS: async () => {
-          window.addEventListener('load', () => {
-            request.options(YASDK_URL).catch(() => {
-              dispatch(
-                sendEvent({
-                  type: 'SET_ANALYTICS_DATA',
-                  payload: {
-                    hacks_detected: ['adblock'],
-                  },
-                })
-              );
-            });
+          request.options(YASDK_URL).catch(() => {
+            dispatch(
+              sendEvent({
+                type: 'SET_ANALYTICS_DATA',
+                payload: {
+                  hacks_detected: ['adblock'],
+                },
+              })
+            );
           });
 
           services.postMessageService.on('initialInfo', ({ data }) => {
@@ -129,6 +136,7 @@ const addMiddleware = () => {
       mediascopeStats(event, opts);
       demonStat(event, opts);
       horusStat(event, opts);
+      ymStats(event, opts);
     },
   });
 };

@@ -1,5 +1,5 @@
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
-import { Nullable } from 'types';
+import { TLinkedTrackConfig } from 'types';
 import { ERROR_TYPE } from 'types/errors';
 
 export enum ERROR_CODE {
@@ -24,7 +24,7 @@ export type OutputEvents = {
     data: Payload<{
       videosession_id: string;
       time_cursor: number;
-      trackDescription: TLinkedTrack;
+      trackDescription: TLinkedTrackConfig;
       trackId: number;
       projectId: number;
     }>
@@ -33,11 +33,11 @@ export type OutputEvents = {
     data: Payload<{
       target: 'next' | 'prev';
       auto: boolean;
-      trackDescription: TLinkedTrack;
+      trackDescription: TLinkedTrackConfig;
       overlay: boolean;
       videosession_id: string;
       time_cursor: number;
-      track_id: number;
+      track_id: number | null;
       project_id: number;
     }>
   ) => void;
@@ -45,42 +45,42 @@ export type OutputEvents = {
     data: Payload<{
       videosession_id: string;
       time_cursor: number;
-      trackDescription: TLinkedTrack;
-      trackId: number;
+      trackDescription: TLinkedTrackConfig;
+      trackId: number | null;
       projectId: number;
     }>
   ) => void;
 
   inited: (data: Payload<{ adv: boolean }>) => void;
   'inited-player': () => void;
-  started: (data: { time: number; payload: { sub_button: boolean } }) => void;
+  started: (data: { time: number }) => void;
   'video-started': () => void;
   paused: (data: { time: number }) => void;
   ended: (data: { time: number }) => void;
-  error: (data: { code: number; payload?: { code: number; type: ERROR_TYPE; track_id: number | null } }) => void;
+  error: (data: { code?: number; payload?: { code: number; type: ERROR_TYPE; track_id: number | null } }) => void;
 
   rewound: (data: { time: number; previousTime: number }) => void;
   adShown: (data: { time: number }) => void;
-  pay_and_watch_button: (data: Payload<{ time_cursor: number; btn_type: string }>) => void;
+  pay_and_watch_button: (data: Payload<{ time_cursor: number; btn_type?: 'about' }>) => void;
 
-  subscription_restore: () => void;
+  // subscription_restore: () => void;
 
   'exit-full-screen': () => void;
   'enter-full-screen': () => void;
   show_payment_popup: () => void;
   button_disable_ad: () => void;
   'launch-player': (data: Payload<{ volume: number; is_sub_button: boolean }>) => void;
-  play: (data: Payload<{ videosession_id: string; track_id: number }>) => void;
-  view: (data: Payload<{ videosession_id: string; track_id: number }>) => void;
+  play: (data: Payload<{ videosession_id: string; track_id: number | null }>) => void;
+  view: (data: Payload<{ videosession_id: string; track_id: number | null }>) => void;
   watchpoint: (
     data: Payload<{
-      track_id: number;
+      track_id: number | null;
       videosession_id: string;
-      user_id: string;
+      user_id: number | null;
       time_cursor: number;
-      duration: number;
-      value: number;
-      sid: string;
+      duration: number | null;
+      value: number | string;
+      sid: string | null;
     }>
   ) => void;
   time_roll: (
@@ -88,7 +88,7 @@ export type OutputEvents = {
       event_value: string;
       videosession_id: string;
       time_cursor: number;
-      track_id: number;
+      track_id: number | null;
       project_id: number;
     }>
   ) => void;
@@ -206,10 +206,10 @@ export type OutputEvents = {
   ) => void;
   watchprogress: (data: {
     data: {
-      track_id: number;
-      project_id: number;
+      track_id: number | null;
+      project_id: number | null;
       time_cursor: number;
-      duration: number;
+      duration: number | null;
     };
   }) => void;
 
@@ -264,33 +264,6 @@ export type INPUT_PLAYER_POST_MESSAGE = {
   unmute: (p: any) => void;
   testAdvPoint: (p: any) => void;
   set_favorites: (p: { data: { isFavorites: boolean } }) => void;
-};
-
-export type TLinkedTracks = {
-  next?: TLinkedTrack;
-  previous?: TLinkedTrack;
-};
-
-export type TLinkedTrack = {
-  canonicalUrl: string;
-  caption: string;
-  episode: number;
-  playerConfig: string;
-  playerUrl: string;
-  projectId: number;
-  season: number;
-  thumbnail: string;
-  trackHubId: number;
-  trackId: number;
-  trackVod: {
-    link: string;
-    playerLink: string;
-    queryParams: {
-      previewFrom: Nullable<string>;
-      previewTo: Nullable<string>;
-      sign: Nullable<string>;
-    };
-  };
 };
 
 export type TMessage = {

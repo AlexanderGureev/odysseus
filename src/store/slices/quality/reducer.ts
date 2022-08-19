@@ -78,6 +78,16 @@ const quality = createSlice({
         return { ...initialState, currentQualityMark, step: 'IDLE' };
       }
 
+      if (type === 'RESET_PLAYBACK_RESOLVE') {
+        return {
+          ...state,
+          previousBitrate: null,
+          previousTime: 0,
+          qualityStats: initialState.qualityStats,
+          step: 'READY',
+        };
+      }
+
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'quality', `${state.step} -> ${type} -> ${next}`);

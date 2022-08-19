@@ -16,6 +16,8 @@ const initialState: FSMState = {
   remainingTime: null,
 
   pausedAt: null,
+  ended: false,
+  isFirstPlay: true,
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -28,6 +30,7 @@ const config: FSMConfig<State, AppEvent> = {
   READY: {
     AD_BREAK_STARTED: 'AD_BREAK',
     START_PLAYBACK: 'PLAY_PENDING',
+    DO_END_PLAYBACK: 'CHECK_AUTOSWITCH_PENDING',
     META_LOADED: null,
   },
   AD_BREAK: {
@@ -60,11 +63,20 @@ const config: FSMConfig<State, AppEvent> = {
     SEEK_STARTED: null,
   },
   END: {
-    CHECK_POST_ROLL_RESOLVE: 'RESET',
-    AD_BREAK_END: 'RESET',
+    START_END_FLOW: 'CHECK_AD_PENDING',
   },
-  RESET: {
-    RESET_RESOLVE: 'PAUSED',
+  CHECK_AD_PENDING: {
+    CHECK_POST_ROLL_RESOLVE: 'CHECK_AUTOSWITCH_PENDING',
+    AD_DISABLED: 'CHECK_AUTOSWITCH_PENDING',
+    AD_BREAK_STARTED: 'AD_BREAK',
+    AD_BREAK_END: 'CHECK_AUTOSWITCH_PENDING',
+  },
+  CHECK_AUTOSWITCH_PENDING: {
+    VIDEO_END: null,
+    AUTOSWITCH_DISABLED: 'RESET_PLAYBACK',
+  },
+  RESET_PLAYBACK: {
+    RESET_PLAYBACK_RESOLVE: 'PAUSED',
   },
 };
 
@@ -80,7 +92,7 @@ const playback = createSlice({
       const step = next || state.step;
 
       if (['CHANGE_TRACK'].includes(type)) return { ...initialState, step: 'READY' };
-      if (['RESUME_VIDEO'].includes(type)) return { ...state, step: 'READY' };
+      // if (['RESUME_VIDEO'].includes(type)) return { ...state, step: 'READY' };
       if (['NETWORK_ERROR', 'GO_TO_NEXT_TRACK', 'GO_TO_PREV_TRACK'].includes(type)) return { ...state, step: 'PAUSED' };
 
       if (next === undefined) return state;
@@ -88,15 +100,18 @@ const playback = createSlice({
       logger.log('[FSM]', 'playback', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
+        case 'DO_PLAY_RESOLVE':
+          return { ...state, isFirstPlay: false, step };
+        case 'ENDED':
+          return { ...state, step, ended: true };
+        case 'START_PLAYBACK':
+          return { ...state, step, ...payload, pausedAt: null };
         case 'SEEK_STARTED':
           const duration = state.duration || 0;
           state.currentTime = meta.to < 0 ? 0 : meta.to > duration ? duration : meta.to;
           break;
-        case 'TIME_UPDATE':
-          return { ...state, step, ...payload };
-        case 'START_PLAYBACK':
-        case 'RESET_RESOLVE':
-          return { ...state, step, ...payload, pausedAt: null };
+        case 'RESET_PLAYBACK_RESOLVE':
+          return { ...initialState, currentTime: 0, duration: state.duration, step };
         case 'DO_PAUSE':
           return { ...state, step, ...payload, pausedAt: Date.now() };
         default:
@@ -160,9 +175,14 @@ const addMiddleware = () => {
             const next = config[step]?.['SET_PAUSED'];
             if (next === undefined) return;
 
+            const isEnded = services.playerService.isEnded();
+
             dispatch(
               sendEvent({
                 type: 'SET_PAUSED',
+                meta: {
+                  isEnded,
+                },
               })
             );
           });
@@ -207,6 +227,8 @@ const addMiddleware = () => {
             );
           });
           services.playerService.on('ended', () => {
+            console.log('[TEST] ended');
+
             dispatch(
               sendEvent({
                 type: 'ENDED',
@@ -223,23 +245,18 @@ const addMiddleware = () => {
         CHECK_TOKEN_PENDING: () => checkToken(opts),
         CHECK_MANIFEST_PENDING: () => checkManifest(opts),
         PLAY_PENDING: () => {
+          const { isFirstPlay } = getState().playback;
           opts.services.playerService.play();
+
           dispatch(
             sendEvent({
               type: 'DO_PLAY_RESOLVE',
+              meta: { isFirstPlay },
             })
           );
         },
         PAUSED: () => {
           opts.services.playerService.pause();
-        },
-        RESET: () => {
-          opts.services.playerService.setCurrentTime(0);
-          dispatch(
-            sendEvent({
-              type: 'RESET_RESOLVE',
-            })
-          );
         },
         END: () => {
           const {
@@ -254,7 +271,65 @@ const addMiddleware = () => {
 
           dispatch(
             sendEvent({
+              type: 'START_END_FLOW',
+            })
+          );
+        },
+        CHECK_AD_PENDING: () => {
+          const { adController } = getState();
+          dispatch(
+            sendEvent({
+              type: adController.step === 'DISABLED' ? 'AD_DISABLED' : 'CHECK_POST_ROLL',
+            })
+          );
+        },
+        CHECK_AUTOSWITCH_PENDING: () => {
+          const { autoSwitch } = getState();
+
+          if (autoSwitch.step === 'DISABLED') {
+            dispatch(
+              sendEvent({
+                type: 'AUTOSWITCH_DISABLED',
+              })
+            );
+          } else {
+            dispatch(
+              sendEvent({
+                type: 'VIDEO_END',
+                meta: {
+                  beforeAutoswitch: true,
+                },
+              })
+            );
+
+            dispatch(
+              sendEvent({
+                type: 'START_VIDEO_END_AUTOSWITCH',
+              })
+            );
+          }
+        },
+        RESET_PLAYBACK: async () => {
+          const {
+            root: { previews },
+          } = getState();
+
+          dispatch(
+            sendEvent({
               type: 'VIDEO_END',
+            })
+          );
+
+          if (!previews) {
+            await new Promise<void>((res) => {
+              services.playerService.one('seeked', res);
+              services.playerService.setCurrentTime(0);
+            });
+          }
+
+          dispatch(
+            sendEvent({
+              type: 'RESET_PLAYBACK_RESOLVE',
             })
           );
         },

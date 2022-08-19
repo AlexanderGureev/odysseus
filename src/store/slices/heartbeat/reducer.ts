@@ -20,7 +20,7 @@ const initialState: FSMState = {
     PLAIN: {},
   },
 
-  heartbeats: [30],
+  heartbeats: [10, 30],
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -45,7 +45,7 @@ const heartbeat = createSlice({
       const next = config[state.step]?.[type];
       const step = next || state.step;
 
-      if (type === 'CHANGE_TRACK') return initialState;
+      if (['CHANGE_TRACK', 'RESET_PLAYBACK_RESOLVE'].includes(type)) return initialState;
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'heartbeat', `${state.step} -> ${type} -> ${next}`);
@@ -71,7 +71,7 @@ const heartbeat = createSlice({
 
           if (diff < 1) {
             state.heartbeats.forEach((p) => {
-              const value = state.progress[videoType][p];
+              const value = state.progress[videoType][p] || 0;
               state.progress[videoType][p] = toFixed(value + diff);
             });
           }

@@ -79,6 +79,7 @@ export type TFeatureConfig = {
   ENABLE_FAVOURITES?: boolean;
   MEDIASCOPE_WATCHING_COUNTER?: boolean;
   HORUS_ENABLED?: boolean;
+  PROMO_OFFER_BUTTON?: string;
 
   AUTH_URL?: string;
 
@@ -116,7 +117,7 @@ export type TFeatureConfig = {
   TITLE_LINKS: boolean;
   NEXT_EPISODE_AUTOPLAY: boolean;
   NEXT_EPISODE_AUTOPLAY_SUGGEST: boolean;
-  RESTORE_SUBSCRIPTION: boolean;
+  // RESTORE_SUBSCRIPTION: boolean; // TODO legacy
   SHARING: boolean;
   SHOW_LOGO_CONTROL: boolean;
   SUBSCRIPTION: boolean;
@@ -347,7 +348,7 @@ export type TParsedFeatures = Partial<
   >
 >;
 
-export type TExtendedConfig = TConfig & {
+export type TExtendedConfig = Omit<TConfig, 'subscription'> & {
   context: TParams | null;
 };
 

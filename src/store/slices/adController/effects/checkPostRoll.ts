@@ -11,7 +11,7 @@ export const checkPostRoll = ({ getState, dispatch, services: { adService } }: E
 
   const data = adConfig?.post_roll;
 
-  if (step !== 'AUTOSWITCH_PENDING' && adService.canPlayAd() && data) {
+  if (step !== 'AUTOSWITCH_WAITING' && adService.canPlayAd() && data) {
     dispatch(
       sendEvent({
         type: 'INIT_AD_BREAK',

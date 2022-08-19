@@ -8,7 +8,7 @@ export const checkConfigError = async ({ getState, dispatch }: EffectOpts) => {
   const { config } = getState().root;
 
   if (!config) {
-    const error = new PlayerError(ERROR_CODES.ERROR_NOT_AVAILABLE, 'config is undefined');
+    const error = new PlayerError(ERROR_CODES.ERROR_NOT_AVAILABLE, 'config is undefined').serialize();
     dispatch(sendEvent({ type: 'CHECK_ERROR_REJECT', meta: { error } }));
     return;
   }

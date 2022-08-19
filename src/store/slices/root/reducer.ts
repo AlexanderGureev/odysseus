@@ -6,6 +6,7 @@ import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { TConfig, TExtendedConfig } from 'types';
 import { logger } from 'utils/logger';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   checkCapabilities,
@@ -19,6 +20,7 @@ import {
   initServices,
   parseConfig,
   selectSource,
+  selectTheme,
   startPlayback,
 } from './effects';
 import { FSMState, State, TrackParams } from './types';
@@ -61,6 +63,9 @@ const config: FSMConfig<State, AppEvent> = {
   PARSE_CONFIG_PENDING: {
     PARSE_CONFIG_RESOLVE: 'RENDER',
     PARSE_CONFIG_REJECT: 'ERROR',
+  },
+  SELECTING_PLAYER_THEME: {
+    SELECTING_PLAYER_THEME_RESOLVE: 'RENDER',
   },
   // первый render приложения
   RENDER: {
@@ -163,6 +168,7 @@ const config: FSMConfig<State, AppEvent> = {
     UPDATE_TOKEN: null,
     RESUME_VIDEO: 'RESUME_VIDEO_PENDING',
     CHANGE_TRACK: 'PARSE_CONFIG_PENDING',
+    RESET_PLAYBACK_RESOLVE: null,
   },
 
   ERROR: {},
@@ -170,11 +176,17 @@ const config: FSMConfig<State, AppEvent> = {
 
 const initialState: FSMState = {
   step: 'IDLE',
+  theme: 'DEFAULT',
+
   config: {} as TExtendedConfig,
   adConfig: null,
   adPoints: [],
 
   features: {},
+  subscription: {
+    ACTIVE: null,
+    DEFFERED: null,
+  },
   session: {
     id: '',
     videosession_id: '',
@@ -238,6 +250,9 @@ const root = createSlice({
       const step = next || state.step;
 
       switch (type) {
+        case 'RESET_PLAYBACK_RESOLVE':
+          state.session.id = uuidv4();
+          break;
         case 'PARSE_CONFIG_RESOLVE':
           return {
             ...initialState,
@@ -338,6 +353,7 @@ const addMiddleware = () =>
             })
           );
         },
+        SELECTING_PLAYER_THEME: () => selectTheme(opts),
         RENDER: () => {
           const { isShowPlayerUI } = getState().root;
 

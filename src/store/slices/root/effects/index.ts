@@ -9,4 +9,5 @@ export { initPlayer } from './initPlayer';
 export { initServices } from './initServices';
 export { parseConfig } from './parseConfig';
 export { selectSource } from './selectSource';
+export { selectTheme } from './selectTheme';
 export { startPlayback } from './startPlayback';

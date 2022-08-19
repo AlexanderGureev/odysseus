@@ -31,6 +31,7 @@ const config: FSMConfig<State, AppEvent> = {
   },
   DISABLED: {
     START_PLAYBACK: 'READY',
+    RESET_PLAYBACK_RESOLVE: 'READY',
   },
 };
 
@@ -83,7 +84,11 @@ const addMiddleware = () =>
       const handler: { [key in State]?: () => Promise<void> | void } = {
         REWIND_INIT: () => {
           services.playerService.on('seeking', () => {
-            if (getState().rewind.step === 'READY') {
+            const {
+              rewind: { step },
+            } = getState();
+
+            if (step === 'READY') {
               dispatch(
                 sendEvent({
                   type: 'SET_SEEKING',
@@ -93,13 +98,17 @@ const addMiddleware = () =>
           });
 
           services.playerService.on('seeked', () => {
-            if (getState().rewind.step === 'DISABLED') return; // TODO FIX
+            const {
+              rewind: { step },
+            } = getState();
 
-            dispatch(
-              sendEvent({
-                type: 'SEEK_END',
-              })
-            );
+            if (step !== 'DISABLED') {
+              dispatch(
+                sendEvent({
+                  type: 'SEEK_END',
+                })
+              );
+            }
           });
 
           dispatch(
