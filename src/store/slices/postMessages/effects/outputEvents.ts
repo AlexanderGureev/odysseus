@@ -16,6 +16,7 @@ export const outputEvents = async (
       adConfig,
       config: {
         playlist: { items },
+        config,
       },
     },
     analytics: { hacks_detected },
@@ -33,21 +34,11 @@ export const outputEvents = async (
         },
       });
       break;
+    case 'PLAYER_INIT_RESOLVE':
+      postMessageService.emit('inited-player');
+      break;
     case 'AD_INIT':
       postMessageService.emit('launch-player');
-      break;
-    case 'PAYWALL_SHOWN':
-      postMessageService.emit('notify', {
-        code: NOTIFY_TYPES.PAYWALL_ON_START,
-      });
-      break;
-    case 'CLICK_PAYWALL_BUTTON':
-      postMessageService.emit('pay_and_watch_button', {
-        payload: {
-          time_cursor: playback.currentTime || 0,
-          btn_type: undefined,
-        },
-      });
       break;
     case 'DO_PLAY_RESOLVE':
       const { isFirstPlay } = payload.meta;
@@ -68,12 +59,62 @@ export const outputEvents = async (
         previousTime: from,
       });
       break;
+    case 'INC_SEEK':
+    case 'DEC_SEEK':
+      postMessageService.emit('time_roll', {
+        payload: {
+          event_value: payload.type === 'INC_SEEK' ? '+30' : '-15',
+          time_cursor: playback.currentTime || 0,
+          track_id: meta.trackId,
+          videosession_id: session.videosession_id,
+          project_id: config.project_id,
+        },
+      });
+      break;
+    case 'DO_PLAY':
+    case 'DO_PAUSE':
+      postMessageService.emit('play_btn_click', {
+        payload: {
+          btn_type: payload.type === 'DO_PLAY' ? 'play' : 'pause',
+        },
+      });
+      break;
+    case 'SET_VOLUME':
+      const { value } = payload.payload;
+      postMessageService.emit('volume', {
+        payload: {
+          volume: Number(value.toFixed(2)),
+        },
+      });
+      break;
+    case 'ENTER_FULLCREEN_RESOLVE':
+      postMessageService.emit('enter-full-screen');
+      break;
+    case 'EXIT_FULLCREEN_RESOLVE':
+      postMessageService.emit('exit-full-screen');
+      break;
+    case 'VIDEO_END':
+      postMessageService.emit('ended', { time: playback.currentTime || 0 });
+      break;
+
+    case 'PAYWALL_SHOWN':
+      postMessageService.emit('notify', {
+        code: NOTIFY_TYPES.PAYWALL_ON_START,
+      });
+      break;
+    case 'CLICK_PAYWALL_BUTTON':
+      postMessageService.emit('pay_and_watch_button', {
+        payload: {
+          time_cursor: playback.currentTime || 0,
+          btn_type: undefined,
+        },
+      });
+      break;
     case 'AD_BLOCK_IMPRESSION':
       postMessageService.emit('adShown', {
         time: playback.currentTime || 0,
       });
       break;
-
     case 'GO_TO_NEXT_TRACK':
     case 'GO_TO_PREV_TRACK': {
       const type = payload.type === 'GO_TO_PREV_TRACK' ? 'previous' : 'next';
@@ -99,9 +140,8 @@ export const outputEvents = async (
       });
       break;
     }
-
     case 'HIDE_AUTOSWITCH_NOTIFY':
-    case 'AUTOSWITCH_NOTIFY_SHOWN':
+    case 'AUTOSWITCH_NOTIFY_SHOWN': {
       const type = payload.type === 'HIDE_AUTOSWITCH_NOTIFY' ? 'switch_cancel' : 'auto_switch';
 
       const { linked_tracks, project_id } = items[0];
@@ -120,22 +160,7 @@ export const outputEvents = async (
         },
       });
       break;
-
-    case 'VIDEO_END':
-      postMessageService.emit('ended', { time: playback.currentTime || 0 });
-      break;
-    case 'ENTER_FULLCREEN_RESOLVE':
-      postMessageService.emit('enter-full-screen');
-      break;
-    case 'EXIT_FULLCREEN_RESOLVE':
-      postMessageService.emit('exit-full-screen');
-      break;
-    case 'PLAYER_INIT_RESOLVE':
-      postMessageService.emit('inited-player');
-      break;
-    case 'PLAYER_INIT_RESOLVE':
-      postMessageService.emit('inited-player');
-      break;
+    }
     case 'ERROR_SHOWN':
       if (error) {
         postMessageService.emit('error', {
@@ -146,34 +171,6 @@ export const outputEvents = async (
           },
         });
       }
-      break;
-    case 'INC_SEEK':
-    case 'DEC_SEEK':
-      postMessageService.emit('time_roll', {
-        payload: {
-          event_value: payload.type === 'INC_SEEK' ? '+30' : '-15',
-          time_cursor: playback.currentTime || 0,
-          track_id: meta.trackId,
-          videosession_id: session.videosession_id,
-          project_id,
-        },
-      });
-      break;
-    case 'DO_PLAY':
-    case 'DO_PAUSE':
-      postMessageService.emit('play_btn_click', {
-        payload: {
-          btn_type: payload.type === 'DO_PLAY' ? 'play' : 'pause',
-        },
-      });
-      break;
-    case 'SET_VOLUME':
-      const { value } = payload.payload;
-      postMessageService.emit('volume', {
-        payload: {
-          volume: Number(value.toFixed(2)),
-        },
-      });
       break;
   }
 };
