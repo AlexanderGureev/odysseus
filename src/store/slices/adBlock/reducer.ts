@@ -27,6 +27,9 @@ const initialState: FSMState = {
   duration: null,
   remainingTime: null,
 
+  muted: true,
+  volume: 0.5,
+
   adFoxParams: {},
 };
 

@@ -23,7 +23,7 @@ const initialState: FSMState = {
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
     GO_OFFLINE: 'RETRY_PENDING',
-    INITIALIZE_NETWORK_RESOLVE: 'RETRY_PENDING',
+    INITIALIZE_NETWORK_RESOLVE: null,
   },
   RETRY_PENDING: {
     GO_ONLINE: 'IDLE',
@@ -39,6 +39,7 @@ const config: FSMConfig<State, AppEvent> = {
     GO_ONLINE: 'IDLE',
     RELOAD: null,
   },
+  DISABLED: {},
 };
 
 const networkRecovery = createSlice({
@@ -47,7 +48,7 @@ const networkRecovery = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(createAction<EventPayload>(FSM_EVENT), (state, action) => {
-      const { type, payload } = action.payload;
+      const { type, payload, meta } = action.payload;
 
       const next = config[state.step]?.[type];
       if (next === undefined) return state;
@@ -56,6 +57,8 @@ const networkRecovery = createSlice({
       logger.log('[FSM]', 'networkRecovery', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
+        case 'INITIALIZE_NETWORK_RESOLVE':
+          return { ...state, step: meta.isEmbedded ? 'RETRY_PENDING' : 'DISABLED' };
         case 'GO_ONLINE':
           return initialState;
         case 'CLICK_RETRY_BUTTON':

@@ -21,12 +21,13 @@ export const getSeasonName = (state: AppState) => getPlaylistItem(state).season_
 export const getEpisodeName = (state: AppState) => getPlaylistItem(state).episode_name;
 
 export const getTrackInfo = (state: AppState) => {
-  const { project_name, min_age, season_name, episode_name } = getPlaylistItem(state);
+  const { project_name, min_age, season_name, episode_name, thumbnail_url } = getPlaylistItem(state);
   return {
     project_name,
     min_age,
     season_name,
     episode_name,
+    thumbnail_url,
   };
 };
 

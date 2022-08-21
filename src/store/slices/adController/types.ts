@@ -18,7 +18,6 @@ export type EventsWithPayload =
   | WithoutPayload<
       | 'AD_INIT'
       | 'INIT_AD_REJECT'
-      | 'PLAY_AD_SKIP'
       | 'CHECK_TIME_POINT_RESOLVE'
       | 'PRELOAD_AD_BLOCK_REJECT'
       | 'NEXT_AD_RESOLVE'

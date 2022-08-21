@@ -1,10 +1,10 @@
 import { DefaultPayload, WithoutPayload } from 'store/types';
 
-export type State = 'IDLE' | 'CHECK_ATTEMPT' | 'REJECTED' | 'RETRY_PENDING' | 'TIMEOUT_WAITING';
+export type State = 'IDLE' | 'CHECK_ATTEMPT' | 'REJECTED' | 'RETRY_PENDING' | 'TIMEOUT_WAITING' | 'DISABLED';
 
 export type EventsWithPayload =
   | {
-      type: 'START_RETRY' | 'GO_REJECT' | 'RETRY_FAILED' | 'CLICK_RETRY_BUTTON' | 'NEXT_RETRY';
+      type: 'START_RETRY' | 'RETRY_FAILED' | 'CLICK_RETRY_BUTTON' | 'NEXT_RETRY';
     }
   | {
       type: 'UPDATE_TIMER';

@@ -2,23 +2,16 @@ import { PayloadAction } from '@reduxjs/toolkit';
 import { EffectOpts } from 'interfaces';
 import { NOTIFY_TYPES } from 'services/PostMessageService/types';
 import { EventPayload } from 'store';
+import { getPlaylistItem } from 'store/selectors';
 import { TLinkedTracks } from 'types';
 
-export const outputEvents = async (
+export const baseEvents = (
   { payload }: PayloadAction<EventPayload>,
   { getState, services: { postMessageService } }: EffectOpts
 ) => {
   const {
     playback,
-    root: {
-      session,
-      meta,
-      adConfig,
-      config: {
-        playlist: { items },
-        config,
-      },
-    },
+    root: { session, meta, adConfig, config },
     analytics: { hacks_detected },
     error: { error },
   } = getState();
@@ -39,6 +32,13 @@ export const outputEvents = async (
       break;
     case 'AD_INIT':
       postMessageService.emit('launch-player');
+      break;
+
+    case 'DO_PAUSE':
+    case 'SET_PAUSED':
+      postMessageService.emit('paused', {
+        time: playback.currentTime || 0,
+      });
       break;
     case 'DO_PLAY_RESOLVE':
       const { isFirstPlay } = payload.meta;
@@ -67,10 +67,11 @@ export const outputEvents = async (
           time_cursor: playback.currentTime || 0,
           track_id: meta.trackId,
           videosession_id: session.videosession_id,
-          project_id: config.project_id,
+          project_id: config.config?.project_id,
         },
       });
       break;
+
     case 'DO_PLAY':
     case 'DO_PAUSE':
       postMessageService.emit('play_btn_click', {
@@ -110,15 +111,10 @@ export const outputEvents = async (
         },
       });
       break;
-    case 'AD_BLOCK_IMPRESSION':
-      postMessageService.emit('adShown', {
-        time: playback.currentTime || 0,
-      });
-      break;
     case 'GO_TO_NEXT_TRACK':
     case 'GO_TO_PREV_TRACK': {
       const type = payload.type === 'GO_TO_PREV_TRACK' ? 'previous' : 'next';
-      const { linked_tracks, project_id } = items[0];
+      const { linked_tracks, project_id } = getPlaylistItem(getState()) || {};
       const data = linked_tracks?.[`${type as keyof TLinkedTracks}`];
       if (!data) return;
 
@@ -143,8 +139,7 @@ export const outputEvents = async (
     case 'HIDE_AUTOSWITCH_NOTIFY':
     case 'AUTOSWITCH_NOTIFY_SHOWN': {
       const type = payload.type === 'HIDE_AUTOSWITCH_NOTIFY' ? 'switch_cancel' : 'auto_switch';
-
-      const { linked_tracks, project_id } = items[0];
+      const { linked_tracks, project_id } = getPlaylistItem(getState()) || {};
       const data = linked_tracks?.next;
       if (!data) return;
 

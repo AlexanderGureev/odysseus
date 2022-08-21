@@ -1,7 +1,7 @@
 import { EffectOpts } from 'interfaces';
 import { sendEvent } from 'store/actions';
 
-export const startPlayback = ({ getState, dispatch }: EffectOpts) => {
+export const initPlayback = ({ getState, dispatch }: EffectOpts) => {
   const {
     root: { isFirstStartPlayback },
     playback: { ended },
@@ -10,7 +10,7 @@ export const startPlayback = ({ getState, dispatch }: EffectOpts) => {
   if (ended) {
     dispatch(
       sendEvent({
-        type: 'DO_END_PLAYBACK',
+        type: 'END_PLAYBACK',
       })
     );
   } else {

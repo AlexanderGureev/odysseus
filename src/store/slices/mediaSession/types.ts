@@ -1,13 +1,13 @@
 import { DefaultPayload, EventPayload, WithoutPayload } from 'store/types';
 
-export type State = 'IDLE' | 'POSTMESSAGE_LISTENERS_INIT' | 'READY' | 'PROCESSING_POSTMESSAGE_EVENT';
+export type State = 'IDLE' | 'INITIALIZE_MEDIASESSION' | 'READY' | 'PROCESSING_MEDIA_EVENT' | 'DISABLED';
 
 export type EventsWithPayload =
   | {
-      type: 'POSTMESSAGE_LISTENERS_INIT_RESOLVE' | 'PROCESSING_POSTMESSAGE_EVENT_RESOLVE';
+      type: 'INITIALIZE_MEDIASESSION_RESOLVE' | 'INITIALIZE_MEDIASESSION_REJECT' | 'PROCESSING_MEDIA_EVENT_RESOLVE';
     }
   | {
-      type: 'POSTMESSAGE_EVENT';
+      type: 'MEDIA_EVENT';
       meta: {
         event: EventPayload;
       };

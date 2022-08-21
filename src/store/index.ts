@@ -3,6 +3,7 @@ import { toXSTATE } from 'utils/toXSTATE';
 
 import { listenerMiddleware } from './middleware';
 import adBlock from './slices/adBlock/reducer';
+import adBlockVolume from './slices/adBlockVolume/reducer';
 import adController from './slices/adController/reducer';
 import adTimeNotify from './slices/adTimeNotify/reducer';
 import adultNotify from './slices/adultNotify/reducer';
@@ -17,6 +18,7 @@ import favouritesController from './slices/favouritesController/reducer';
 import fullscreen from './slices/fullscreen/reducer';
 import heartbeat from './slices/heartbeat/reducer';
 import hotkeys from './slices/hotkeys/reducer';
+import mediaSession from './slices/mediaSession/reducer';
 import network from './slices/network/reducer';
 import networkRecovery from './slices/networkRecovery/reducer';
 import offlineMode from './slices/offlineMode/reducer';
@@ -69,6 +71,7 @@ const rootReducer = combineReducers({
   adController: adController.reducer,
   // управление рекламной паузой, загрука и воспроизведение креатива, управление воспроизведением
   adBlock: adBlock.reducer,
+  adBlockVolume: adBlockVolume.reducer,
   // управление воспроизведением основного видео
   playback: playback.reducer,
   // детекция и отправка событий при достижении watchpoint
@@ -119,6 +122,7 @@ const rootReducer = combineReducers({
   favouritesController: favouritesController.reducer,
   // управление пирингом
   p2p: p2p.reducer,
+  mediaSession: mediaSession.reducer,
   // модуль сбора ошибок
   error: error.reducer,
 });
@@ -129,6 +133,7 @@ root.addMiddleware();
 resumeVideo.addMiddleware();
 adController.addMiddleware();
 adBlock.addMiddleware();
+adBlockVolume.addMiddleware();
 playback.addMiddleware();
 watchpoint.addMiddleware();
 heartbeat.addMiddleware();
@@ -154,6 +159,7 @@ beholder.addMiddleware();
 favourites.addMiddleware();
 favouritesController.addMiddleware();
 p2p.addMiddleware();
+mediaSession.addMiddleware();
 error.addMiddleware();
 
 // console.log(

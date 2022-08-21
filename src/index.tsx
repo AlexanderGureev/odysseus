@@ -63,6 +63,7 @@ const Player = () => {
   const root = useAppSelector((state) => state.root);
   const playback = useAppSelector((state) => state.playback);
   const adBlock = useAppSelector((state) => state.adBlock);
+  const adBlockVolume = useAppSelector((state) => state.adBlockVolume);
   const adController = useAppSelector((state) => state.adController);
   const rewind = useAppSelector((state) => state.rewind);
   const rewindAcc = useAppSelector((state) => state.rewindAcc);
@@ -71,6 +72,7 @@ const Player = () => {
   const quality = useAppSelector((state) => state.quality);
   const playbackSpeed = useAppSelector((state) => state.playbackSpeed);
   const volume = useAppSelector((state) => state.volume);
+
   const buffering = useAppSelector((state) => state.buffering);
   const fullscreen = useAppSelector((state) => state.fullscreen);
   const changeTrack = useAppSelector((state) => state.changeTrack);
@@ -326,9 +328,9 @@ const Player = () => {
             <button
               style={{ position: 'absolute', left: '0' }}
               onClick={() => {
-                dispatch(sendEvent({ type: 'SET_MUTE_AD_BLOCK', payload: { value: !volume.muted } }));
+                dispatch(sendEvent({ type: 'SET_MUTE_AD_BLOCK', payload: { value: !adBlockVolume.muted } }));
               }}>
-              {volume.muted ? 'unmute' : 'mute'}
+              {adBlockVolume.muted ? 'unmute' : 'mute'}
             </button>
 
             {!root.deviceInfo.isMobile && (
@@ -340,7 +342,7 @@ const Player = () => {
                     dispatch(sendEvent({ type: 'SET_VOLUME_AD_BLOCK', payload: { value } }));
                   }}
                   step={0.1}
-                  value={volume.muted ? 0 : volume.volume}
+                  value={adBlockVolume.muted ? 0 : adBlockVolume.volume}
                   max={1}
                   getFormattedLabel={() => null}
                 />
@@ -440,6 +442,8 @@ const NetworkNotify = () => {
     setIsOnline(network.step === 'ONLINE' && prevStatus.current === 'OFFLINE');
     prevStatus.current = network.step;
   }, [network.step]);
+
+  if (networkRecovery.step === 'DISABLED') return null;
 
   return (
     <div

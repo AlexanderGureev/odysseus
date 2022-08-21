@@ -1,6 +1,7 @@
 import { RawPlayerError } from 'types/errors';
 
 import * as adBlock from './slices/adBlock';
+import * as adBlockVolume from './slices/adBlockVolume';
 import * as adController from './slices/adController';
 import * as adTimeNotify from './slices/adTimeNotify';
 import * as adultNotify from './slices/adultNotify';
@@ -15,6 +16,7 @@ import * as favouritesController from './slices/favouritesController';
 import * as fullscreen from './slices/fullscreen';
 import * as heartbeat from './slices/heartbeat';
 import * as hotkeys from './slices/hotkeys';
+import * as mediaSession from './slices/mediaSession';
 import * as network from './slices/network';
 import * as networkRecovery from './slices/networkRecovery';
 import * as offlineMode from './slices/offlineMode';
@@ -44,6 +46,10 @@ export type DefaultPayload<E> = {
   type: E;
   payload?: Record<string, unknown>; // payload попадает в текущий state
   meta?: Record<string, unknown>; // meta используется для передачи данных в effect
+
+  isKeyboardEvent?: boolean; // событие вызвано через горячую клавишу
+  isPostMessageEvent?: boolean; // событие вызвано через postmessage
+  isMediaEvent?: boolean; // событие вызвано через мультимедийные клавиши
 };
 
 export type WithoutPayload<T> = {
@@ -88,7 +94,9 @@ export type EventPayload =
   | favouritesController.ActionPayload
   | analytics.ActionPayload
   | p2p.ActionPayload
-  | postMessages.ActionPayload;
+  | postMessages.ActionPayload
+  | adBlockVolume.ActionPayload
+  | mediaSession.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -123,4 +131,6 @@ export type AppEvent =
   | favouritesController.Event
   | analytics.Event
   | p2p.Event
-  | postMessages.Event;
+  | postMessages.Event
+  | adBlockVolume.Event
+  | mediaSession.Event;

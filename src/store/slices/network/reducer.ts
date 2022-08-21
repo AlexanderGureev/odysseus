@@ -15,7 +15,7 @@ const initialState: FSMState = {
 
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
-    DO_INIT: 'INITIALIZE_NETWORK',
+    INIT_RESOLVE: 'INITIALIZE_NETWORK',
   },
   INITIALIZE_NETWORK: {
     INITIALIZE_NETWORK_RESOLVE: 'ONLINE',
@@ -29,6 +29,12 @@ const config: FSMConfig<State, AppEvent> = {
     GO_REJECT: null,
   },
 };
+
+const MapType = {
+  online: 'GO_ONLINE',
+  offline: 'GO_OFFLINE',
+  reject: 'GO_REJECT',
+} as const;
 
 const network = createSlice({
   name: 'network',
@@ -76,15 +82,27 @@ const addMiddleware = () =>
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         INITIALIZE_NETWORK: () => {
-          request.addHook('networkError', () => {
-            dispatch(sendEvent({ type: 'GO_OFFLINE' }));
-          });
-          on(window, 'online', () => {
-            dispatch(sendEvent({ type: 'GO_ONLINE' }));
-          });
-          on(window, 'offline', () => {
-            dispatch(sendEvent({ type: 'GO_OFFLINE' }));
-          });
+          const { isEmbedded } = getState().root.meta;
+
+          if (isEmbedded) {
+            request.addHook('networkError', () => {
+              dispatch(sendEvent({ type: 'GO_OFFLINE' }));
+            });
+            on(window, 'online', () => {
+              dispatch(sendEvent({ type: 'GO_ONLINE' }));
+            });
+            on(window, 'offline', () => {
+              dispatch(sendEvent({ type: 'GO_OFFLINE' }));
+            });
+          } else {
+            services.postMessageService.on('networkDispatched', ({ status }) => {
+              dispatch(
+                sendEvent({
+                  type: MapType[status],
+                })
+              );
+            });
+          }
 
           const type = navigator?.connection?.type ?? null;
 
@@ -101,7 +119,9 @@ const addMiddleware = () =>
             });
           }
 
-          dispatch(sendEvent({ type: 'INITIALIZE_NETWORK_RESOLVE', payload: { connectionType: type } }));
+          dispatch(
+            sendEvent({ type: 'INITIALIZE_NETWORK_RESOLVE', payload: { connectionType: type }, meta: { isEmbedded } })
+          );
         },
       };
 

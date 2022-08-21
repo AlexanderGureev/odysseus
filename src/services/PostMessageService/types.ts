@@ -1,5 +1,6 @@
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
 import { TLinkedTrackConfig } from 'types';
+import { AdCategory } from 'types/ad';
 import { ERROR_TYPE } from 'types/errors';
 
 export enum ERROR_CODE {
@@ -193,17 +194,6 @@ export type OutputEvents = {
   audio_choice: (data: Payload<{ event_value: 'english' | 'russian' }>) => void;
   volume: (data: Payload<{ volume: number }>) => void;
 
-  player_status: (
-    data: Payload<{
-      time_cursor: number;
-      video_type: string;
-      loadedmetadata: boolean;
-      started: boolean;
-      error_code: number;
-      error_shown: boolean;
-      app_version: string;
-    }>
-  ) => void;
   watchprogress: (data: {
     data: {
       track_id: number | null;
@@ -223,6 +213,16 @@ export type OutputEvents = {
       track_id: number | null;
     }>
   ) => void;
+
+  ad_manifest: (data: Payload<{ numBreaks: number; numExpectedBreaks: number; breaksTimeLimit: number[] }>) => void;
+  ad_break_start: (data: Payload<{ category: AdCategory; limit: number; point: number }>) => void;
+  ad_start: (data: Payload<{ category: AdCategory; position: number }>) => void;
+  ad_quartile: (data: Payload<{ value: number }>) => void;
+  ad_click_thru: (data: Payload<{ category: AdCategory; position: number }>) => void;
+  ad_skip: (data: Payload<{ category: AdCategory; position: number }>) => void;
+  ad_error: (data: Payload<{ category: AdCategory; position: number }>) => void;
+  ad_end: (data: Payload<{ category: AdCategory; position: number }>) => void;
+  ad_break_end: () => void;
 };
 
 export type PlayerParams = {
@@ -252,17 +252,17 @@ export type INPUT_PLAYER_POST_MESSAGE = {
   changeTrack: (p: any) => void;
   updateConfig: (p: { data: UpdateConfigType }) => void;
   terminatePlayer: (p: any) => void;
-  networkDispatched: (p: any) => void;
+  networkDispatched: (p: { status: 'offline' | 'online' | 'reject' }) => void;
   initialInfo: (p: { data: { ym_client_id: string } }) => void;
   on_click_bt_close_trial_suggestion: (p: any) => void;
   set_settings: (p: any) => void;
-  play: (p: any) => void;
-  pause: (p: any) => void;
-  seek: (p: any) => void;
-  setVolume: (p: any) => void;
-  mute: (p: any) => void;
-  unmute: (p: any) => void;
-  testAdvPoint: (p: any) => void;
+  play: () => void;
+  pause: () => void;
+  seek: (p: { data: { to: number } }) => void;
+  setVolume: (p: { data: { value: number } }) => void;
+  mute: () => void;
+  unmute: () => void;
+  testAdvPoint: () => void;
   set_favorites: (p: { data: { isFavorites: boolean } }) => void;
 };
 

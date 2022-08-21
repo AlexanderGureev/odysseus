@@ -16,12 +16,12 @@ import {
   fetchManifest,
   initAnalytics,
   initialize,
+  initPlayback,
   initPlayer,
   initServices,
   parseConfig,
   selectSource,
   selectTheme,
-  startPlayback,
 } from './effects';
 import { FSMState, State, TrackParams } from './types';
 
@@ -257,7 +257,6 @@ const root = createSlice({
           return {
             ...initialState,
             isShowPlayerUI: state.isShowPlayerUI,
-            isFirstStartPlayback: true,
             capabilities: state.capabilities,
             deviceInfo: state.deviceInfo,
             step,
@@ -416,7 +415,7 @@ const addMiddleware = () =>
           const { config } = getState().root;
 
           services.localStorageService.setItemByDomain(STORAGE_SETTINGS.USER_ID, config.config?.user_id || null);
-          startPlayback(opts);
+          initPlayback(opts);
         },
         PAYWALL: () => {
           dispatch(

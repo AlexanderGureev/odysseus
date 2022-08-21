@@ -30,7 +30,7 @@ export const AdBlock = ({
   let adPlaybackController: Nullable<AdPlaybackController> = null;
   let isYaCreative = false;
   let isDisposed = false;
-  let isImpression = false;
+
   const blockId = randomUnit32();
 
   let meta: BlockMeta = {
@@ -147,7 +147,6 @@ export const AdBlock = ({
         mediator.emit('AdStarted');
       });
       adPlaybackController.subscribe('AdPodImpression', () => {
-        isImpression = true;
         mediator.emit('AdPodImpression');
       });
       adPlaybackController.subscribe('AdPodVideoFirstQuartile', () => {
@@ -194,6 +193,8 @@ export const AdBlock = ({
         if (!adPlaybackController?.getAdVolumeAvailabilityState()) return;
 
         const volume = adPlaybackController.getAdVolume();
+
+        console.log('[TEST] AdVolumeChange', { adVolume: volume });
         mediator.emit('AdVolumeChange', { volume });
       });
       adPlaybackController.subscribe('AdClickThru', () => {

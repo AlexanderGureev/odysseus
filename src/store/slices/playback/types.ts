@@ -49,7 +49,7 @@ export type EventsWithPayload =
       meta: { isFirst: boolean };
     }
   | {
-      type: 'DO_END_PLAYBACK';
+      type: 'END_PLAYBACK';
     }
   | { type: 'VIDEO_END'; meta?: { beforeAutoswitch: boolean } }
   | { type: 'SET_PAUSED'; meta: { isEnded: boolean } };

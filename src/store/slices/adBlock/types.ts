@@ -23,6 +23,7 @@ export type EventsWithPayload =
       | 'RESET'
       | 'AD_BLOCK_IMPRESSION'
       | 'AD_BLOCK_ERROR'
+      | 'AD_BLOCK_CLICK'
     >
   | {
       type: 'AD_BLOCK_TIME_UPDATE';
@@ -97,6 +98,9 @@ export type FSMState = {
   currentTime: number | null;
   duration: number | null;
   remainingTime: number | null;
+
+  muted: boolean;
+  volume: number;
 
   adFoxParams: Record<string, any>;
 };

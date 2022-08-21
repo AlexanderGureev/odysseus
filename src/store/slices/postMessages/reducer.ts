@@ -1,10 +1,11 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { FSM_EVENT } from 'store/actions';
+import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
-import { outputEvents } from './effects/outputEvents';
+import { adEvents } from './effects/adEvents';
+import { baseEvents } from './effects/baseEvents';
 import { FSMState, State } from './types';
 
 const initialState: FSMState = {
@@ -12,7 +13,21 @@ const initialState: FSMState = {
 };
 
 const config: FSMConfig<State, AppEvent> = {
-  IDLE: {},
+  IDLE: {
+    DO_INIT: 'POSTMESSAGE_LISTENERS_INIT',
+    START_PLAYBACK: 'READY',
+  },
+  POSTMESSAGE_LISTENERS_INIT: {
+    POSTMESSAGE_LISTENERS_INIT_RESOLVE: 'IDLE',
+  },
+  READY: {
+    AD_BREAK_STARTED: 'IDLE',
+    POSTMESSAGE_EVENT: 'PROCESSING_POSTMESSAGE_EVENT',
+    NETWORK_ERROR: 'IDLE',
+  },
+  PROCESSING_POSTMESSAGE_EVENT: {
+    PROCESSING_POSTMESSAGE_EVENT_RESOLVE: 'READY',
+  },
 };
 
 const postMessages = createSlice({
@@ -49,7 +64,68 @@ const addMiddleware = () => {
 
       const { step } = getState().postMessages;
 
-      const handler: { [key in State]?: () => Promise<void> | void } = {};
+      const handler: { [key in State]?: () => Promise<void> | void } = {
+        POSTMESSAGE_LISTENERS_INIT: () => {
+          services.postMessageService
+            .on('play', () => {
+              dispatch(sendEvent({ type: 'POSTMESSAGE_EVENT', meta: { event: { type: 'DO_PLAY' } } }));
+            })
+            .on('pause', () => {
+              dispatch(sendEvent({ type: 'POSTMESSAGE_EVENT', meta: { event: { type: 'DO_PAUSE' } } }));
+            })
+            .on('seek', ({ data }) => {
+              const { duration } = getState().playback;
+              if (!duration) return;
+
+              const event: EventPayload = {
+                type: 'SEEK',
+                meta: { to: data.to > duration ? duration : data.to < 0 ? 0 : data.to },
+              };
+
+              dispatch(sendEvent({ type: 'POSTMESSAGE_EVENT', meta: { event } }));
+            })
+            .on('mute', () => {
+              dispatch(
+                sendEvent({
+                  type: 'POSTMESSAGE_EVENT',
+                  meta: { event: { type: 'SET_MUTE', payload: { value: true } } },
+                })
+              );
+            })
+            .on('unmute', () => {
+              dispatch(
+                sendEvent({
+                  type: 'POSTMESSAGE_EVENT',
+                  meta: { event: { type: 'SET_MUTE', payload: { value: false } } },
+                })
+              );
+            })
+            .on('setVolume', ({ data: { value } }) => {
+              dispatch(
+                sendEvent({
+                  type: 'POSTMESSAGE_EVENT',
+                  meta: { event: { type: 'SET_VOLUME', payload: { value } } },
+                })
+              );
+            });
+
+          dispatch(sendEvent({ type: 'POSTMESSAGE_LISTENERS_INIT_RESOLVE' }));
+        },
+        PROCESSING_POSTMESSAGE_EVENT: () => {
+          const {
+            payload: { meta },
+          } = action as PayloadAction<{
+            meta: {
+              event: EventPayload;
+            };
+          }>;
+
+          logger.log('[postMessages]', 'method', meta.event);
+
+          dispatch(sendEvent({ ...meta.event, isPostMessageEvent: true }));
+          dispatch(sendEvent({ type: 'PROCESSING_POSTMESSAGE_EVENT_RESOLVE' }));
+        },
+      };
 
       const effect = handler[step];
       if (effect) {
@@ -79,7 +155,8 @@ const addMiddleware = () => {
       };
 
       const event = action as PayloadAction<EventPayload>;
-      outputEvents(event, opts);
+      baseEvents(event, opts);
+      adEvents(event, opts);
     },
   });
 };

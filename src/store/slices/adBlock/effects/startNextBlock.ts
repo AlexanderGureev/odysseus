@@ -3,6 +3,9 @@ import { VIDEO_TYPE } from 'services/PlayerService/types';
 import { createFakeSource } from 'services/StreamService/utils';
 import { sendEvent } from 'store/actions';
 import { logger } from 'utils/logger';
+import { sleep } from 'utils/retryUtils';
+
+const DEFAULT_SYNC_TIMEOUT = 2000;
 
 export const startNextBlock = async ({ getState, dispatch, services: { adService, playerService } }: EffectOpts) => {
   const {
@@ -11,6 +14,7 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
   } = getState();
   const currentBlock = adService.getBlock(point, index);
   let error = null;
+  let isSyncVolume = true;
 
   try {
     await currentBlock.preload();
@@ -33,6 +37,10 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
 
     currentBlock
       .on('AdStarted', () => {
+        sleep(DEFAULT_SYNC_TIMEOUT).then(() => {
+          isSyncVolume = false;
+        });
+
         dispatch(
           sendEvent({
             type: 'PLAY_AD_BLOCK_RESOLVE',
@@ -59,6 +67,13 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
         dispatch(
           sendEvent({
             type: 'DO_PAUSE_AD_BLOCK',
+          })
+        );
+      })
+      .on('AdClickThru', () => {
+        dispatch(
+          sendEvent({
+            type: 'AD_BLOCK_CLICK',
           })
         );
       })
@@ -97,12 +112,25 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
         );
       })
       .on('AdVolumeChange', ({ volume }) => {
-        dispatch(
-          sendEvent({
-            type: 'AD_BLOCK_VOLUME_CHANGE',
-            meta: { value: volume },
-          })
-        );
+        // некоторая реклама при старте включает или выключает звук независимо от состояния звук в видеотеге
+        // если в течение 2сек yasdk присылает ивент изменения звука, то мы считает, что это автоивент
+        // и пытаемся принудительно синхронизировать звук видео и рекламы
+        // при этом в ивенте мы отправялем isSyncVolume, чтобы пропустить сохранение этого состояния в localStorage
+        if (isSyncVolume) {
+          isSyncVolume = false;
+          dispatch(
+            sendEvent({
+              type: 'SYNC_VOLUME',
+            })
+          );
+        } else {
+          dispatch(
+            sendEvent({
+              type: 'UPDATE_VOLUME_AD_BLOCK',
+              meta: { value: volume },
+            })
+          );
+        }
       })
       .on('AdRemainingTimeChange', (payload) => {
         dispatch(

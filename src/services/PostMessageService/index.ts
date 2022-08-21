@@ -24,7 +24,7 @@ const PostMessageService = () => {
     if (window.parent && window.location !== window.parent.location) {
       mediator.emit(name, rest);
     } else {
-      logger.log('[PostMessageService]', 'event:', { name, ...rest });
+      logger.log('[PostMessageService]', 'incoming event:', { name, ...rest });
     }
   };
 

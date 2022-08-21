@@ -180,7 +180,7 @@ const addMiddleware = () =>
 
           logger.log('[hotkeys]', 'event', meta.event);
 
-          dispatch(sendEvent(meta.event));
+          dispatch(sendEvent({ ...meta.event, isKeyboardEvent: true }));
           dispatch(sendEvent({ type: 'PROCESSING_KEYBOARD_EVENT_RESOLVE' }));
         },
       };
