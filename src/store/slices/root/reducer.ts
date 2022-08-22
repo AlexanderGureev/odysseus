@@ -61,7 +61,7 @@ const config: FSMConfig<State, AppEvent> = {
   },
   // парсинг raw конфига от сервера
   PARSE_CONFIG_PENDING: {
-    PARSE_CONFIG_RESOLVE: 'RENDER',
+    PARSE_CONFIG_RESOLVE: 'SELECTING_PLAYER_THEME',
     PARSE_CONFIG_REJECT: 'ERROR',
   },
   SELECTING_PLAYER_THEME: {
@@ -91,8 +91,10 @@ const config: FSMConfig<State, AppEvent> = {
   // проверка на возможность воспроизведения превью
   CHECK_PREVIEW_PENDING: {
     CHECK_PREVIEW_RESOLVE: 'INIT_SERVICES_PENDING',
-    CHECK_PREVIEW_REJECT: 'PAYWALL',
+    SHOW_PAYWALL: 'PAYWALL', // передача управления в paywall fsm
   },
+  // платный трек недоступен для просмотра
+  PAYWALL: {},
   // инциализация основных сервисов приложения
   INIT_SERVICES_PENDING: {
     INIT_SERVICES_RESOLVE: 'CHECK_ADULT_CONTENT',
@@ -109,10 +111,6 @@ const config: FSMConfig<State, AppEvent> = {
     RESUME_VIDEO_NOTIFY_REJECT: 'CHECK_PERMISSIONS_PENDING',
     SKIP_RESUME_VIDEO_NOTIFY: 'CHECK_PERMISSIONS_PENDING',
   },
-  // платный трек недоступен для просмотра
-  PAYWALL: {
-    CLICK_PAYWALL_BUTTON: null,
-  },
   // проверка прав на запуск (autoplay, mute)
   CHECK_PERMISSIONS_PENDING: {
     CHECK_PERMISSIONS_RESOLVE: 'INITIAL_SELECT_SOURCE_PENDING',
@@ -124,8 +122,12 @@ const config: FSMConfig<State, AppEvent> = {
     SELECT_SOURCE_ERROR: 'ERROR',
   },
   INITIAL_FETCHING_MANIFEST: {
-    FETCHING_MANIFEST_RESOLVE: 'SETUP_INITIAL_VOLUME',
+    FETCHING_MANIFEST_RESOLVE: 'INITIALIZING_QUALITY_SERVICE',
     FETCHING_MANIFEST_REJECT: 'ERROR',
+  },
+  INITIALIZING_QUALITY_SERVICE: {
+    QUALITY_INITIALIZATION_RESOLVE: 'SETUP_INITIAL_VOLUME',
+    QUALITY_INITIALIZATION_REJECT: 'ERROR',
   },
   // выбор другого доступного потока в случае ошибок
   SELECT_SOURCE_PENDING: {
@@ -250,6 +252,8 @@ const root = createSlice({
       const step = next || state.step;
 
       switch (type) {
+        case 'QUALITY_INITIALIZATION_RESOLVE':
+          return { ...state, step };
         case 'RESET_PLAYBACK_RESOLVE':
           state.session.id = uuidv4();
           break;

@@ -1,3 +1,4 @@
+import { Experiments } from '@moretv/types';
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
 import { TLinkedTrackConfig } from 'types';
 import { AdCategory } from 'types/ad';
@@ -264,6 +265,7 @@ export type INPUT_PLAYER_POST_MESSAGE = {
   unmute: () => void;
   testAdvPoint: () => void;
   set_favorites: (p: { data: { isFavorites: boolean } }) => void;
+  set_experiment_group: (p: { data: { name: Experiments; group: string } }) => void;
 };
 
 export type TMessage = {

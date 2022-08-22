@@ -30,7 +30,8 @@ import { HeartBeatTnsEvent, TNSEvent } from 'services/TNSCounter/types';
 import { Params } from 'services/UTMService/types';
 import { QUALITY_MARKS } from 'services/VigoService';
 import { TVigoParams, VigoEvent } from 'services/VigoService/types';
-import { YMQueryParams } from 'services/YmService/types';
+import { YandexEvents } from 'services/YmService';
+import { YandexGoal, YMQueryParams } from 'services/YmService/types';
 import type { AppState } from 'store';
 import { SessionDispatch } from 'store/dispatch';
 import { DeviceInfo } from 'store/slices/root/types';
@@ -102,9 +103,10 @@ export interface IVigoService {
 
 export interface IYMService {
   init: (params: Partial<YMQueryParams>) => Promise<void>;
-  reachGoal: (event: string) => void;
+  reachGoal: (event: YandexGoal) => void;
   sendUserParams: (payload: Partial<YMQueryParams>) => void;
   log: (payload?: Partial<YMQueryParams>) => void;
+  sendEvent: (event: YandexEvents) => void;
 }
 
 export interface IGAService {

@@ -12,7 +12,6 @@ const SkinConstructor = ({ children }: React.PropsWithChildren) => {
   return (
     <>
       {children}
-      <div id={DEFAULT_SKIN_CONTROLS}></div>
       <div
         id={'adv-controls'}
         className={cn(Styles.ad_controls, {

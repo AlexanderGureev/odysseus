@@ -6,6 +6,7 @@ import { AppState } from 'store';
 import { TConfig, TExtendedConfig } from 'types';
 import { AppliedTariffModifiers, SubscriptionStatus, SubscriptionType, UserSubscription } from 'types/UserSubscription';
 import { pad } from 'utils';
+import { declOfNum } from 'utils/declOfNum';
 import { logger } from 'utils/logger';
 
 export const getPlaylistItem = (state: AppState) => state.root.config.playlist.items[0];
@@ -134,4 +135,27 @@ export const featuresSelector = (isEmbedded: boolean) => {
 export const getPlaylistError = (config: TExtendedConfig) => {
   const [error = null] = config?.playlist?.items?.[0]?.errors || [];
   return error;
+};
+
+export const getStatusTrialSelector = (state: AppState) => {
+  const activeTariff = state.root.config?.serviceTariffs?.[0]?.tariffs?.[0];
+  const trialAvailable = state.root.params.trial_available;
+
+  if (!activeTariff || trialAvailable === false) return false;
+  const [paymentMethod] = activeTariff.paymentMethods ?? [];
+
+  return Boolean(activeTariff.tariffModifiers.mapFreeTrialEligible && paymentMethod?.trial);
+};
+
+export const getTrialDurationSelector = (state: AppState) => {
+  const activeTariff = state.root.config?.serviceTariffs?.[0]?.tariffs?.[0];
+  return activeTariff?.paymentMethods?.[0]?.trial?.duration ?? null;
+};
+
+export const getTrialDurationText = (state: AppState) => {
+  const duration = getTrialDurationSelector(state);
+  if (!duration) return;
+
+  const text = declOfNum(duration, ['день', 'дня', 'дней']);
+  return `${duration} ${text}`;
 };

@@ -1,6 +1,15 @@
 import { DefaultPayload, WithoutPayload } from 'store/types';
 
-export type State = 'IDLE' | 'SETUP_INITIAL_VOLUME' | 'CHANGE_MUTE_PENDING' | 'CHANGE_VOLUME_PENDING';
+export type State =
+  | 'IDLE'
+  | 'SETUP_INITIAL_VOLUME'
+  | 'CHANGE_MUTE_PENDING'
+  | 'CHANGE_VOLUME_PENDING'
+  // ad
+  | 'SYNC_VOLUME_PENDING'
+  | 'CHANGE_VOLUME_AD_BLOCK_PENDING'
+  | 'CHANGE_MUTE_AD_BLOCK_PENDING'
+  | 'UPDATE_VOLUME_AD_BLOCK_PENDING';
 
 export type EventsWithPayload =
   | {

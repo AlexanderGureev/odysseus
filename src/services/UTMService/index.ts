@@ -1,20 +1,16 @@
-import { Params, UTM_PARAMS, UTM_TERMS } from './types';
+import { Params, UTMParam } from './types';
 
-const PARAMS_LIST = [UTM_PARAMS.UTM_SOURCE, UTM_PARAMS.UTM_MEDIUM, UTM_PARAMS.UTM_CONTENT, UTM_PARAMS.UTM_TERM];
-
-const PARAMS_SELECTOR: Record<UTM_PARAMS, (p: Params) => number | string | UTM_TERMS> = {
-  [UTM_PARAMS.UTM_SOURCE]: () => 'player',
-  [UTM_PARAMS.UTM_TERM]: ({ term }) => term,
-  [UTM_PARAMS.UTM_MEDIUM]: ({ skinId }) => skinId,
-  [UTM_PARAMS.UTM_CONTENT]: ({ videoId }) => videoId,
+const PARAMS_SELECTOR: Record<UTMParam, (p: Params) => any> = {
+  utm_source: () => 'player',
+  utm_term: ({ term }) => term,
+  utm_medium: ({ skinId }) => skinId,
+  utm_content: ({ trackId }) => trackId,
 };
 
 export class UTMService {
-  static buildUTMQueryParams = ({ term, skinId, videoId }: Params): string => {
-    const params = PARAMS_LIST.reduce((obj: Record<string, any>, param) => {
-      obj[param] = PARAMS_SELECTOR[param]({ skinId, videoId, term });
-
-      return obj;
+  static buildUTMQueryParams = ({ term, skinId, trackId }: Params): string => {
+    const params = Object.keys(PARAMS_SELECTOR).reduce((acc: Record<string, any>, param) => {
+      return { ...acc, [param]: PARAMS_SELECTOR[param as UTMParam]({ skinId, trackId, term }) };
     }, {});
 
     return new URLSearchParams(params).toString();

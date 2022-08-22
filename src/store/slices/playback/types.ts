@@ -51,7 +51,7 @@ export type EventsWithPayload =
   | {
       type: 'END_PLAYBACK';
     }
-  | { type: 'VIDEO_END'; meta?: { beforeAutoswitch: boolean } }
+  | { type: 'VIDEO_END'; meta: { beforeAutoswitch: boolean; isPreview: boolean } }
   | { type: 'SET_PAUSED'; meta: { isEnded: boolean } };
 
 export type Event = EventsWithPayload['type'];

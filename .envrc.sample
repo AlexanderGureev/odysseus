@@ -1,0 +1,11 @@
+# чтобы заработали переменные окружения из этого файла нужно:
+# 1) установить пакет direnv - https://direnv.net/docs/installation.html
+# 2) запустить команду в корне проекта - direnv allow .
+
+# id проекта moretv-web
+export REPO_PROJECT_ID=142
+
+# личный access token для проекта moretv-web
+# создание токена - https://gitlab.ctcmedia.ru/-/profile/personal_access_tokens
+# задать Scopes: read_api, read_repository
+export NPM_TOKEN=

@@ -1,24 +1,18 @@
-export enum UTM_TERMS {
-  LOGO = 'logo',
-  CONTROLS = 'controls',
-  THUMBNAIL = 'thumbnail',
-  PREVIEW = 'preview',
-  SUBSCRIBE_CTA = 'subscribe_cta',
-  PAYWALL = 'paywall',
-  PROJECT = 'project',
-  SEASON = 'season',
-  TRACK = 'track',
-}
+export type UTMTerm =
+  | 'logo'
+  | 'controls'
+  | 'thumbnail'
+  | 'preview'
+  | 'subscribe_cta'
+  | 'paywall'
+  | 'project'
+  | 'season'
+  | 'track';
 
-export enum UTM_PARAMS {
-  UTM_SOURCE = 'utm_source',
-  UTM_MEDIUM = 'utm_medium',
-  UTM_CONTENT = 'utm_content',
-  UTM_TERM = 'utm_term',
-}
+export type UTMParam = 'utm_source' | 'utm_medium' | 'utm_content' | 'utm_term';
 
 export type Params = {
-  term: UTM_TERMS;
-  skinId: number;
-  videoId: number;
+  term: UTMTerm;
+  skinId: number | null;
+  trackId: number | null;
 };

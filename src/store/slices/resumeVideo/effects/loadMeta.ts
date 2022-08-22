@@ -13,7 +13,7 @@ export const loadMeta = async ({ getState, dispatch, services: { playerService }
     } = getState();
 
     if (!currentStream || !currentURL) {
-      throw new PlayerError(ERROR_CODES.UNKNOWN, 'currentStream or manifestData is undefined');
+      throw new PlayerError(ERROR_CODES.UNKNOWN, 'currentStream or currentURL is undefined');
     }
 
     const source = createSource({ ...currentStream, url: currentURL });

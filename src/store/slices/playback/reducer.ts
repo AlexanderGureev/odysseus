@@ -228,8 +228,6 @@ const addMiddleware = () => {
             );
           });
           services.playerService.on('ended', () => {
-            console.log('[TEST] ended');
-
             dispatch(
               sendEvent({
                 type: 'ENDED',
@@ -285,7 +283,10 @@ const addMiddleware = () => {
           );
         },
         CHECK_AUTOSWITCH_PENDING: () => {
-          const { autoSwitch } = getState();
+          const {
+            autoSwitch,
+            root: { previews },
+          } = getState();
 
           if (autoSwitch.step === 'DISABLED') {
             dispatch(
@@ -299,6 +300,7 @@ const addMiddleware = () => {
                 type: 'VIDEO_END',
                 meta: {
                   beforeAutoswitch: true,
+                  isPreview: Boolean(previews),
                 },
               })
             );
@@ -318,6 +320,10 @@ const addMiddleware = () => {
           dispatch(
             sendEvent({
               type: 'VIDEO_END',
+              meta: {
+                beforeAutoswitch: false,
+                isPreview: Boolean(previews),
+              },
             })
           );
 

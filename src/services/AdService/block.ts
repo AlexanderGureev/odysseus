@@ -7,7 +7,7 @@ import { logger } from 'utils/logger';
 import { randomUnit32 } from 'utils/randomHash';
 import { sleep } from 'utils/retryUtils';
 
-import { AdPodError, PreloadTimeoutExpired } from './errors';
+import { AdPodError, NotFoundAdCreative, PreloadTimeoutExpired } from './errors';
 import { AD_BLOCK_STATUS, BlockMeta, BlockOpts, Events, TAdBlock, TAdLinkItem } from './types';
 import { getAdFoxParameters, parseCreativeXML } from './utils';
 
@@ -118,7 +118,9 @@ export const AdBlock = ({
           adViewer = adStore;
           resolve(adStore);
         })
-        .catch(reject);
+        .catch((err) => {
+          reject(new AdPodError(err?.code, err?.message));
+        });
     });
 
   const playLink = (adViewer: AdViewer, item: TAdLinkItem) =>
@@ -193,8 +195,6 @@ export const AdBlock = ({
         if (!adPlaybackController?.getAdVolumeAvailabilityState()) return;
 
         const volume = adPlaybackController.getAdVolume();
-
-        console.log('[TEST] AdVolumeChange', { adVolume: volume });
         mediator.emit('AdVolumeChange', { volume });
       });
       adPlaybackController.subscribe('AdClickThru', () => {
@@ -211,9 +211,9 @@ export const AdBlock = ({
         item.status = AD_BLOCK_STATUS.FINISHED_SUCCESS;
         resolve();
       });
-      adPlaybackController.subscribe('AdPodError', (e) => {
+      adPlaybackController.subscribe('AdPodError', (err) => {
         mediator.emit('AdPodError');
-        reject(new AdPodError(e?.code));
+        reject(new AdPodError(err?.code, err?.message));
       });
 
       item.status = AD_BLOCK_STATUS.PLAYING;
@@ -251,7 +251,7 @@ export const AdBlock = ({
         }
       }
 
-      reject(new Error('preload block failed'));
+      reject(new NotFoundAdCreative('preload block failed'));
     });
 
     return _preload;
@@ -280,9 +280,8 @@ export const AdBlock = ({
           }
         }
 
-        throw new Error('play block failed (not found link');
+        throw new NotFoundAdCreative('play block failed (not found link');
       } catch (err) {
-        // TODO CUSTOM ERROR CLASS
         reject(err);
       } finally {
         dispose();

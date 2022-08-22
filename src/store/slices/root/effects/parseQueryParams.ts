@@ -75,7 +75,7 @@ const PARSE_MAP: Record<string, (value?: string) => string | number | boolean | 
   p2p: (value?: string) => ['1', 'true'].includes(value || ''),
   adult: (value?: string) => (value ? ['1', 'true'].includes(value) : true),
   autoplay: (value?: string) => value?.toLowerCase(),
-  trial_available: (value?: string) => ['1', 'true'].includes(value || ''),
+  trial_available: (value?: string) => !['0', 'false'].includes(value || ''),
   startAt: (value?: string) => {
     const num = toNumber(value);
     return typeof num === 'number' && num >= 0 ? num : null;

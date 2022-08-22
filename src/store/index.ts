@@ -13,6 +13,7 @@ import beholder from './slices/beholder/reducer';
 import buffering from './slices/buffering/reducer';
 import changeTrack from './slices/changeTrack/reducer';
 import error from './slices/error/reducer';
+import experiments from './slices/experiments/reducer';
 import favourites from './slices/favourites/reducer';
 import favouritesController from './slices/favouritesController/reducer';
 import fullscreen from './slices/fullscreen/reducer';
@@ -23,6 +24,9 @@ import network from './slices/network/reducer';
 import networkRecovery from './slices/networkRecovery/reducer';
 import offlineMode from './slices/offlineMode/reducer';
 import p2p from './slices/p2p/reducer';
+import payButton from './slices/payButton/reducer';
+import payNotify from './slices/payNotify/reducer';
+import paywall from './slices/paywall/reducer';
 import playback from './slices/playback/reducer';
 import playbackSpeed from './slices/playbackSpeed/reducer';
 import postMessages from './slices/postMessages/reducer';
@@ -55,9 +59,13 @@ sendEvent(type: "DO_INIT", payload: {}, meta: {})
 */
 
 const rootReducer = combineReducers({
+  //  обработка экспериментов от веба
+  experiments: experiments.reducer,
+  // прослушивание событий приложения и отправка событий в различные системы аналитики
   analytics: analytics.reducer,
   // отправка и обработка postmessages
   postMessages: postMessages.reducer,
+
   /* 
   корневой автомат, точка входа в приложение:
   1) парсинг конфига
@@ -122,13 +130,22 @@ const rootReducer = combineReducers({
   favouritesController: favouritesController.reducer,
   // управление пирингом
   p2p: p2p.reducer,
+  // обработка событий от мультимедийных устройств
   mediaSession: mediaSession.reducer,
+  // кнопка "отключить рекламу"
+  payButton: payButton.reducer,
+  // paywall
+  paywall: paywall.reducer,
+  //
+  payNotify: payNotify.reducer,
   // модуль сбора ошибок
   error: error.reducer,
 });
 
+experiments.addMiddleware();
 analytics.addMiddleware();
 postMessages.addMiddleware();
+
 root.addMiddleware();
 resumeVideo.addMiddleware();
 adController.addMiddleware();
@@ -160,6 +177,9 @@ favourites.addMiddleware();
 favouritesController.addMiddleware();
 p2p.addMiddleware();
 mediaSession.addMiddleware();
+payButton.addMiddleware();
+paywall.addMiddleware();
+payNotify.addMiddleware();
 error.addMiddleware();
 
 // console.log(

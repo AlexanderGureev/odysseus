@@ -45,7 +45,7 @@ export const checkPreview = async ({ dispatch, getState }: EffectOpts) => {
   const data = handlers[`${features?.SUBSCRIPTION_PREVIEW}`]?.();
 
   if (!data?.previews?.length) {
-    dispatch(sendEvent({ type: 'CHECK_PREVIEW_REJECT' }));
+    dispatch(sendEvent({ type: 'SHOW_PAYWALL' }));
     return;
   }
 

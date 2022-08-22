@@ -103,7 +103,9 @@ export const baseEvents = (
         code: NOTIFY_TYPES.PAYWALL_ON_START,
       });
       break;
-    case 'CLICK_PAYWALL_BUTTON':
+    case 'CLICK_PAY_BUTTON':
+      postMessageService.emit('button_disable_ad');
+    case 'CLICK_SUB_BUTTON':
       postMessageService.emit('pay_and_watch_button', {
         payload: {
           time_cursor: playback.currentTime || 0,

@@ -80,8 +80,10 @@ export type TFeatureConfig = {
   MEDIASCOPE_WATCHING_COUNTER?: boolean;
   HORUS_ENABLED?: boolean;
   PROMO_OFFER_BUTTON?: string;
+  SUBSCRIPTION_TEXT?: string; // текст для уведомления о покупке подписки над таймлайном (включено на стс)
+  PAYWALL_TITLE?: string; // текст на paywall
 
-  AUTH_URL?: string;
+  AUTH_URL?: string; // используется для открытия страницы авторизации в эмбедах
 
   CONTINUE_WATCHING_NOTIFY?: boolean;
   PREVIEW_TIMELINE?: 'PREVIEW' | 'TRACK';
@@ -90,8 +92,8 @@ export type TFeatureConfig = {
 
   SPLASH_SCREEN_IMAGE?: string;
   SPLASH_SCREEN_DURATION?: number;
-  // SPLASH_SCREEN_ENABLED?: boolean;
-  // SPLASH_SCREEN_VARIATION: 'MORE_TV' | null;
+  // SPLASH_SCREEN_ENABLED?: boolean; // TODO legacy
+  // SPLASH_SCREEN_VARIATION: 'MORE_TV' | null; // TODO legacy
   AD_SPLASH_SCREEN_IMAGE?: string;
   AD_SPLASH_SCREEN_DURATION?: number;
 

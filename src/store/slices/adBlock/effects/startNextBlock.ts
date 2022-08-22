@@ -5,6 +5,8 @@ import { sendEvent } from 'store/actions';
 import { logger } from 'utils/logger';
 import { sleep } from 'utils/retryUtils';
 
+// в течение этого времени идет синхрозиация звука для рекламы, пользовательские действия игнорируются
+// таймаут нужен, т.к мы не можем отличить пользовательское действие от автоматического со стороны креатива
 const DEFAULT_SYNC_TIMEOUT = 2000;
 
 export const startNextBlock = async ({ getState, dispatch, services: { adService, playerService } }: EffectOpts) => {
@@ -12,9 +14,11 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
     adBlock: { point, index },
     adController: { isStarted },
   } = getState();
+
   const currentBlock = adService.getBlock(point, index);
   let error = null;
-  let isSyncVolume = true;
+  let isSyncPhase = true;
+  let isSynced = false;
 
   try {
     await currentBlock.preload();
@@ -38,7 +42,7 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
     currentBlock
       .on('AdStarted', () => {
         sleep(DEFAULT_SYNC_TIMEOUT).then(() => {
-          isSyncVolume = false;
+          isSyncPhase = false;
         });
 
         dispatch(
@@ -93,9 +97,6 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
       .on('AdPodImpression', () => {
         const isVolumeAvailable = currentBlock.getAdVolumeAvailability();
 
-        // const { volume } = getState().volume;
-        // currentBlock.setVolume(volume);
-
         dispatch(
           sendEvent({
             type: 'AD_BLOCK_IMPRESSION',
@@ -112,12 +113,20 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
         );
       })
       .on('AdVolumeChange', ({ volume }) => {
+        console.log('[TEST] AdVolumeChange', { isSyncPhase, isSynced, volume });
+
         // некоторая реклама при старте включает или выключает звук независимо от состояния звук в видеотеге
         // если в течение 2сек yasdk присылает ивент изменения звука, то мы считает, что это автоивент
         // и пытаемся принудительно синхронизировать звук видео и рекламы
-        // при этом в ивенте мы отправялем isSyncVolume, чтобы пропустить сохранение этого состояния в localStorage
-        if (isSyncVolume) {
-          isSyncVolume = false;
+
+        // 1) есть реклама которая после нашего синка опять выставляет звук в 0 (группа ПИК adriver)
+        // 2) есть реклама на которой при выставлении звука на 0.1, yasdk ставит звук на 100% (мегафон, сбербанк реклама)
+
+        // исправляет пункт 1), предотвращает вызов UPDATE_VOLUME_AD_BLOCK
+        if (isSyncPhase && isSynced) return;
+
+        if (isSyncPhase) {
+          isSynced = true;
           dispatch(
             sendEvent({
               type: 'SYNC_VOLUME',
@@ -152,11 +161,15 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
     await playerService.setSource(createFakeSource(), { type: VIDEO_TYPE.FAKE_VIDEO });
     await currentBlock.play();
   } catch (err) {
-    logger.error('[ad play pending]', { index }, err?.message);
+    logger.error('[ad play pending]', { index, code: err?.code || err?.name, message: err?.message });
     error = err?.message;
     dispatch(
       sendEvent({
         type: 'AD_BLOCK_ERROR',
+        meta: {
+          name: err?.code || err?.name,
+          message: err?.message,
+        },
       })
     );
   } finally {

@@ -121,3 +121,55 @@ body {
   right: 0;
   top: 0;
 }
+
+.paywall,
+.paywall-text-wrapper,
+.pay-notify {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.paywall-text-wrapper {
+  color: #fff;
+}
+
+.paywall .title {
+  font-size: 20px;
+}
+
+.paywall .description {
+  margin-top: 6px;
+  font-size: 18px;
+}
+
+.paywall button,
+.pay-notify button {
+  margin-top: 16px;
+  font-size: 16px;
+}
+
+.pay-notify {
+  position: absolute;
+  bottom: 30px;
+  width: 100%;
+  color: #fff;
+  font-size: 18px;
+}
+
+.pay-notify .text {
+  pointer-events: none;
+}
+
+.pay-notify .text span {
+  pointer-events: auto;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.pay-button {
+  position: absolute;
+  right: 20px;
+  bottom: 50px;
+}

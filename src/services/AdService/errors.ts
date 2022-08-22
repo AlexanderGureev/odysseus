@@ -12,9 +12,19 @@ export class PlayTimeoutExpired extends Error {
   }
 }
 
-export class AdPodError extends Error {
+export class NotFoundAdCreative extends Error {
   constructor(message?: string) {
     super(message);
+    this.name = 'NotFoundAdCreative';
+  }
+}
+
+export class AdPodError extends Error {
+  code: string;
+
+  constructor(code: string, message?: string) {
+    super(message);
     this.name = 'AdPodError';
+    this.code = code || 'UNKNOWN';
   }
 }

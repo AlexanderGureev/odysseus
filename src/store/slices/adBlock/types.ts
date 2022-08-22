@@ -22,7 +22,6 @@ export type EventsWithPayload =
       | 'PAUSE_AD_BLOCK_RESOLVE'
       | 'RESET'
       | 'AD_BLOCK_IMPRESSION'
-      | 'AD_BLOCK_ERROR'
       | 'AD_BLOCK_CLICK'
     >
   | {
@@ -77,7 +76,8 @@ export type EventsWithPayload =
   | {
       type: 'SET_ADFOX_PARAMS';
       payload: { adFoxParams: Record<string, any> };
-    };
+    }
+  | { type: 'AD_BLOCK_ERROR'; meta: { name: string | undefined; message: string | undefined } };
 
 export type Event = EventsWithPayload['type'];
 

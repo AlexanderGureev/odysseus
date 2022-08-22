@@ -11,6 +11,7 @@ import * as beholder from './slices/beholder';
 import * as buffering from './slices/buffering';
 import * as changeTrack from './slices/changeTrack';
 import * as error from './slices/error';
+import * as experiments from './slices/experiments';
 import * as favourites from './slices/favourites';
 import * as favouritesController from './slices/favouritesController';
 import * as fullscreen from './slices/fullscreen';
@@ -21,6 +22,9 @@ import * as network from './slices/network';
 import * as networkRecovery from './slices/networkRecovery';
 import * as offlineMode from './slices/offlineMode';
 import * as p2p from './slices/p2p';
+import * as payButton from './slices/payButton';
+import * as payNotify from './slices/payNotify';
+import * as paywall from './slices/paywall';
 import * as playback from './slices/playback';
 import * as playbackSpeed from './slices/playbackSpeed';
 import * as postMessages from './slices/postMessages';
@@ -96,7 +100,11 @@ export type EventPayload =
   | p2p.ActionPayload
   | postMessages.ActionPayload
   | adBlockVolume.ActionPayload
-  | mediaSession.ActionPayload;
+  | mediaSession.ActionPayload
+  | experiments.ActionPayload
+  | payButton.ActionPayload
+  | paywall.ActionPayload
+  | payNotify.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -133,4 +141,8 @@ export type AppEvent =
   | p2p.Event
   | postMessages.Event
   | adBlockVolume.Event
-  | mediaSession.Event;
+  | mediaSession.Event
+  | experiments.Event
+  | payButton.Event
+  | paywall.Event
+  | payNotify.Event;

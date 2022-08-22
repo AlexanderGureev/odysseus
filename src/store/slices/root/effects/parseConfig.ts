@@ -146,7 +146,7 @@ export const parseConfig = async (
 
   const error = getPlaylistError(config);
 
-  if (!error) {
+  if (!error || error?.code === 103) {
     dispatch(
       sendEvent({
         type: 'PARSE_CONFIG_RESOLVE',

@@ -1,21 +1,53 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 import { EffectOpts } from 'interfaces';
 import { EventPayload, sendEvent } from 'store';
+import { getTrackInfo } from 'store/selectors';
+
+let isFullscreenGoalSent = false;
 
 export const ymStats = async (
   { payload }: PayloadAction<EventPayload>,
-  { dispatch, getState, services: { postMessageService } }: EffectOpts
+  { dispatch, getState, services: { postMessageService, ymService } }: EffectOpts
 ) => {
   const {
     playback,
-    root: { meta, session, config },
+    root: { meta, session, config, deviceInfo, previews },
+    analytics: { isViewSent },
   } = getState();
 
   switch (payload.type) {
+    case 'GO_TO_NEXT_TRACK':
+      ymService.reachGoal('next_episode');
+      break;
+    case 'GO_TO_PREV_TRACK':
+      ymService.reachGoal('previous_episode');
+      break;
+    case 'CLICK_PAY_BUTTON':
+      ymService.reachGoal('disable_adv');
+    case 'CLICK_SUB_BUTTON':
+      if (previews) ymService.reachGoal('pay_and_watch'); // TODO возможно нужно отправлять всегда
+      ymService.sendEvent('click_subscribe');
+      break;
+    case 'ENTER_FULLCREEN':
+      if (!isFullscreenGoalSent && !deviceInfo.isMobile) {
+        isFullscreenGoalSent = true;
+        ymService.reachGoal('fullscreen');
+      }
+      break;
     case 'DO_PLAY_RESOLVE':
       const { isFirstPlay } = payload.meta;
 
       if (isFirstPlay) {
+        const { project_name, season_name, episode_name } = getTrackInfo(getState());
+
+        ymService.log({
+          video_start: {
+            project_title: project_name || 'empty',
+            season_number: season_name || 'empty',
+            episode_number: episode_name || 'empty',
+          },
+        });
+
         postMessageService.emit('play', {
           payload: {
             track_id: meta.trackId,
@@ -25,7 +57,17 @@ export const ymStats = async (
       }
       break;
     case 'WATCHPOINT':
-      if (payload.payload.value.value === '30sec') {
+      if (!isViewSent && payload.payload.value.value === '30sec') {
+        const { project_name, season_name, episode_name } = getTrackInfo(getState());
+
+        ymService.log({
+          video_30_sec: {
+            project_title: project_name || 'empty',
+            season_number: season_name || 'empty',
+            episode_number: episode_name || 'empty',
+          },
+        });
+
         postMessageService.emit('view', {
           payload: {
             track_id: meta.trackId,
