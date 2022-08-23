@@ -1,3 +1,4 @@
+import { BannerOptions } from 'services/AdBannerManager/types';
 import { AdHookType, AdLinksByType, AdServiceHooks, InitOpts, NewBlockOpts, TAdBlock } from 'services/AdService/types';
 import {
   AmberdataEventPayload,
@@ -36,7 +37,7 @@ import type { AppState } from 'store';
 import { SessionDispatch } from 'store/dispatch';
 import { DeviceInfo } from 'store/slices/root/types';
 import { Nullable, SkinClass, StreamProtocol, THeartBeatTnsCounterConfig, TnsCounter, TStreamItem } from 'types';
-import { TAdConfig, TAdPointConfig, TAdPointsConfig } from 'types/ad';
+import { AdCategory, TAdConfig, TAdPointConfig, TAdPointsConfig } from 'types/ad';
 import { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
 
 export interface IEmbeddedCheckService {
@@ -165,7 +166,7 @@ export interface IAdService {
   isPassed: (currentTime: number, point: number) => boolean;
   resetPreloadedBlocks: () => void;
   getPauseRoll: (pausedAt: number) => TAdPointConfig | null;
-  canPlayAd: () => boolean;
+  canPlayAd: (category: AdCategory) => boolean;
   updateTimeout: () => void;
   isPreloadable: () => boolean;
   addHook: <T extends AdHookType, C extends AdServiceHooks[T]>(type: T, hook: C) => void;
@@ -234,6 +235,19 @@ export interface IP2PService {
   dispose: () => void;
 }
 
+export interface IAdBannerService {
+  show: (
+    containerId: string,
+    key: string,
+    bannerParamsJSON: string,
+    options?: BannerOptions
+  ) => Promise<boolean | undefined>;
+  hide: (key: string) => Promise<void>;
+  replaceParams: (code: string, params: Record<string, any>) => string;
+  isHidden: (key: string) => boolean;
+  dispose: (key: string) => Promise<void>;
+}
+
 export interface IServices {
   embeddedCheckService: IEmbeddedCheckService;
   dbService: IDBService;
@@ -257,6 +271,7 @@ export interface IServices {
   favouritesService: IFavouritesService;
   mediascopeCounter: IMediascopeCounter;
   p2pService: IP2PService;
+  bannerService: IAdBannerService;
 }
 
 export type EffectOpts = {

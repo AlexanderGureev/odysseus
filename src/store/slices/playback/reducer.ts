@@ -46,11 +46,14 @@ const config: FSMConfig<State, AppEvent> = {
   },
   PLAY_PENDING: {
     DO_PLAY_RESOLVE: 'PLAYING',
-    DO_PAUSE: 'PAUSED',
+    DO_PAUSE: 'PAUSE_PENDING',
+  },
+  PAUSE_PENDING: {
+    DO_PAUSE_RESOLVE: 'PAUSED',
   },
   PLAYING: {
     SET_PAUSED: 'PAUSED',
-    DO_PAUSE: 'PAUSED',
+    DO_PAUSE: 'PAUSE_PENDING',
     AD_BREAK_STARTED: 'AD_BREAK',
     TIME_UPDATE: null,
     SEEK_STARTED: null,
@@ -94,7 +97,9 @@ const playback = createSlice({
 
       if (['CHANGE_TRACK'].includes(type)) return { ...initialState, step: 'READY' };
       // if (['RESUME_VIDEO'].includes(type)) return { ...state, step: 'READY' };
-      if (['NETWORK_ERROR', 'GO_TO_NEXT_TRACK', 'GO_TO_PREV_TRACK'].includes(type)) return { ...state, step: 'PAUSED' };
+      if (['NETWORK_ERROR', 'GO_TO_NEXT_TRACK', 'GO_TO_PREV_TRACK'].includes(type)) {
+        return { ...state, step: 'PAUSE_PENDING' };
+      }
 
       if (next === undefined) return state;
 
@@ -254,8 +259,13 @@ const addMiddleware = () => {
             })
           );
         },
-        PAUSED: () => {
+        PAUSE_PENDING: () => {
           opts.services.playerService.pause();
+          dispatch(
+            sendEvent({
+              type: 'DO_PAUSE_RESOLVE',
+            })
+          );
         },
         END: () => {
           const {

@@ -105,7 +105,7 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
   const parseNativeError = () => {
     const nativeError = player.error();
     const err = new PlayerError(nativeError?.code ?? ERROR_CODES.UNKNOWN, nativeError?.message);
-    return err;
+    return err.serialize();
   };
 
   const init = (playerId: string, options: VideoJsPlayerOptions = {}) =>

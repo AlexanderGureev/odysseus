@@ -1,6 +1,6 @@
 import { Subscribe, Unsubscribe } from 'services/MediatorService/types';
 import { Puid12, TParsedFeatures } from 'types';
-import { AdLinkType, TAdPointConfig, TAdPointsConfig } from 'types/ad';
+import { AdCategory, AdLinkType, TAdPointConfig, TAdPointsConfig } from 'types/ad';
 import { AdViewer } from 'types/yasdk';
 
 import { TAdFoxConfig } from './utils';
@@ -58,6 +58,7 @@ export type Events = {
 
 export type AdServiceHooks = {
   adBlockCreated: (block: TAdBlock) => void;
+  canPlayAd: (category: AdCategory) => boolean;
 };
 
 export type AdHookType = keyof AdServiceHooks;

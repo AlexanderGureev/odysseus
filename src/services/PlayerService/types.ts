@@ -1,6 +1,6 @@
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
 import { Nullable } from 'types';
-import { PlayerError } from 'utils/errors';
+import { RawPlayerError } from 'types/errors';
 import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
 
 type TimeData = { currentTime: number; duration: number; remainingTime: number };
@@ -16,7 +16,7 @@ export enum VIDEO_TYPE {
 
 export type Events = {
   timeupdate: (payload: TimeData) => void;
-  error: (payload: PlayerError) => void;
+  error: (payload: RawPlayerError) => void;
   seeking: () => void;
   seeked: () => void;
   ended: () => void;

@@ -15,6 +15,7 @@ import { DEFAULT_PLAYER_ID } from 'services/PlayerService/types';
 import { QUALITY_MARKS } from 'services/VigoService';
 import { sendEvent, store } from 'store';
 import { getTrackInfo } from 'store/selectors';
+import { AD_BANNER_CONTAINER_ID } from 'store/slices/adBanner';
 import { Screens } from 'store/slices/splashscreen';
 import { secToHumanReadeable } from 'utils';
 import { sleep } from 'utils/retryUtils';
@@ -476,6 +477,16 @@ const Player = () => {
       {splashscreen.step === 'SHOWING_SPLASHCREEN' && <SpashScreen data={splashscreen.screens} />}
 
       <NetworkNotify />
+
+      <AdBanner />
+    </div>
+  );
+};
+
+const AdBanner = () => {
+  return (
+    <div className="ad-banner-wrapper">
+      <div id={AD_BANNER_CONTAINER_ID} />
     </div>
   );
 };

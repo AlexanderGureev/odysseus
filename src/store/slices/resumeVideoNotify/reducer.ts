@@ -24,11 +24,8 @@ const config: FSMConfig<State, AppEvent> = {
     SKIP_RESUME_VIDEO_NOTIFY: 'IDLE',
   },
   RESUME_VIDEO_NOTIFY: {
-    RESUME_VIDEO_NOTIFY_RESOLVE: 'SENDING_BI',
-    RESUME_VIDEO_NOTIFY_REJECT: 'SENDING_BI',
-  },
-  SENDING_BI: {
-    SENDING_BI_RESOLVE: 'IDLE',
+    RESUME_VIDEO_NOTIFY_RESOLVE: 'IDLE',
+    RESUME_VIDEO_NOTIFY_REJECT: 'IDLE',
   },
 };
 
@@ -86,33 +83,6 @@ const addMiddleware = () => {
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         CHECK_RESUME_VIDEO: () => checkResumeVideo(opts),
-        SENDING_BI: () => {
-          const {
-            root: {
-              config: { trackInfo },
-              meta: { trackId },
-            },
-          } = getState();
-
-          const payload = {
-            page: 'player',
-            block: 'default',
-            event_type: 'click',
-            event_name: 'continue_watching_question',
-            project_id: trackInfo?.project?.id,
-            track_id: trackId,
-          };
-
-          const answer = action.payload.type === 'RESUME_VIDEO_NOTIFY_RESOLVE' ? 'continue' : 'start';
-          services.postMessageService.emit('BI', {
-            payload: {
-              ...payload,
-              answer,
-            },
-          });
-
-          dispatch(sendEvent({ type: 'SENDING_BI_RESOLVE' }));
-        },
       };
 
       const effect = handler[step];

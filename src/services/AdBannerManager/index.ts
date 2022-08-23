@@ -1,16 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { logger } from 'utils/logger';
 
-type TOptions = {
-  bannerStates: Array<'desktop' | 'tablet' | 'phone'>;
-  adaptiveOptions: Partial<{
-    tabletWidth: number;
-    phoneWidth: number;
-    isAutoReloads: boolean;
-  }>;
-};
+import { BannerOptions } from './types';
 
 const AdBannerManager = () => {
-  let promise: Promise<boolean> | null = null;
+  let loadPromise: Promise<boolean> | null = null;
+  const bannerPromise: { [key in string]?: Promise<any> } = {};
   const banners: Record<string, any> = {};
 
   const getContainer = () => {
@@ -24,9 +19,9 @@ const AdBannerManager = () => {
   };
 
   const loadCode = () => {
-    if (promise) return promise;
+    if (loadPromise) return loadPromise;
 
-    promise = new Promise<boolean>((resolve, reject) => {
+    loadPromise = new Promise<boolean>((resolve, reject) => {
       const code = document.createElement('script');
       code.innerHTML = 'window.yaContextCb = window.yaContextCb || []';
 
@@ -47,7 +42,7 @@ const AdBannerManager = () => {
       append(script);
     });
 
-    return promise;
+    return loadPromise;
   };
 
   const replaceParams = (code: string, params: Record<string, any>) => {
@@ -64,11 +59,11 @@ const AdBannerManager = () => {
     }
   };
 
-  const show = (
+  const show = async (
     containerId: string,
     key: string,
     bannerParamsJSON: string,
-    options: TOptions = {
+    options: BannerOptions = {
       bannerStates: ['desktop', 'tablet'],
       adaptiveOptions: {
         tabletWidth: 1280,
@@ -76,15 +71,14 @@ const AdBannerManager = () => {
         isAutoReloads: false,
       },
     }
-  ) =>
-    new Promise<boolean>(async (resolve) => {
+  ) => {
+    if (bannerPromise[key]) await bannerPromise[key];
+
+    bannerPromise[key] = new Promise<boolean>(async (resolve) => {
       try {
         const w = options?.adaptiveOptions?.phoneWidth || 480;
 
-        if (window.innerWidth < w) {
-          resolve(false);
-          return;
-        }
+        if (window.innerWidth < w) throw new Error(`window.innerWidth < ${w}`);
 
         if (banners[key]) {
           banners[key].show();
@@ -92,10 +86,10 @@ const AdBannerManager = () => {
           return;
         }
 
-        if (!(await loadCode())) return;
+        if (!(await loadCode())) throw new Error('code load failed');
 
         const params = parse(bannerParamsJSON);
-        if (!params) return;
+        if (!params) throw new Error('banner params is undefined');
 
         logger.log('[AdBannerManager] params', params);
 
@@ -127,23 +121,36 @@ const AdBannerManager = () => {
         });
       } catch (e) {
         console.error('[AdBannerManager] show error: ', e?.message);
+        resolve(false);
       }
     });
 
-  const hide = (key: string) => {
+    return bannerPromise[key];
+  };
+
+  const hide = async (key: string) => {
+    if (bannerPromise[key]) await bannerPromise[key];
     banners[key]?.hide();
   };
 
-  const dispose = (key: string) => {
+  const dispose = async (key: string) => {
+    if (bannerPromise[key]) await bannerPromise[key];
     banners[key]?.destroy();
     banners[key] = null;
+    bannerPromise[key] = undefined;
   };
 
   const isHidden = (key: string): boolean => {
     return Boolean(banners[key]?.isHidden);
   };
 
-  return { show, hide, replaceParams, isHidden, dispose };
+  return {
+    show,
+    hide,
+    dispose,
+    replaceParams,
+    isHidden,
+  };
 };
 
 const instance = AdBannerManager();

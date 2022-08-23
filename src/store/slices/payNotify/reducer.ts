@@ -114,13 +114,14 @@ const addMiddleware = () => {
             root: {
               features: { SUBSCRIPTION_TEXT },
               previews,
+              adConfig,
             },
           } = state;
 
           const isTrialAvailable = getStatusTrialSelector(state);
           const type = isTrialAvailable ? 'TRIAL' : 'FULL_PRICE';
 
-          const text = previews ? getPreviewNotifyText(state) : SUBSCRIPTION_TEXT;
+          const text = previews ? getPreviewNotifyText(state) : adConfig ? SUBSCRIPTION_TEXT : null;
           const buttonText = getButtonTextBySkin(state, type);
 
           if (text && buttonText) {

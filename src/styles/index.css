@@ -173,3 +173,15 @@ body {
   right: 20px;
   bottom: 50px;
 }
+
+.ad-banner-wrapper {
+  position: absolute;
+  bottom: 100px;
+  width: 100%;
+}
+
+#ad-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

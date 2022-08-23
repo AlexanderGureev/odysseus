@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { toXSTATE } from 'utils/toXSTATE';
 
 import { listenerMiddleware } from './middleware';
+import adBanner from './slices/adBanner/reducer';
 import adBlock from './slices/adBlock/reducer';
 import adBlockVolume from './slices/adBlockVolume/reducer';
 import adController from './slices/adController/reducer';
@@ -65,7 +66,8 @@ const rootReducer = combineReducers({
   analytics: analytics.reducer,
   // отправка и обработка postmessages
   postMessages: postMessages.reducer,
-
+  // управление рекламными баннерами
+  adBanner: adBanner.reducer,
   /* 
   корневой автомат, точка входа в приложение:
   1) парсинг конфига
@@ -145,6 +147,7 @@ const rootReducer = combineReducers({
 experiments.addMiddleware();
 analytics.addMiddleware();
 postMessages.addMiddleware();
+adBanner.addMiddleware();
 
 root.addMiddleware();
 resumeVideo.addMiddleware();

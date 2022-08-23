@@ -262,7 +262,6 @@ const HorusService = () => {
 
       eventNum += 1;
       const payload = createPayload(eventName, eventNum, debugInfo);
-
       logger.log('[HorusService]', `routeEvent >>> ${eventName}, ${eventNum}`);
 
       await pushToBuffer(payload);
@@ -271,7 +270,7 @@ const HorusService = () => {
         await sendEvents();
       }
     } catch (e) {
-      logger.error('[HorusService]', `routeEvent error >>> ${eventName} `, e?.message);
+      logger.error('[HorusService]', `routeEvent error >>> ${eventName} `, e);
     }
   };
 

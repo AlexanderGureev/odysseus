@@ -37,6 +37,7 @@ const AdService = (localStorageService: ILocalStorageService) => {
 
   let hooks: AdControllerHooks = {
     adBlockCreated: [],
+    canPlayAd: [],
   };
 
   const addHook = <T extends AdHookType, C extends AdServiceHooks[T]>(type: T, hook: C) => {
@@ -64,7 +65,7 @@ const AdService = (localStorageService: ILocalStorageService) => {
     isInitialized = Boolean(sdk);
 
     // TODO DELETE
-    // throw new Error('test');
+    throw new Error('test');
   };
 
   const isPreloadable = () => ADV_CACHE_LOOKAHEAD > 0;
@@ -124,9 +125,12 @@ const AdService = (localStorageService: ILocalStorageService) => {
       : null;
   };
 
-  const canPlayAd = () => {
+  const canPlayAd = (category: AdCategory): boolean => {
     const time = localStorageService.getItemByDomain<number>(STORAGE_SETTINGS.AD_TIMEOUT) || 0;
-    return Date.now() - time > ADV_INTERSECTION_TIMEOUT;
+    const isCanPlay = Date.now() - time > ADV_INTERSECTION_TIMEOUT;
+    const isDisabledByHook = hooks.canPlayAd.some((h) => h(category) === false);
+
+    return !isDisabledByHook && isCanPlay;
   };
 
   const updateTimeout = () => {

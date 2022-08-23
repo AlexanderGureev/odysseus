@@ -22,6 +22,7 @@ export type EventsWithPayload =
       | 'DO_INIT'
       | 'DO_PLAY'
       | 'DO_PAUSE'
+      | 'DO_PAUSE_RESOLVE'
       | 'DO_PLAY_REJECT'
       | 'DO_PAUSE_REJECT'
       | 'RESET_PLAYBACK_RESOLVE'

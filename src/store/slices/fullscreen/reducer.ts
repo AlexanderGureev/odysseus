@@ -46,11 +46,15 @@ const fullscreen = createSlice({
       const { type, payload } = action.payload;
 
       const next = config[state.step]?.[type];
+      const step = next || state.step;
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'fullscreen', `${state.step} -> ${type} -> ${next}`);
 
-      return next ? { ...state, step: next, ...payload } : { ...state, ...payload };
+      switch (type) {
+        default:
+          return { ...state, step, ...payload };
+      }
     });
   },
 });

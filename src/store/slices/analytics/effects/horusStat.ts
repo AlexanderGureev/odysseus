@@ -14,6 +14,7 @@ export const horusStat = async (
     quality,
     playback,
     error: { error },
+    visibility,
   } = getState();
 
   switch (payload.type) {
@@ -38,7 +39,8 @@ export const horusStat = async (
       break;
     case 'SET_PAUSED':
       const { isEnded } = payload.meta;
-      horusService.routeEvent(isEnded ? 'HORUS_AUTO_PAUSE' : 'HORUS_CLICK_PAUSE');
+      const isHidden = visibility.step === 'HIDDEN';
+      horusService.routeEvent(isEnded || isHidden ? 'HORUS_AUTO_PAUSE' : 'HORUS_CLICK_PAUSE');
       break;
     case 'SET_SEEKING':
     case 'SEEK':
@@ -135,6 +137,7 @@ export const horusStat = async (
 
     case 'BEFORE_UNLOAD':
       horusService.routeEvent('HORUS_SESSION_FINISHED');
+      // TODO в сафари ивент может не успеть отправиться (indexeddb transaction aborted)
       horusService.routeEvent('HORUS_CLOSE');
       break;
 

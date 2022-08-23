@@ -4,7 +4,6 @@ import { sendEvent } from 'store/actions';
 
 export const checkPauseRoll = ({ getState, dispatch, services: { adService } }: EffectOpts) => {
   const {
-    autoSwitch: { step },
     playback: { pausedAt },
     root: { adConfig },
   } = getState();
@@ -12,7 +11,7 @@ export const checkPauseRoll = ({ getState, dispatch, services: { adService } }: 
   const point = pausedAt ? adService.getPauseRoll(pausedAt) : null;
   const data = point ? adConfig?.[point.category] : null;
 
-  if (step !== 'AUTOSWITCH_NOTIFY' && adService.canPlayAd() && point && data) {
+  if (point && data && adService.canPlayAd(point.category)) {
     dispatch(
       sendEvent({
         type: 'INIT_AD_BREAK',

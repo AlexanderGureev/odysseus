@@ -22,7 +22,7 @@ export const init = async ({ getState, dispatch, services: { adService } }: Effe
 
     const delayedPreroll = adPoints.find((p) => p.category === AdCategory.PRE_ROLL);
 
-    if (adService.canPlayAd() && !delayedPreroll && adConfig.pre_roll) {
+    if (adService.canPlayAd(AdCategory.PRE_ROLL) && !delayedPreroll && adConfig.pre_roll) {
       dispatch(
         sendEvent({
           type: 'INIT_AD_BREAK',

@@ -1,5 +1,6 @@
 import { RawPlayerError } from 'types/errors';
 
+import * as adBanner from './slices/adBanner';
 import * as adBlock from './slices/adBlock';
 import * as adBlockVolume from './slices/adBlockVolume';
 import * as adController from './slices/adController';
@@ -104,7 +105,8 @@ export type EventPayload =
   | experiments.ActionPayload
   | payButton.ActionPayload
   | paywall.ActionPayload
-  | payNotify.ActionPayload;
+  | payNotify.ActionPayload
+  | adBanner.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -145,4 +147,5 @@ export type AppEvent =
   | experiments.Event
   | payButton.Event
   | paywall.Event
-  | payNotify.Event;
+  | payNotify.Event
+  | adBanner.Event;

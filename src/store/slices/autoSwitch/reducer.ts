@@ -3,6 +3,7 @@ import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { SkinClass } from 'types';
+import { AdCategory } from 'types/ad';
 import { isNil } from 'utils';
 import { logger } from 'utils/logger';
 
@@ -26,7 +27,11 @@ const initialState: FSMState = {
 
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
+    DO_INIT: 'PREPARE_AUTOSWITCH',
     PARSE_CONFIG_RESOLVE: null,
+  },
+  PREPARE_AUTOSWITCH: {
+    PREPARE_AUTOSWITCH_RESOLVE: 'IDLE',
   },
   READY: {
     TIME_UPDATE: null,
@@ -163,6 +168,17 @@ const addMiddleware = () =>
       };
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
+        PREPARE_AUTOSWITCH: () => {
+          services.adService.addHook('canPlayAd', (category) => {
+            const { step } = getState().autoSwitch;
+
+            if (['AUTOSWITCH_NOTIFY', 'AUTOSWITCH_PENDING'].includes(step)) return false;
+            if (step === 'AUTOSWITCH_WAITING' && category === AdCategory.POST_ROLL) return false;
+            return true;
+          });
+
+          dispatch(sendEvent({ type: 'PREPARE_AUTOSWITCH_RESOLVE' }));
+        },
         AUTOSWITCH_NOTIFY: () => {
           dispatch(sendEvent({ type: 'AUTOSWITCH_NOTIFY_SHOWN' }));
         },

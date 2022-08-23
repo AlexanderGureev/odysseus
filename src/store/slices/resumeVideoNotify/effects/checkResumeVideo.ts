@@ -1,13 +1,8 @@
 import { EffectOpts } from 'interfaces';
-import { ERROR_CODE } from 'services/PostMessageService/types';
 import { sendEvent } from 'store';
 import { getSavedProgressTime, getStartAt } from 'store/selectors';
 
-export const checkResumeVideo = async ({
-  getState,
-  dispatch,
-  services: { localStorageService, postMessageService },
-}: EffectOpts) => {
+export const checkResumeVideo = async ({ getState, dispatch, services: { localStorageService } }: EffectOpts) => {
   const {
     resumeVideoNotify: { isActive },
     root: { features, previews },
@@ -23,10 +18,6 @@ export const checkResumeVideo = async ({
         payload: { time },
       })
     );
-
-    postMessageService.emit('error', {
-      code: ERROR_CODE.RESUME_NOTIFY,
-    });
   } else {
     dispatch(
       sendEvent({

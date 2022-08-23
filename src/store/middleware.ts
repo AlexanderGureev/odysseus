@@ -2,6 +2,7 @@ import type { CreateListenerMiddlewareOptions, TypedAddListener, TypedStartListe
 import { addListener, createListenerMiddleware } from '@reduxjs/toolkit';
 import { IServices } from 'interfaces';
 import {
+  AdBannerManager,
   AmberdataService,
   DemonService,
   EmbeddedCheckService,
@@ -60,6 +61,7 @@ const opts: CreateListenerMiddlewareOptions<MiddlewareDeps> = {
       favouritesService: FavouritesService,
       mediascopeCounter: MediascopeCounter,
       p2pService: P2PManager,
+      bannerService: AdBannerManager,
     },
   },
 };

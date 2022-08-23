@@ -5,7 +5,9 @@ import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
 import { adEvents } from './effects/adEvents';
+import { adultNotify } from './effects/adultNotify';
 import { baseEvents } from './effects/baseEvents';
+import { resumeNotify } from './effects/resumeNotify';
 import { FSMState, State } from './types';
 
 const initialState: FSMState = {
@@ -157,6 +159,8 @@ const addMiddleware = () => {
       const event = action as PayloadAction<EventPayload>;
       baseEvents(event, opts);
       adEvents(event, opts);
+      resumeNotify(event, opts);
+      adultNotify(event, opts);
     },
   });
 };

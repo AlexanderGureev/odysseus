@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { isMobile } from 'react-device-detect';
 import { off, on } from 'utils';
 
 type State = {
@@ -40,20 +41,26 @@ export const useMouse = (ref: React.RefObject<Element>): State => {
       setState((prev) => ({ ...prev, isMouseDown: true, isMouseUp: false }));
     };
 
-    on(document, 'mouseup', mouseupHandler);
-    on(ref.current, 'mouseup', mouseupHandler);
-    on(ref.current, 'mousedown', mousedownHandler);
-
-    on(ref.current, 'touchend', mouseupHandler);
-    on(ref.current, 'touchstart', mousedownHandler);
+    if (isMobile) {
+      on(ref.current, 'touchcancel', mouseupHandler);
+      on(ref.current, 'touchend', mouseupHandler);
+      on(ref.current, 'touchstart', mousedownHandler);
+    } else {
+      on(document, 'mouseup', mouseupHandler);
+      on(ref.current, 'mouseup', mouseupHandler);
+      on(ref.current, 'mousedown', mousedownHandler);
+    }
 
     return () => {
-      off(document, 'mouseup', mouseupHandler);
-      off(ref.current, 'mouseup', mouseupHandler);
-      off(ref.current, 'mousedown', mousedownHandler);
-
-      off(ref.current, 'touchend', mouseupHandler);
-      off(ref.current, 'touchstart', mousedownHandler);
+      if (isMobile) {
+        off(ref.current, 'touchcancel', mouseupHandler);
+        off(ref.current, 'touchend', mouseupHandler);
+        off(ref.current, 'touchstart', mousedownHandler);
+      } else {
+        off(document, 'mouseup', mouseupHandler);
+        off(ref.current, 'mouseup', mouseupHandler);
+        off(ref.current, 'mousedown', mousedownHandler);
+      }
     };
   }, [ref]);
 
@@ -78,7 +85,6 @@ export const useMouse = (ref: React.RefObject<Element>): State => {
 
       const { posX = 0, posY = 0, elW = 0, elH = 0 } = getRect();
       const pageX = event instanceof MouseEvent ? event.pageX : event.targetTouches[0].pageX;
-
       const pageY = event instanceof MouseEvent ? event.pageY : event.targetTouches[0].pageY;
 
       const elX = pageX - posX;
@@ -100,14 +106,20 @@ export const useMouse = (ref: React.RefObject<Element>): State => {
 
     setState((prev) => ({ ...prev, ...getRect() }));
 
-    on(document, 'mousemove', moveHandler);
-    on(document, 'touchstart', moveHandler);
-    on(document, 'touchmove', moveHandler);
+    if (isMobile) {
+      on(document, 'touchstart', moveHandler);
+      on(document, 'touchmove', moveHandler);
+    } else {
+      on(document, 'mousemove', moveHandler);
+    }
 
     return () => {
-      off(document, 'touchstart', moveHandler);
-      off(document, 'mousemove', moveHandler);
-      off(document, 'touchmove', moveHandler);
+      if (isMobile) {
+        off(document, 'touchstart', moveHandler);
+        off(document, 'touchmove', moveHandler);
+      } else {
+        off(document, 'mousemove', moveHandler);
+      }
     };
   }, [ref]);
 

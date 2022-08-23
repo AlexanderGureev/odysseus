@@ -1,6 +1,6 @@
 import { Ya } from 'types/yasdk';
 
-export const YASDK_URL = 'https://an.yandex.ru/system/video-ads-sdk/adsdk.js';
+export const YASDK_URL = 'https://yandex.ru/ads/system/adsdk.js';
 
 const createSdkLoader = () => {
   let sdk: Ya | null = null;

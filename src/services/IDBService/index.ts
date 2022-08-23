@@ -99,11 +99,11 @@ const IDBService = () => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const transaction = db!.transaction([collectionName], type);
 
-      const txComplete = new Promise((resolve) => {
-        transaction.oncomplete = resolve;
+      const transactionPromise = new Promise((res, rej) => {
+        transaction.oncomplete = res;
+        transaction.onabort = rej;
+        transaction.onerror = rej;
       });
-
-      transaction.onerror = reject;
 
       const objectStoreRequest = transaction.objectStore(collectionName);
 
@@ -138,7 +138,7 @@ const IDBService = () => {
 
       const doneFn: TDoneFunction<T> = (error, record) => {
         if (error) reject(error);
-        else txComplete.then(() => resolve(record as T));
+        else transactionPromise.then(() => resolve(record as T)).catch(reject);
       };
 
       query(objectStoreRequest, doneFn, api).catch(reject);

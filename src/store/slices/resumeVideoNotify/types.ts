@@ -1,15 +1,10 @@
 import { DefaultPayload, WithoutPayload } from 'store/types';
 
-export type State = 'IDLE' | 'CHECK_RESUME_VIDEO' | 'RESUME_VIDEO_NOTIFY' | 'SENDING_BI';
+export type State = 'IDLE' | 'CHECK_RESUME_VIDEO' | 'RESUME_VIDEO_NOTIFY';
 
 export type EventsWithPayload =
   | {
-      type:
-        | 'CHECK_RESUME'
-        | 'SKIP_RESUME_VIDEO_NOTIFY'
-        | 'RESUME_VIDEO_NOTIFY_RESOLVE'
-        | 'RESUME_VIDEO_NOTIFY_REJECT'
-        | 'SENDING_BI_RESOLVE';
+      type: 'CHECK_RESUME' | 'SKIP_RESUME_VIDEO_NOTIFY' | 'RESUME_VIDEO_NOTIFY_RESOLVE' | 'RESUME_VIDEO_NOTIFY_REJECT';
     }
   | {
       type: 'SHOW_RESUME_VIDEO_NOTIFY';

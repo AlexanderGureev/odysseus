@@ -82,6 +82,7 @@ export type TFeatureConfig = {
   PROMO_OFFER_BUTTON?: string;
   SUBSCRIPTION_TEXT?: string; // текст для уведомления о покупке подписки над таймлайном (включено на стс)
   PAYWALL_TITLE?: string; // текст на paywall
+  AD_PAUSE_BANNER_PARAMS?: string; // текст
 
   AUTH_URL?: string; // используется для открытия страницы авторизации в эмбедах
 

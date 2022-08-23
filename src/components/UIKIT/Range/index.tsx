@@ -63,8 +63,8 @@ export const Range = ({
   const bufferPx = bufferValue ? w * (bufferValue / max) : null;
 
   useUpdateEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
+    if (!isDrag) setValue(initialValue);
+  }, [isDrag, initialValue]);
 
   useEffect(() => {
     if (isKeyboardEvent.current) {
@@ -96,7 +96,6 @@ export const Range = ({
         case 'ArrowRight': {
           isKeyboardEvent.current = true;
           setValue((prev) => (prev + step > max ? max : prev + step));
-
           return;
         }
         case 'ArrowDown':
@@ -129,7 +128,6 @@ export const Range = ({
     if (!thumbLabelRef.current || !isEnter) return;
 
     const { width } = thumbLabelRef.current.getBoundingClientRect();
-
     const [start, end] = [progressValue - (width + 10), progressValue + (width + 10)];
 
     setOverlap(pos >= start && pos <= end);
