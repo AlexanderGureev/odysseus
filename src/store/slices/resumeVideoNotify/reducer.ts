@@ -73,13 +73,13 @@ const addMiddleware = () => {
         dispatch: api.dispatch,
       });
 
-      const { step } = getState().resumeVideoNotify;
-
       const opts = {
         dispatch,
         getState,
         services,
       };
+
+      const { step } = getState().resumeVideoNotify;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         CHECK_RESUME_VIDEO: () => checkResumeVideo(opts),

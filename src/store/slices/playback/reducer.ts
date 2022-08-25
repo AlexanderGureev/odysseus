@@ -1,4 +1,5 @@
-import { createAction, createSlice } from '@reduxjs/toolkit';
+import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { isIOS } from 'react-device-detect';
 import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
@@ -46,14 +47,15 @@ const config: FSMConfig<State, AppEvent> = {
   },
   PLAY_PENDING: {
     DO_PLAY_RESOLVE: 'PLAYING',
-    DO_PAUSE: 'PAUSE_PENDING',
   },
   PAUSE_PENDING: {
     DO_PAUSE_RESOLVE: 'PAUSED',
+    AUTO_PAUSE_RESOLVE: 'PAUSED',
   },
   PLAYING: {
     SET_PAUSED: 'PAUSED',
     DO_PAUSE: 'PAUSE_PENDING',
+    AUTO_PAUSE: 'PAUSE_PENDING',
     AD_BREAK_STARTED: 'AD_BREAK',
     TIME_UPDATE: null,
     SEEK_STARTED: null,
@@ -61,6 +63,7 @@ const config: FSMConfig<State, AppEvent> = {
   PAUSED: {
     SET_PLAYING: 'PLAYING',
     DO_PLAY: 'CHECK_TOKEN_PENDING',
+    AD_BREAK_STARTED: 'AD_BREAK',
     ENDED: 'END',
     TIME_UPDATE: null,
     SEEK_STARTED: null,
@@ -118,8 +121,6 @@ const playback = createSlice({
           break;
         case 'RESET_PLAYBACK_RESOLVE':
           return { ...initialState, currentTime: 0, duration: state.duration, step };
-        case 'DO_PAUSE':
-          return { ...state, step, ...payload, pausedAt: Date.now() };
         default:
           return { ...state, step, ...payload };
       }
@@ -141,13 +142,13 @@ const addMiddleware = () => {
         dispatch: api.dispatch,
       });
 
-      const { step } = getState().playback;
-
       const opts = {
         dispatch,
         getState,
         services,
       };
+
+      const { step } = getState().playback;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         PLAYBACK_INIT: () => {
@@ -176,6 +177,7 @@ const addMiddleware = () => {
           services.playerService.on('pause', () => {
             const {
               playback: { step },
+              fullscreen,
             } = getState();
 
             const next = config[step]?.['SET_PAUSED'];
@@ -186,6 +188,9 @@ const addMiddleware = () => {
             dispatch(
               sendEvent({
                 type: 'SET_PAUSED',
+                payload: {
+                  pausedAt: isIOS && fullscreen.step === 'FULLSCREEN' ? Date.now() : null,
+                },
                 meta: {
                   isEnded,
                 },
@@ -260,12 +265,28 @@ const addMiddleware = () => {
           );
         },
         PAUSE_PENDING: () => {
+          const {
+            payload: { type },
+          } = action as PayloadAction<EventPayload>;
+
           opts.services.playerService.pause();
-          dispatch(
-            sendEvent({
-              type: 'DO_PAUSE_RESOLVE',
-            })
-          );
+
+          if (type === 'AUTO_PAUSE') {
+            dispatch(
+              sendEvent({
+                type: 'AUTO_PAUSE_RESOLVE',
+              })
+            );
+          } else {
+            dispatch(
+              sendEvent({
+                type: 'DO_PAUSE_RESOLVE',
+                payload: {
+                  pausedAt: Date.now(),
+                },
+              })
+            );
+          }
         },
         END: () => {
           const {

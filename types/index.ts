@@ -75,6 +75,13 @@ type DISCLAIMER_AGE_RESTRICTIONS = {
   };
 };
 
+export type TrialSuggestionCfg = {
+  suggestionDisplayDuration?: number;
+  afterPrerollsInterval?: number;
+  afterMidrollsInterval?: number;
+  beforePauserollsInterval?: number;
+};
+
 export type TFeatureConfig = {
   ENABLE_FAVOURITES?: boolean;
   MEDIASCOPE_WATCHING_COUNTER?: boolean;
@@ -83,6 +90,8 @@ export type TFeatureConfig = {
   SUBSCRIPTION_TEXT?: string; // текст для уведомления о покупке подписки над таймлайном (включено на стс)
   PAYWALL_TITLE?: string; // текст на paywall
   AD_PAUSE_BANNER_PARAMS?: string; // текст
+  TRIAL_SUGGESTION?: TrialSuggestionCfg;
+  FEATURE_OFF_ADS_DISPLAY_TIME?: number;
 
   AUTH_URL?: string; // используется для открытия страницы авторизации в эмбедах
 
@@ -138,6 +147,10 @@ export type TFeatureConfig = {
 };
 
 export type TEnvConfig = {
+  APP_STATIC_ENDPOINT?: string;
+  LINKED_AUDIO_TRACKS_CONFIG_PATH?: string;
+  SIREN_PUBLIC_HOST: string;
+
   AD_FOX_OWNER_ID: string;
   DEBUG_MODE: boolean;
   NODE_ENV?: string;
@@ -230,13 +243,13 @@ export type TLinkedTrackConfig = {
   caption?: string;
   episode?: number;
   playerConfig: string;
-  playerUrl: string;
+  playerUrl?: string;
   projectId?: number;
   season?: number;
   thumbnail?: string;
   trackHubId?: number;
   trackId?: number;
-  trackVod: {
+  trackVod?: {
     link: string;
     playerLink: string;
     queryParams: LinkedTrackQueryParams;

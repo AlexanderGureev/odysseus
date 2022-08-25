@@ -13,7 +13,9 @@ export interface IProcessEnv {
   MORPHEUS_ENDPOINT?: string;
 
   SIREN_HOST: string;
+  SIREN_PUBLIC_HOST: string;
   SIREN_CTC_HOST: string;
+  SIREN_CTC_PUBLIC_HOST: string;
 
   WHATISMYBROWSER_KEY?: string;
   WHATISMYBROWSER_LINK?: string;
@@ -38,6 +40,9 @@ export interface IProcessEnv {
 
   SIREN_API_TOKEN?: string;
   PAK_API_TOKEN?: string;
+
+  LINKED_AUDIO_TRACKS_CONFIG_PATH?: string;
+  APP_STATIC_ENDPOINT?: string;
 }
 
 declare global {

@@ -1,5 +1,6 @@
 import { Experiments } from '@moretv/types';
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
+import { TS_TRIGGER } from 'store/slices/trialSuggestion/utils';
 import { TLinkedTrackConfig } from 'types';
 import { AdCategory } from 'types/ad';
 import { ERROR_TYPE } from 'types/errors';
@@ -33,7 +34,7 @@ export type OutputEvents = {
   ) => void;
   new_track: (
     data: Payload<{
-      target: 'next' | 'prev';
+      target: 'next' | 'prev' | 'change_audio_track';
       auto: boolean;
       trackDescription: TLinkedTrackConfig;
       overlay: boolean;
@@ -98,6 +99,7 @@ export type OutputEvents = {
   playerStarted: () => void;
   notify: (data: { code: NOTIFY_TYPES }) => void;
   token_expired: () => void;
+
   BI: (
     data: Payload<{
       page?: string;
@@ -106,6 +108,9 @@ export type OutputEvents = {
       event_type?: string;
       event_value?: string;
       answer?: string;
+      project_id?: number;
+      track_id?: number | null;
+      videosession_id?: string;
     }>
   ) => void;
   play_btn_click: (data: Payload<{ btn_type: 'play' | 'pause' }>) => void;
@@ -191,8 +196,8 @@ export type OutputEvents = {
       canonical_url: string;
     }>
   ) => void;
-  audio: () => void;
-  audio_choice: (data: Payload<{ event_value: 'english' | 'russian' }>) => void;
+  // audio: () => void;
+  // audio_choice: (data: Payload<{ event_value: 'english' | 'russian' }>) => void;
   volume: (data: Payload<{ volume: number }>) => void;
 
   watchprogress: (data: {
@@ -214,6 +219,22 @@ export type OutputEvents = {
       track_id: number | null;
     }>
   ) => void;
+
+  on_click_bt_turnoff_adv_at_trial_suggestion: (
+    data: Payload<{ videosession_id: string; time_cursor: number; triggerType: TS_TRIGGER }>
+  ) => void;
+  on_click_bt_close_trial_suggestion: (
+    data: Payload<{ videosession_id: string; time_cursor: number; triggerType: TS_TRIGGER }>
+  ) => void;
+  on_show_trial_suggestion: (
+    data: Payload<{ videosession_id: string; time_cursor: number; triggerType: TS_TRIGGER }>
+  ) => void;
+  timeout_close_suggestion: (
+    data: Payload<{ videosession_id: string; time_cursor: number; triggerType: TS_TRIGGER }>
+  ) => void;
+
+  on_open_off_ads_experiment: () => void;
+  on_close_off_ads_experiment: () => void;
 
   ad_manifest: (data: Payload<{ numBreaks: number; numExpectedBreaks: number; breaksTimeLimit: number[] }>) => void;
   ad_break_start: (data: Payload<{ category: AdCategory; limit: number; point: number }>) => void;
@@ -255,7 +276,7 @@ export type INPUT_PLAYER_POST_MESSAGE = {
   terminatePlayer: (p: any) => void;
   networkDispatched: (p: { status: 'offline' | 'online' | 'reject' }) => void;
   initialInfo: (p: { data: { ym_client_id: string } }) => void;
-  on_click_bt_close_trial_suggestion: (p: any) => void;
+  on_click_bt_close_trial_suggestion: (p: { data: { triggerType: TS_TRIGGER } }) => void;
   set_settings: (p: any) => void;
   play: () => void;
   pause: () => void;
@@ -266,6 +287,8 @@ export type INPUT_PLAYER_POST_MESSAGE = {
   testAdvPoint: () => void;
   set_favorites: (p: { data: { isFavorites: boolean } }) => void;
   set_experiment_group: (p: { data: { name: Experiments; group: string } }) => void;
+
+  on_close_off_ads_experiment: () => void;
 };
 
 export type TMessage = {

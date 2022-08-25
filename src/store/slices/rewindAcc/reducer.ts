@@ -73,13 +73,13 @@ const addMiddleware = () =>
         dispatch: api.dispatch,
       });
 
-      const { step } = getState().rewindAcc;
-
       const opts = {
         dispatch,
         getState,
         services,
       };
+
+      const { step } = getState().rewindAcc;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         ACCUMULATION: () => accumulation(opts),

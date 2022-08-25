@@ -22,9 +22,7 @@ export type EventsWithPayload =
       | 'DO_INIT'
       | 'DO_PLAY'
       | 'DO_PAUSE'
-      | 'DO_PAUSE_RESOLVE'
       | 'DO_PLAY_REJECT'
-      | 'DO_PAUSE_REJECT'
       | 'RESET_PLAYBACK_RESOLVE'
       | 'PLAYBACK_INIT_RESOLVE'
       | 'SET_PLAYING'
@@ -32,6 +30,8 @@ export type EventsWithPayload =
       | 'START_END_FLOW'
       | 'AD_DISABLED'
       | 'AUTOSWITCH_DISABLED'
+      | 'AUTO_PAUSE'
+      | 'AUTO_PAUSE_RESOLVE'
     >
   | {
       type: 'TIME_UPDATE';
@@ -52,8 +52,14 @@ export type EventsWithPayload =
   | {
       type: 'END_PLAYBACK';
     }
+  | {
+      type: 'DO_PAUSE_RESOLVE';
+      payload: {
+        pausedAt: number;
+      };
+    }
   | { type: 'VIDEO_END'; meta: { beforeAutoswitch: boolean; isPreview: boolean } }
-  | { type: 'SET_PAUSED'; meta: { isEnded: boolean } };
+  | { type: 'SET_PAUSED'; payload: { pausedAt: number | null }; meta: { isEnded: boolean } };
 
 export type Event = EventsWithPayload['type'];
 

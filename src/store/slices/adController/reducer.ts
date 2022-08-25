@@ -1,7 +1,7 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
-import type { AppEvent, FSMConfig } from 'store/types';
+import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { TAdPointConfig } from 'types/ad';
 import { logger } from 'utils/logger';
 
@@ -15,6 +15,7 @@ const initialState: FSMState = {
   data: null,
   point: null,
   isStarted: false,
+  adBreaksCount: 0,
 };
 
 const extend = (config: FSMConfig<State, Event>, transition: { [event in Event]?: State | null }) => {
@@ -35,6 +36,7 @@ const config: FSMConfig<State, AppEvent> = {
     AD_INIT: 'INIT_AD_PENDING',
     CHECK_TIME_POINT: 'CHECK_TIME_POINT_PENDING',
     DO_PLAY_RESOLVE: 'CHECK_PAUSE_ROLL_PENDING',
+    SET_PLAYING: 'CHECK_PAUSE_ROLL_PENDING', // для обработки нажатия play в ios в фулскрине
     CHECK_POST_ROLL: 'CHECK_POST_ROLL_PENDING',
   },
   INIT_AD_SERVICE: {
@@ -42,28 +44,31 @@ const config: FSMConfig<State, AppEvent> = {
   },
   CHECK_POST_ROLL_PENDING: {
     CHECK_POST_ROLL_RESOLVE: 'IDLE',
-    INIT_AD_BREAK: 'AD_BREAK',
+    INIT_AD_BREAK: 'INITIALIZING_AD_BREAK',
   },
   CHECK_PAUSE_ROLL_PENDING: {
     CHECK_PAUSE_ROLL_RESOLVE: 'IDLE',
-    INIT_AD_BREAK: 'AD_BREAK',
+    INIT_AD_BREAK: 'INITIALIZING_AD_BREAK',
   },
   INIT_AD_PENDING: {
     RESUME_VIDEO: 'IDLE', // нет преролла
     INIT_AD_REJECT: 'DISABLED', // нет рекламы
-    INIT_AD_BREAK: 'AD_BREAK',
+    INIT_AD_BREAK: 'INITIALIZING_AD_BREAK',
   },
   CHECK_TIME_POINT_PENDING: {
     PRELOAD_AD_BLOCK: 'PRELOAD_AD_BLOCK_PENDING',
-    INIT_AD_BREAK: 'AD_BREAK',
+    INIT_AD_BREAK: 'INITIALIZING_AD_BREAK',
     CHECK_TIME_POINT_RESOLVE: 'IDLE',
   },
   PRELOAD_AD_BLOCK_PENDING: {
     PRELOAD_AD_BLOCK_STARTED: 'IDLE',
     PRELOAD_AD_BLOCK_REJECT: 'IDLE',
   },
+  INITIALIZING_AD_BREAK: {
+    AD_BREAK_STARTED: 'AD_BREAK',
+    AD_BREAK_END: 'END',
+  },
   AD_BREAK: {
-    AD_BREAK_STARTED: null,
     AD_BREAK_END: 'END',
   },
   END: {
@@ -79,21 +84,22 @@ const adController = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(createAction<ActionPayload>(FSM_EVENT), (state, action) => {
+    builder.addCase(createAction<EventPayload>(FSM_EVENT), (state, action) => {
       const { type, payload } = action.payload;
 
-      if (type === 'RESET') return initialState;
-
       const next = config[state.step]?.[type];
+      const step = next || state.step;
+
+      if (type === 'RESET') return { ...initialState, adBreaksCount: state.adBreaksCount };
+      if (type === 'CHANGE_TRACK') return initialState;
+
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'adController', `${state.step} -> ${type} -> ${next}`);
 
-      const step = next || state.step;
-
       switch (type) {
         case 'AD_BREAK_STARTED':
-          return { ...state, step, isStarted: true };
+          return { ...state, step, isStarted: true, adBreaksCount: state.adBreaksCount + 1 };
         default:
           return { ...state, step, ...payload };
       }
@@ -165,7 +171,7 @@ const addMiddleware = () =>
 
           preloadAdBlock(point, opts);
         },
-        AD_BREAK: () => {
+        INITIALIZING_AD_BREAK: () => {
           const {
             payload: { payload },
           } = action as PayloadAction<{

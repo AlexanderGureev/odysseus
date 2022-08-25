@@ -3,14 +3,12 @@ import { EffectOpts } from 'interfaces';
 import { LS_KEY_STREAM, THistoryStreams } from 'services/StreamService/types';
 import { QUALITY_MARKS } from 'services/VigoService';
 import { EventPayload } from 'store';
-import { AdCategory } from 'types/ad';
 
-export const horusStat = async (
+export const horusStat = (
   { payload }: PayloadAction<EventPayload>,
   { getState, services: { horusService, localStorageService } }: EffectOpts
 ) => {
   const {
-    adController,
     quality,
     playback,
     error: { error },
@@ -36,6 +34,9 @@ export const horusStat = async (
       break;
     case 'SET_PLAYING':
       horusService.routeEvent('HORUS_VIDEO_STARTED');
+      break;
+    case 'AUTO_PAUSE_RESOLVE':
+      horusService.routeEvent('HORUS_AUTO_PAUSE');
       break;
     case 'SET_PAUSED':
       const { isEnded } = payload.meta;
@@ -88,12 +89,6 @@ export const horusStat = async (
 
     case 'AD_CREATIVE_INITIALIZED':
       horusService.routeEvent('HORUS_AD_REQUEST');
-      break;
-    case 'AD_BREAK_STARTED':
-      const { point, category } = adController.point || {};
-      if ((point === 0 && category === AdCategory.PRE_ROLL) || category === AdCategory.POST_ROLL) return;
-
-      horusService.routeEvent('HORUS_AUTO_PAUSE');
       break;
     case 'AD_BLOCK_IMPRESSION':
       horusService.routeEvent('HORUS_AD_SHOW_START');

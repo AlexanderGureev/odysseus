@@ -71,6 +71,7 @@ export const amberdataStats = async (
         eventManual: 0,
       });
       break;
+    case 'AUTO_PAUSE_RESOLVE':
     case 'SET_PAUSED':
       amberdataService.sendAmberdataStat({
         eventType: 'pause',

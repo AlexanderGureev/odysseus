@@ -307,13 +307,13 @@ const addMiddleware = () =>
         dispatch: api.dispatch,
       });
 
-      const { step } = getState().root;
-
       const opts = {
         dispatch,
         getState,
         services,
       };
+
+      const { step } = getState().root;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         INIT_PENDING: () => initialize(opts),

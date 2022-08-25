@@ -40,7 +40,6 @@ export const getNext = ({ getState, dispatch, services: { adService, embeddedChe
       });
     }
 
-    // limit
     dispatch(
       sendEvent({
         type: 'PLAY_NEXT_BLOCK',

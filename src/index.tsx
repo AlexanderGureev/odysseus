@@ -16,8 +16,11 @@ import { QUALITY_MARKS } from 'services/VigoService';
 import { sendEvent, store } from 'store';
 import { getTrackInfo } from 'store/selectors';
 import { AD_BANNER_CONTAINER_ID } from 'store/slices/adBanner';
+import { Lang, LinkedAudioTrackItem } from 'store/slices/audioTracks';
 import { Screens } from 'store/slices/splashscreen';
+import { ContentByType, TS_TRIGGER } from 'store/slices/trialSuggestion/utils';
 import { secToHumanReadeable } from 'utils';
+import { declOfNum } from 'utils/declOfNum';
 import { sleep } from 'utils/retryUtils';
 
 // start app
@@ -87,6 +90,8 @@ const Player = () => {
   const paywall = useAppSelector((state) => state.paywall);
   const payNotify = useAppSelector((state) => state.payNotify);
   const payButton = useAppSelector((state) => state.payButton);
+  const audioTracks = useAppSelector((state) => state.audioTracks);
+  const trialSuggestion = useAppSelector((state) => state.trialSuggestion);
 
   useEffect(() => {
     dispatch(sendEvent({ type: 'DO_PLAYER_INIT' }));
@@ -161,6 +166,8 @@ const Player = () => {
                 ))}
               </select>
             </div>
+
+            {audioTracks.currentConfig && <AudioTracks config={audioTracks.currentConfig} />}
 
             {!root.deviceInfo.isMobile && (
               <div>
@@ -323,7 +330,15 @@ const Player = () => {
           </div>
           {payNotify.step === 'READY' && <PayNotify />}
 
-          {payButton.step === 'READY' && <PayButton />}
+          {payButton.step === 'READY' && trialSuggestion.step !== 'SHOWING_TRIAL_NOTICE' && <PayButton />}
+
+          {volume.muted && <UnmuteButton />}
+
+          {trialSuggestion.step === 'SHOWING_TRIAL_NOTICE' &&
+            trialSuggestion.notifyType &&
+            trialSuggestion.notifyContent && (
+              <TrialSuggestionNotify type={trialSuggestion.notifyType} content={trialSuggestion.notifyContent} />
+            )}
         </>
       )}
 
@@ -389,31 +404,7 @@ const Player = () => {
 
       {adNotify.time && <div className="ad-notify">{adNotify.time} сек. до рекламной паузы</div>}
 
-      {autoSwitch.step === 'AUTOSWITCH_NOTIFY' && (
-        <div className="auto-switch">
-          <div>{Math.ceil(autoSwitch.countdownValue)} сек. до автопереключения</div>
-          <button
-            onClick={() => {
-              dispatch(
-                sendEvent({
-                  type: 'HIDE_AUTOSWITCH_NOTIFY',
-                })
-              );
-            }}>
-            {autoSwitch.cancelButtonText}
-          </button>
-          <button
-            onClick={() => {
-              dispatch(
-                sendEvent({
-                  type: 'START_AUTOSWITCH',
-                })
-              );
-            }}>
-            {autoSwitch.buttonText}
-          </button>
-        </div>
-      )}
+      {autoSwitch.step === 'AUTOSWITCH_NOTIFY' && <Autoswitch />}
 
       {root.step === 'BIG_PLAY_BUTTON' && (
         <div
@@ -483,7 +474,159 @@ const Player = () => {
   );
 };
 
+const Autoswitch = () => {
+  const dispatch = useAppDispatch();
+  const autoSwitch = useAppSelector((state) => state.autoSwitch);
+  const adBreaksCount = useAppSelector((state) => state.adController.adBreaksCount);
+
+  if (autoSwitch.autoswitchNotifyType === 'avod_popup') {
+    const text = declOfNum(adBreaksCount, [
+      'была показана [N] рекламная вставка',
+      'было показано [N] рекламные вставки',
+      'было показано [N] рекламных вставок',
+    ]);
+
+    return (
+      <div className="auto-switch">
+        <div className="title">За прошедшую серию {text.replace('[N]', `${adBreaksCount}`)}</div>
+        {autoSwitch.autoswitchNotifyText && (
+          <div className="description" dangerouslySetInnerHTML={{ __html: autoSwitch.autoswitchNotifyText }} />
+        )}
+
+        <button
+          onClick={() => {
+            dispatch(
+              sendEvent({
+                type: 'CLICK_SUB_BUTTON',
+              })
+            );
+
+            dispatch(
+              sendEvent({
+                type: 'HIDE_AUTOSWITCH_NOTIFY',
+              })
+            );
+          }}>
+          {autoSwitch.cancelButtonText}
+        </button>
+        <button
+          onClick={() => {
+            dispatch(
+              sendEvent({
+                type: 'START_AUTOSWITCH',
+              })
+            );
+          }}>
+          {autoSwitch.buttonText}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="auto-switch">
+      <div>{Math.ceil(autoSwitch.countdownValue)} сек. до автопереключения</div>
+      <button
+        onClick={() => {
+          dispatch(
+            sendEvent({
+              type: 'HIDE_AUTOSWITCH_NOTIFY',
+            })
+          );
+        }}>
+        {autoSwitch.cancelButtonText}
+      </button>
+      <button
+        onClick={() => {
+          dispatch(
+            sendEvent({
+              type: 'START_AUTOSWITCH',
+            })
+          );
+        }}>
+        {autoSwitch.buttonText}
+      </button>
+    </div>
+  );
+};
+
+const TrialSuggestionNotify: React.FC<{ type: TS_TRIGGER; content: ContentByType }> = ({ type, content }) => {
+  const dispatch = useAppDispatch();
+
+  return (
+    <div className="trial-suggestion">
+      {content.title && <div className="title" dangerouslySetInnerHTML={{ __html: content.title }} />}
+      {content.description && <div className="description" dangerouslySetInnerHTML={{ __html: content.description }} />}
+
+      {content.payButtonText && (
+        <button
+          className="pay-btn"
+          onClick={() => {
+            dispatch(sendEvent({ type: 'CLICK_PAY_BUTTON_TRIAL_NOTICE' }));
+          }}>
+          {content.payButtonText}
+        </button>
+      )}
+
+      {content.closeButtonText && (
+        <button
+          className="close-btn"
+          onClick={() => {
+            dispatch(sendEvent({ type: 'CLICK_CLOSE_TRIAL_NOTICE' }));
+          }}>
+          {content.closeButtonText}
+        </button>
+      )}
+    </div>
+  );
+};
+
+const UnmuteButton = () => {
+  const dispatch = useAppDispatch();
+
+  return (
+    <div className="unmute-btn">
+      <button
+        onClick={() => {
+          dispatch(sendEvent({ type: 'SET_MUTE', payload: { value: false } }));
+        }}>
+        unmute
+      </button>
+    </div>
+  );
+};
+
+const AudioTracksMap: { [key in Lang]: string } = {
+  rus: 'Русский',
+  eng: 'Английский с русскими субтитрами',
+};
+
+const AudioTracks: React.FC<{ config: LinkedAudioTrackItem }> = ({ config }) => {
+  const dispatch = useAppDispatch();
+
+  return (
+    <div className="audio-tracks-wrapper">
+      <select
+        value={config.currentLang}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+          dispatch(sendEvent({ type: 'CHANGE_AUDIO_TRACK' }));
+        }}>
+        {Object.keys(AudioTracksMap).map((key) => {
+          const isActive = config.currentLang === key;
+
+          return (
+            <option value={key} key={key} className={cn('audio-track-option', isActive && 'active')}>
+              {AudioTracksMap[key as Lang]}
+            </option>
+          );
+        })}
+      </select>
+    </div>
+  );
+};
+
 const AdBanner = () => {
+  // todo скрыть баннер при показе trial notify
   return (
     <div className="ad-banner-wrapper">
       <div id={AD_BANNER_CONTAINER_ID} />
@@ -560,7 +703,7 @@ const NetworkNotify = () => {
 
 const Paywall = () => {
   const dispatch = useAppDispatch();
-  const { title, description, buttonText } = useAppSelector((state) => state.paywall);
+  const { title, description, paywallButtonText } = useAppSelector((state) => state.paywall);
 
   return (
     <div className="paywall overlay">
@@ -572,7 +715,7 @@ const Paywall = () => {
         onClick={() => {
           dispatch(sendEvent({ type: 'CLICK_SUB_BUTTON' }));
         }}>
-        {buttonText}
+        {paywallButtonText}
       </button>
     </div>
   );

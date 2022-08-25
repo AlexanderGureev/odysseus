@@ -78,12 +78,6 @@ const addMiddleware = () =>
 
       const { step } = getState().adBanner;
 
-      const opts = {
-        dispatch,
-        getState,
-        services,
-      };
-
       const handler: { [key in State]?: () => Promise<void> | void } = {
         INIT_AD_BANNER: () => {
           const {

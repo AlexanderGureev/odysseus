@@ -5,7 +5,7 @@ import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { toFixed } from 'utils';
 import { logger } from 'utils/logger';
 
-import { ActionPayload, FSMState, State } from './types';
+import { FSMState, State } from './types';
 
 const initialState: FSMState = {
   step: 'IDLE',
@@ -57,8 +57,6 @@ const buffering = createSlice({
       logger.log('[FSM]', 'buffering', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
-        case 'BUFFERING_START':
-          return { ...state, step, startAt: Date.now() };
         case 'BUFFERING_END':
           const { bufferingTime } = payload;
 
@@ -116,6 +114,9 @@ const addMiddleware = () =>
               dispatch(
                 sendEvent({
                   type: 'BUFFERING_START',
+                  payload: {
+                    startAt: Date.now(),
+                  },
                 })
               );
             }

@@ -59,6 +59,7 @@ export type Events = {
 export type AdServiceHooks = {
   adBlockCreated: (block: TAdBlock) => void;
   canPlayAd: (category: AdCategory) => boolean;
+  beforeAdBreakStart: (category: AdCategory) => Promise<void>;
 };
 
 export type AdHookType = keyof AdServiceHooks;

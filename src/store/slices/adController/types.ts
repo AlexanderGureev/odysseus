@@ -7,6 +7,7 @@ export type State =
   | 'INIT_AD_SERVICE'
   | 'END'
   | 'INIT_AD_PENDING'
+  | 'INITIALIZING_AD_BREAK'
   | 'AD_BREAK'
   | 'PRELOAD_AD_BLOCK_PENDING'
   | 'CHECK_TIME_POINT_PENDING'
@@ -74,4 +75,5 @@ export type FSMState = {
   data: TAdConfig | null;
   point: TAdPointConfig | null;
   isStarted: boolean;
+  adBreaksCount: number;
 };

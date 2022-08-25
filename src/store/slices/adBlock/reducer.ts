@@ -112,13 +112,13 @@ const addMiddleware = () =>
         dispatch: api.dispatch,
       });
 
-      const { step } = getState().adBlock;
-
       const opts = {
         dispatch,
         getState,
         services,
       };
+
+      const { step } = getState().adBlock;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         NEXT_BLOCK_PENDING: () => {

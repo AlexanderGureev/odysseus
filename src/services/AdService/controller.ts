@@ -38,6 +38,7 @@ const AdService = (localStorageService: ILocalStorageService) => {
   let hooks: AdControllerHooks = {
     adBlockCreated: [],
     canPlayAd: [],
+    beforeAdBreakStart: [],
   };
 
   const addHook = <T extends AdHookType, C extends AdServiceHooks[T]>(type: T, hook: C) => {
@@ -65,7 +66,7 @@ const AdService = (localStorageService: ILocalStorageService) => {
     isInitialized = Boolean(sdk);
 
     // TODO DELETE
-    throw new Error('test');
+    // throw new Error('test');
   };
 
   const isPreloadable = () => ADV_CACHE_LOOKAHEAD > 0;
@@ -214,6 +215,14 @@ const AdService = (localStorageService: ILocalStorageService) => {
     });
   };
 
+  const startAdBreakHook = async (category: AdCategory) => {
+    for (const hook of hooks.beforeAdBreakStart) {
+      try {
+        await hook(category);
+      } catch (err) {}
+    }
+  };
+
   return {
     init,
     isInitialized,
@@ -232,6 +241,7 @@ const AdService = (localStorageService: ILocalStorageService) => {
     updateTimeout,
     isPreloadable,
     addHook,
+    startAdBreakHook,
   };
 };
 

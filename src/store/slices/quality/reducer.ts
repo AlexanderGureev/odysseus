@@ -127,13 +127,13 @@ const addMiddleware = () =>
         dispatch: api.dispatch,
       });
 
-      const { step } = getState().quality;
-
       const opts = {
         dispatch,
         getState,
         services,
       };
+
+      const { step } = getState().quality;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         QUALITY_INITIALIZATION: () => init(opts),

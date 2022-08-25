@@ -6,6 +6,9 @@ export type EventsWithPayload =
   | WithoutPayload<'REBUFFERING_INIT_RESOLVE'>
   | {
       type: 'BUFFERING_START';
+      payload: {
+        startAt: number;
+      };
     }
   | {
       type: 'BUFFER_UPDATE';

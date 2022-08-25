@@ -8,7 +8,7 @@ export type EventsWithPayload =
       payload: {
         title: string;
         description: string | null;
-        buttonText: string;
+        paywallButtonText: string;
       };
     }
   | {
@@ -25,5 +25,5 @@ export type FSMState = {
   step: State;
   title: string;
   description: string | null;
-  buttonText: string;
+  paywallButtonText: string;
 };

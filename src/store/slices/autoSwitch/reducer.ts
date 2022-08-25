@@ -1,4 +1,6 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
+import { isIOS } from 'react-device-detect';
+import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
@@ -8,6 +10,7 @@ import { isNil } from 'utils';
 import { logger } from 'utils/logger';
 
 import { FSMState, State } from './types';
+import { getAutoswitchNotifyContent, selectAutoswitchNotifyType } from './utils';
 
 const initialState: FSMState = {
   step: 'IDLE',
@@ -23,6 +26,8 @@ const initialState: FSMState = {
   previousTime: null,
 
   auto: true,
+  autoswitchNotifyType: 'default',
+  autoswitchNotifyText: null,
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -36,10 +41,14 @@ const config: FSMConfig<State, AppEvent> = {
   READY: {
     TIME_UPDATE: null,
   },
+  SELECT_AUTOSWITCH_NOTIFY_TYPE: {
+    SELECT_AUTOSWITCH_NOTIFY_TYPE_RESOLVE: 'AUTOSWITCH_NOTIFY',
+  },
   AUTOSWITCH_NOTIFY: {
     TIME_UPDATE: null,
     START_AUTOSWITCH: 'AUTOSWITCH_PENDING',
     HIDE_AUTOSWITCH_NOTIFY: 'AUTOSWITCH_WAITING',
+    CLOSE_AUTOSWITCH_NOTIFY: 'AUTOSWITCH_WAITING',
   },
   AUTOSWITCH_WAITING: {
     START_VIDEO_END_AUTOSWITCH: 'AUTOSWITCH_PENDING',
@@ -114,6 +123,9 @@ const autoSwitch = createSlice({
           const previousTime = state.previousTime || currentTime;
           const diff = currentTime - previousTime;
 
+          // TODO узнать нужно ли так?
+          if (state.step === 'AUTOSWITCH_NOTIFY' && state.autoswitchNotifyType === 'avod_popup') return state;
+
           // если старт ролика или перемотка сразу попадает в интервал autoswitch,
           // то переходим в механику автопереключения в конце трека
           if (currentTime >= state.autoswitchPoint && (previousTime === currentTime || diff > 1)) {
@@ -132,7 +144,7 @@ const autoSwitch = createSlice({
               ...state,
               previousTime: currentTime,
               countdownValue,
-              step: Math.ceil(countdownValue) > 0 ? 'AUTOSWITCH_NOTIFY' : 'AUTOSWITCH_PENDING',
+              step: Math.ceil(countdownValue) > 0 ? 'SELECT_AUTOSWITCH_NOTIFY_TYPE' : 'AUTOSWITCH_PENDING',
             };
           }
 
@@ -159,13 +171,13 @@ const addMiddleware = () =>
         dispatch: api.dispatch,
       });
 
-      const { step } = getState().autoSwitch;
-
       const opts = {
-        dispatch,
         getState,
+        dispatch,
         services,
       };
+
+      const { step } = getState().autoSwitch;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         PREPARE_AUTOSWITCH: () => {
@@ -177,9 +189,44 @@ const addMiddleware = () =>
             return true;
           });
 
+          services.postMessageService.on('on_close_off_ads_experiment', () => {
+            const { autoswitchNotifyType } = getState().autoSwitch;
+            if (autoswitchNotifyType === 'avod_popup') {
+              dispatch(sendEvent({ type: 'CLOSE_AUTOSWITCH_NOTIFY' }));
+            }
+          });
+
           dispatch(sendEvent({ type: 'PREPARE_AUTOSWITCH_RESOLVE' }));
         },
+        SELECT_AUTOSWITCH_NOTIFY_TYPE: () => {
+          const autoswitchNotifyType = selectAutoswitchNotifyType(opts);
+          const content = getAutoswitchNotifyContent(getState(), autoswitchNotifyType);
+
+          dispatch(
+            sendEvent({
+              type: 'SELECT_AUTOSWITCH_NOTIFY_TYPE_RESOLVE',
+              payload: {
+                autoswitchNotifyType,
+                ...content,
+              },
+            })
+          );
+        },
         AUTOSWITCH_NOTIFY: () => {
+          const {
+            fullscreen: { step },
+            autoSwitch: { autoswitchNotifyType },
+          } = getState();
+
+          if (autoswitchNotifyType === 'avod_popup') {
+            services.localStorageService.setItemByDomain(STORAGE_SETTINGS.AUTOSWITCH_AVOD_POPUP, Date.now());
+          }
+
+          // на ios в фулскрине нативный плеер и мы не увидим там autoSwitch notify, поэтому принудительно выходим
+          if (step === 'FULLSCREEN' && isIOS) {
+            dispatch(sendEvent({ type: 'EXIT_FULLCREEN' }));
+          }
+
           dispatch(sendEvent({ type: 'AUTOSWITCH_NOTIFY_SHOWN' }));
         },
         AUTOSWITCH_PENDING: () => {

@@ -50,7 +50,7 @@ const initialState: FSMState = {
   step: 'IDLE',
   title: '',
   description: null,
-  buttonText: '',
+  paywallButtonText: '',
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -124,12 +124,12 @@ const addMiddleware = () => {
 
           const title = PAYWALL_TITLE || DEFAULT_TITLE;
           const description = getPaywallDescription(state, type);
-          const buttonText = getButtonTextBySkin(state, type);
+          const paywallButtonText = getButtonTextBySkin(state, type);
 
           dispatch(
             sendEvent({
               type: 'SETUP_PAYWALL_RESOLVE',
-              payload: { title, description, buttonText },
+              payload: { title, description, paywallButtonText },
             })
           );
         },

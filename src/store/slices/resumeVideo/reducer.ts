@@ -88,13 +88,13 @@ const addMiddleware = () =>
         dispatch: api.dispatch,
       });
 
-      const { step } = getState().resumeVideo;
-
       const opts = {
         dispatch,
         getState,
         services,
       };
+
+      const { step } = getState().resumeVideo;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         INITIALIZE_P2P: () => {

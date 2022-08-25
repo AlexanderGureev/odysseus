@@ -9,6 +9,7 @@ import adController from './slices/adController/reducer';
 import adTimeNotify from './slices/adTimeNotify/reducer';
 import adultNotify from './slices/adultNotify/reducer';
 import analytics from './slices/analytics/reducer';
+import audioTracks from './slices/audioTracks/reducer';
 import autoSwitch from './slices/autoSwitch/reducer';
 import beholder from './slices/beholder/reducer';
 import buffering from './slices/buffering/reducer';
@@ -38,6 +39,7 @@ import rewind from './slices/rewind/reducer';
 import rewindAcc from './slices/rewindAcc/reducer';
 import root from './slices/root/reducer';
 import splashscreen from './slices/splashscreen/reducer';
+import trialSuggestion from './slices/trialSuggestion/reducer';
 import visibility from './slices/visibility/reducer';
 import volume from './slices/volume/reducer';
 import watchpoint from './slices/watchpoint/reducer';
@@ -68,6 +70,8 @@ const rootReducer = combineReducers({
   postMessages: postMessages.reducer,
   // управление рекламными баннерами
   adBanner: adBanner.reducer,
+  trialSuggestion: trialSuggestion.reducer,
+
   /* 
   корневой автомат, точка входа в приложение:
   1) парсинг конфига
@@ -140,6 +144,7 @@ const rootReducer = combineReducers({
   paywall: paywall.reducer,
   //
   payNotify: payNotify.reducer,
+  audioTracks: audioTracks.reducer,
   // модуль сбора ошибок
   error: error.reducer,
 });
@@ -148,6 +153,7 @@ experiments.addMiddleware();
 analytics.addMiddleware();
 postMessages.addMiddleware();
 adBanner.addMiddleware();
+trialSuggestion.addMiddleware();
 
 root.addMiddleware();
 resumeVideo.addMiddleware();
@@ -183,6 +189,7 @@ mediaSession.addMiddleware();
 payButton.addMiddleware();
 paywall.addMiddleware();
 payNotify.addMiddleware();
+audioTracks.addMiddleware();
 error.addMiddleware();
 
 // console.log(

@@ -90,13 +90,13 @@ const addMiddleware = () =>
         dispatch: api.dispatch,
       });
 
-      const { step } = getState().favouritesController;
-
       const opts = {
         dispatch,
         getState,
         services,
       };
+
+      const { step } = getState().favouritesController;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         INITIAL_SYNC_FAVOURITES: () => initialSync(opts),

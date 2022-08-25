@@ -6,8 +6,10 @@ import { logger } from 'utils/logger';
 
 import { adEvents } from './effects/adEvents';
 import { adultNotify } from './effects/adultNotify';
+import { autoswitchPopup } from './effects/autoswitchPopup';
 import { baseEvents } from './effects/baseEvents';
 import { resumeNotify } from './effects/resumeNotify';
+import { trialSuggestion } from './effects/trialSuggestion';
 import { FSMState, State } from './types';
 
 const initialState: FSMState = {
@@ -157,10 +159,13 @@ const addMiddleware = () => {
       };
 
       const event = action as PayloadAction<EventPayload>;
+
+      autoswitchPopup(event, opts);
       baseEvents(event, opts);
       adEvents(event, opts);
       resumeNotify(event, opts);
       adultNotify(event, opts);
+      trialSuggestion(event, opts);
     },
   });
 };

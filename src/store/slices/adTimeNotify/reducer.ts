@@ -89,13 +89,13 @@ const addMiddleware = () =>
         dispatch: api.dispatch,
       });
 
-      const { step } = getState().adTimeNotify;
-
       const opts = {
         dispatch,
         getState,
         services,
       };
+
+      const { step } = getState().adTimeNotify;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {};
 

@@ -34,6 +34,7 @@ export const baseEvents = (
       postMessageService.emit('launch-player');
       break;
 
+    case 'AUTO_PAUSE_RESOLVE':
     case 'DO_PAUSE':
     case 'SET_PAUSED':
       postMessageService.emit('paused', {
@@ -113,6 +114,7 @@ export const baseEvents = (
         },
       });
       break;
+
     case 'GO_TO_NEXT_TRACK':
     case 'GO_TO_PREV_TRACK': {
       const type = payload.type === 'GO_TO_PREV_TRACK' ? 'previous' : 'next';

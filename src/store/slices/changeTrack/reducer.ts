@@ -96,13 +96,13 @@ const addMiddleware = () =>
         dispatch: api.dispatch,
       });
 
-      const { step } = getState().changeTrack;
-
       const opts = {
         dispatch,
         getState,
         services,
       };
+
+      const { step } = getState().changeTrack;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         CHECK_TOKEN_PENDING: () => checkToken(opts),
@@ -128,7 +128,7 @@ const addMiddleware = () =>
 
             const { location } = await services.embeddedCheckService.getIframeLocation();
             const config = await fetchConfig(configURL, location);
-            const query = data.trackVod.queryParams;
+            const query = data.trackVod?.queryParams;
 
             dispatch(
               sendEvent({
@@ -147,7 +147,10 @@ const addMiddleware = () =>
                     ...params,
                   },
                 },
-              })
+              }),
+              {
+                currentSession: true,
+              }
             );
           } catch (err) {
             logger.error('[change track]', err);

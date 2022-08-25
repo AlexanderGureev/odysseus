@@ -19,4 +19,10 @@ export enum STORAGE_SETTINGS {
   CURRENT_TIME = 'current_time',
   USER_ID = 'user_id',
   USER_TOKEN = 'user_token',
+
+  AFTER_PREROLL_TIMESTAMP = '@trial_suggestion/after_preroll_ts',
+  AFTER_MIDROLL_TIMESTAMP = '@trial_suggestion/after_midroll_ts',
+  BEFORE_PAUSEROLL_TIMESTAMP = '@trial_suggestion/before_pauseroll_ts',
+
+  AUTOSWITCH_AVOD_POPUP = '@autoswitch/avod_popup',
 }

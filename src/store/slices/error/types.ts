@@ -1,7 +1,7 @@
 import { DefaultPayload, ErrorPayload, WithoutPayload } from 'store/types';
 import { RawPlayerError } from 'types/errors';
 
-export type State = 'IDLE' | 'ERROR' | 'NETWORK_ERROR';
+export type State = 'IDLE' | 'ERROR' | 'NETWORK_ERROR' | 'DISABLED';
 
 export type EventsWithPayload =
   | ErrorPayload<'PLAYER_ERROR' | 'NETWORK_ERROR'>

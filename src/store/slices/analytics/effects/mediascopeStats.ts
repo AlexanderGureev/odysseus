@@ -33,6 +33,7 @@ export const mediascopeStats = async (
         videoType: VIDEO_TYPE.PLAIN,
       });
       break;
+    case 'AUTO_PAUSE_RESOLVE':
     case 'SET_PAUSED':
     case 'DO_PAUSE':
       mediascopeCounter.sendEvent('VIDEO_PAUSE', {

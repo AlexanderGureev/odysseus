@@ -99,6 +99,9 @@ export const createEnv = (req: express.Request): TEnvConfig => ({
   FAIRPLAY_CERT_ENDPOINT: process.env.FAIRPLAY_CERT_ENDPOINT || 'https://static.more.tv/cert/fp/ctc.der',
   YMID: toNumber(process.env.YMID),
   PUBLIC_BE_ENDPOINT: process.env.PUBLIC_BE_ENDPOINT,
+  APP_STATIC_ENDPOINT: process.env.APP_STATIC_ENDPOINT,
+  LINKED_AUDIO_TRACKS_CONFIG_PATH: process.env.LINKED_AUDIO_TRACKS_CONFIG_PATH,
+  SIREN_PUBLIC_HOST: process.env.SIREN_PUBLIC_HOST,
 });
 
-export const isNumber = (num: string | undefined) => num && !Number.isNaN(Number(num));
+export const isNumber = (num: string | undefined) => (num ? !Number.isNaN(Number(num)) : false);

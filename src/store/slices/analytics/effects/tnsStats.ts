@@ -25,6 +25,7 @@ export const tnsStats = async (
     case 'SET_PLAYING':
       tnsCounter.sendTnsHeartBeatStat('play', currentTime);
       break;
+    case 'AUTO_PAUSE_RESOLVE':
     case 'SET_PAUSED':
     case 'DO_PAUSE':
       tnsCounter.sendTnsHeartBeatStat('pause', currentTime);

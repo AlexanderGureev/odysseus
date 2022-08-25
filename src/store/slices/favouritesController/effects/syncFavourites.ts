@@ -84,7 +84,11 @@ const sync = async (
   }
 };
 
-export const syncFavourites = (prevState: boolean, newState: boolean, { getState, dispatch, services }: EffectOpts) => {
+export const syncFavourites = (
+  prevState: boolean,
+  newState: boolean,
+  { getState, dispatch, services, ...rest }: EffectOpts
+) => {
   clearTimer();
   if (initialState === null) initialState = prevState;
 
@@ -102,7 +106,7 @@ export const syncFavourites = (prevState: boolean, newState: boolean, { getState
     if (initialState === newState) return;
     initialState = null;
 
-    await sync(trackInfo.project.id, prevState, newState, { getState, dispatch, services });
+    await sync(trackInfo.project.id, prevState, newState, { getState, dispatch, services, ...rest });
   }, TIMEOUT);
 
   dispatch(

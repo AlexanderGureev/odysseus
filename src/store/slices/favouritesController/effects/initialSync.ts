@@ -113,7 +113,7 @@ const syncByMode = async (mode: Mode, { getState, services }: EffectOpts) => {
   }
 };
 
-export const initialSync = async ({ getState, dispatch, services }: EffectOpts) => {
+export const initialSync = async ({ getState, dispatch, services, ...rest }: EffectOpts) => {
   const {
     favourites: { mode },
     root: {
@@ -134,7 +134,7 @@ export const initialSync = async ({ getState, dispatch, services }: EffectOpts) 
       await services.favouritesService.clearFavourites();
     }
 
-    await syncByMode(mode, { getState, dispatch, services });
+    await syncByMode(mode, { getState, dispatch, services, ...rest });
 
     dispatch(
       sendEvent({

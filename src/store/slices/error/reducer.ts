@@ -27,7 +27,9 @@ const config: FSMConfig<State, AppEvent> = {
     FETCH_TRACK_CONFIG_REJECT: 'ERROR',
     QUALITY_INITIALIZATION_REJECT: 'ERROR',
     PLAYER_ERROR: 'ERROR',
+    CHANGE_AUDIO_TRACK_REJECT: 'ERROR',
     NETWORK_ERROR: 'NETWORK_ERROR',
+    BEFORE_UNLOAD: 'DISABLED', // мы не хотим отправлять ошибки об aborted запросах
   },
   ERROR: {
     RELOAD: 'IDLE',
@@ -35,6 +37,7 @@ const config: FSMConfig<State, AppEvent> = {
   NETWORK_ERROR: {
     GO_ONLINE: 'IDLE',
   },
+  DISABLED: {},
 };
 
 const error = createSlice({
@@ -53,6 +56,8 @@ const error = createSlice({
       const step = next || state.step;
 
       switch (type) {
+        case 'BEFORE_UNLOAD':
+          return { ...state, step };
         case 'GO_ONLINE':
           return initialState;
         default:

@@ -7,6 +7,7 @@ import * as adController from './slices/adController';
 import * as adTimeNotify from './slices/adTimeNotify';
 import * as adultNotify from './slices/adultNotify';
 import * as analytics from './slices/analytics';
+import * as audioTracks from './slices/audioTracks';
 import * as autoSwitch from './slices/autoSwitch';
 import * as beholder from './slices/beholder';
 import * as buffering from './slices/buffering';
@@ -36,6 +37,7 @@ import * as rewind from './slices/rewind';
 import * as rewindAcc from './slices/rewindAcc';
 import * as root from './slices/root';
 import * as splashscreen from './slices/splashscreen';
+import * as trialSuggestion from './slices/trialSuggestion';
 import * as updater from './slices/updater';
 import * as visibility from './slices/visibility';
 import * as volume from './slices/volume';
@@ -106,7 +108,9 @@ export type EventPayload =
   | payButton.ActionPayload
   | paywall.ActionPayload
   | payNotify.ActionPayload
-  | adBanner.ActionPayload;
+  | adBanner.ActionPayload
+  | audioTracks.ActionPayload
+  | trialSuggestion.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -148,4 +152,6 @@ export type AppEvent =
   | payButton.Event
   | paywall.Event
   | payNotify.Event
-  | adBanner.Event;
+  | adBanner.Event
+  | audioTracks.Event
+  | trialSuggestion.Event;

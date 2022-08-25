@@ -62,3 +62,13 @@ export const createCounter = () => {
     return counter;
   };
 };
+
+export const buildQueryParams = (params: Record<string, any>) => {
+  const queryParams = new URLSearchParams();
+
+  for (const key of Object.keys(params)) {
+    if (!isNil(params[key])) queryParams.set(key, params[key]);
+  }
+
+  return queryParams.toString();
+};

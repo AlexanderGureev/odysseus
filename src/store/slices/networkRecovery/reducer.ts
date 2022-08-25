@@ -17,7 +17,6 @@ const initialState: FSMState = {
 
   attempt: 0,
   timerValue: 0,
-  timerTimestamp: null,
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -63,12 +62,10 @@ const networkRecovery = createSlice({
           return initialState;
         case 'CLICK_RETRY_BUTTON':
           state.attempt = 0;
-          state.timerTimestamp = Date.now();
           state.step = step;
           break;
         case 'RETRY_FAILED':
           state.timerValue = state.offlineTimer[state.attempt];
-          state.timerTimestamp = Date.now();
           state.step = step;
           break;
         case 'NEXT_RETRY': {
@@ -122,14 +119,12 @@ const addMiddleware = () =>
           }
         },
         TIMEOUT_WAITING: async () => {
-          const ts = getState().networkRecovery.timerTimestamp;
-
           while (true) {
             const {
-              networkRecovery: { timerTimestamp, timerValue },
+              networkRecovery: { step, timerValue },
             } = getState();
 
-            if (timerTimestamp !== ts) return;
+            if (step !== 'TIMEOUT_WAITING') return;
             await sleep(1000);
 
             if (timerValue === 1) {

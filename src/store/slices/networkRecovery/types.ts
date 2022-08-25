@@ -26,5 +26,4 @@ export type FSMState = {
 
   attempt: number;
   timerValue: number;
-  timerTimestamp: number | null;
 };

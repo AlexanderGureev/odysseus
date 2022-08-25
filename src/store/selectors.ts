@@ -3,11 +3,10 @@ import { isIOS, isMobile } from 'react-device-detect';
 import { Device, FavouritesItemMeta } from 'services/FavouritesService/types';
 import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { AppState } from 'store';
-import { TConfig, TExtendedConfig } from 'types';
+import { TExtendedConfig } from 'types';
 import { AppliedTariffModifiers, SubscriptionStatus, SubscriptionType, UserSubscription } from 'types/UserSubscription';
 import { pad } from 'utils';
 import { declOfNum } from 'utils/declOfNum';
-import { logger } from 'utils/logger';
 
 export const getPlaylistItem = (state: AppState) => state.root.config.playlist.items[0];
 
@@ -158,4 +157,15 @@ export const getTrialDurationText = (state: AppState) => {
 
   const text = declOfNum(duration, ['день', 'дня', 'дней']);
   return `${duration} ${text}`;
+};
+
+export const getSubPrice = (state: AppState) => {
+  const activeTariff = state.root.config?.serviceTariffs?.[0]?.tariffs?.[0];
+  return activeTariff?.price?.amount ?? 299;
+};
+
+export const getSubPriceText = (state: AppState) => {
+  const price = getSubPrice(state);
+  const priceText = declOfNum(price, ['рубль', 'рубля', 'рублей']);
+  return `${price} ${priceText}`;
 };

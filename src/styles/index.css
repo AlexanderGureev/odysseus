@@ -185,3 +185,21 @@ body {
   align-items: center;
   justify-content: center;
 }
+
+.unmute-btn {
+  position: absolute;
+  left: 20px;
+  bottom: 50px;
+}
+
+.trial-suggestion {
+  position: absolute;
+  left: 20px;
+  bottom: 100px;
+  color: #fff;
+}
+
+.trial-suggestion .title,
+.description {
+  margin-bottom: 12px;
+}

@@ -22,7 +22,10 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
 
   try {
     await currentBlock.preload();
+
     if (!isStarted) {
+      await adService.startAdBreakHook(point.category);
+      dispatch(sendEvent({ type: 'AUTO_PAUSE' }));
       dispatch(
         sendEvent({
           type: 'AD_BREAK_STARTED',

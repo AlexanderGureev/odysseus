@@ -1,3 +1,4 @@
+import { ConditionFunction } from '@reduxjs/toolkit/dist/listenerMiddleware/types';
 import { BannerOptions } from 'services/AdBannerManager/types';
 import { AdHookType, AdLinksByType, AdServiceHooks, InitOpts, NewBlockOpts, TAdBlock } from 'services/AdService/types';
 import {
@@ -170,6 +171,7 @@ export interface IAdService {
   updateTimeout: () => void;
   isPreloadable: () => boolean;
   addHook: <T extends AdHookType, C extends AdServiceHooks[T]>(type: T, hook: C) => void;
+  startAdBreakHook: AdServiceHooks['beforeAdBreakStart'];
 }
 
 export interface ITNSCounter {
