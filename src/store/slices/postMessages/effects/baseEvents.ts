@@ -24,8 +24,10 @@ export const baseEvents = (
       postMessageService.emit('inited', {
         payload: {
           adv: Boolean(adConfig && !hacks_detected.includes('adblock')),
+          tracks: config.playlist?.items?.[0]?.linked_tracks || null,
         },
       });
+
       break;
     case 'PLAYER_INIT_RESOLVE':
       postMessageService.emit('inited-player');

@@ -2,6 +2,7 @@ export interface IProcessEnv {
   NODE_ENV?: string;
   PORT?: string;
   DEBUG_MODE?: string;
+  APP_VERSION: string;
 
   PAK_HOST: string;
   HYDRA_HOST: string;

@@ -110,7 +110,10 @@ export const createParamsSelector = ({
   shown_frames: () => getState().quality.videoMeta.shown_frames,
   video_format: () => getState().quality.videoMeta.video_format,
   audio_format: () => getState().root.manifestData?.parsedManifest.audioFormat ?? null,
-  stream_hostname: () => getState().root.manifestData?.responseUrl ?? null,
+  stream_hostname: () => {
+    const url = getState().root.manifestData?.responseUrl;
+    return url ? new URL(url).hostname : null;
+  },
   app_name: () => {
     const skin = getState().root.meta.skin;
     if (!skin || skin === 'DEFAULT') {

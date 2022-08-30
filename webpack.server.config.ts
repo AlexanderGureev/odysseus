@@ -6,7 +6,7 @@ import pkg from './package.json';
 
 const IS_DEV = process.env.NODE_ENV !== 'production';
 const ENTRY = path.resolve('server');
-const DEV_SERVER_PATH = path.join(ENTRY, 'devServer.ts');
+const DEV_SERVER_PATH = path.join(ENTRY, 'httpserver', 'devServer.ts');
 
 const config: webpack.Configuration = {
   target: 'node',
@@ -44,7 +44,7 @@ const config: webpack.Configuration = {
   externals: IS_DEV ? [nodeExternals()] : [],
   plugins: [
     new webpack.DefinePlugin({
-      APP_VERSION: JSON.stringify(pkg.version),
+      'process.env.APP_VERSION': JSON.stringify(pkg.version),
     }),
   ],
 };

@@ -1,5 +1,6 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 import { EffectOpts } from 'interfaces';
+import { isIOS } from 'react-device-detect';
 import { AMBERDATA_BUFFERING_THRESHOLD, AmberdataEventValue, mapAmberDataError } from 'services/AmberdataService/types';
 import { EventPayload } from 'store';
 import { Nullable, SkinClass } from 'types';
@@ -22,6 +23,7 @@ export const amberdataStats = async (
     error: { error },
     adController,
     root: { meta, session },
+    fullscreen,
   } = getState();
 
   const currentTime = playback.currentTime || 0;
@@ -92,7 +94,7 @@ export const amberdataStats = async (
       amberdataService.sendAmberdataStat({
         eventType: 'move',
         eventPosition: currentTime,
-        eventManual: 1,
+        eventManual: fullscreen.step === 'FULLSCREEN' && isIOS ? 1 : 0,
       });
       break;
     case 'SEEK_STARTED':

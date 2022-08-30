@@ -74,6 +74,7 @@ export type EventsWithPayload =
       | 'SETUP_INITIAL_VOLUME_RESOLVE'
       | 'BEFORE_UNLOAD'
       | 'PAYWALL_SHOWN'
+      | 'RESIZE'
     >
   | ErrorPayload<
       | 'CHECK_ERROR_REJECT'

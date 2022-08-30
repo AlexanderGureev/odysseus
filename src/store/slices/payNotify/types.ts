@@ -7,7 +7,7 @@ export type EventsWithPayload =
       type: 'SETUP_PAY_NOTIFY_RESOLVE';
       payload: {
         text: string;
-        buttonText: string;
+        btnText: string;
       };
     }
   | {
@@ -21,5 +21,5 @@ export type ActionPayload = DefaultPayload<Event> & EventsWithPayload;
 export type FSMState = {
   step: State;
   text: string;
-  buttonText: string;
+  btnText: string;
 };

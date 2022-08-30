@@ -123,7 +123,6 @@ const autoSwitch = createSlice({
           const previousTime = state.previousTime || currentTime;
           const diff = currentTime - previousTime;
 
-          // TODO узнать нужно ли так?
           if (state.step === 'AUTOSWITCH_NOTIFY' && state.autoswitchNotifyType === 'avod_popup') return state;
 
           // если старт ролика или перемотка сразу попадает в интервал autoswitch,

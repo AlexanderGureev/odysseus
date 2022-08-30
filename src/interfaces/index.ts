@@ -19,6 +19,7 @@ import {
 } from 'services/FavouritesService/types';
 import { DebugInfo, HORUS_EVENT, HorusInitOpts } from 'services/HorusService/types';
 import { TQuery, TStoresConfig } from 'services/IDBService/types';
+import { EmailBody } from 'services/MailService/types';
 import { TManifestData, TParsedManifest } from 'services/ManifestParser/types';
 import { MEDIASCOPE_EVENT } from 'services/MediascopeCounter';
 import { MediascopeEventParams, MediascopeInitOpts } from 'services/MediascopeCounter/types';
@@ -194,8 +195,6 @@ export interface IQualityService {
     qualityItem: TQualityItem,
     opts: {
       currentStream: TStreamItem;
-      currentTime: number;
-      isOldSafari: boolean;
     }
   ) => Promise<void>;
 
@@ -203,11 +202,11 @@ export interface IQualityService {
     qualityRecord: TQualityRecord;
     qualityList: TQualityList;
     currentQualityMark: QUALITY_MARKS;
+    auto: boolean;
   };
-  // getLinkByCurrentQuality: () => Nullable<string>;
-  // getCurrentQualityObj: () => Nullable<TQualityItem>;
-  // onChangeQuality: (qualityMark: QUALITY_MARKS) => void;
-  // getCurrentQualityMark: () => QUALITY_MARKS;
+  setInitialQuality: (qualityItem: TQualityItem) => Promise<void>;
+  isRepresentationsSupport: () => boolean;
+  selectQualityByHeight: (data: TQualityRecord, videoHeight: number) => QUALITY_MARKS;
 }
 
 export interface IDemonService {
@@ -250,6 +249,10 @@ export interface IAdBannerService {
   dispose: (key: string) => Promise<void>;
 }
 
+export interface IMailService {
+  send: (data: EmailBody) => Promise<void>;
+}
+
 export interface IServices {
   embeddedCheckService: IEmbeddedCheckService;
   dbService: IDBService;
@@ -274,6 +277,7 @@ export interface IServices {
   mediascopeCounter: IMediascopeCounter;
   p2pService: IP2PService;
   bannerService: IAdBannerService;
+  mailService: IMailService;
 }
 
 export type EffectOpts = {

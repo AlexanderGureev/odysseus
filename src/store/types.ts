@@ -13,6 +13,7 @@ import * as beholder from './slices/beholder';
 import * as buffering from './slices/buffering';
 import * as changeTrack from './slices/changeTrack';
 import * as error from './slices/error';
+import * as errorReports from './slices/errorReports';
 import * as experiments from './slices/experiments';
 import * as favourites from './slices/favourites';
 import * as favouritesController from './slices/favouritesController';
@@ -110,7 +111,8 @@ export type EventPayload =
   | payNotify.ActionPayload
   | adBanner.ActionPayload
   | audioTracks.ActionPayload
-  | trialSuggestion.ActionPayload;
+  | trialSuggestion.ActionPayload
+  | errorReports.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -154,4 +156,5 @@ export type AppEvent =
   | payNotify.Event
   | adBanner.Event
   | audioTracks.Event
-  | trialSuggestion.Event;
+  | trialSuggestion.Event
+  | errorReports.Event;

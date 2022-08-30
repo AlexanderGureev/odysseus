@@ -1,9 +1,10 @@
 import express from 'express';
 import FormData from 'form-data';
+import { PlayerError } from 'utils/errors';
 
 import { logger } from '../../src/utils/logger';
-import { ReqInit, request } from '../../src/utils/request';
-import { ApiResponse, SkinClass, TBaseConfig, TConfigSource, THydraResponse } from '../../types';
+import { HTTPResponseError, ReqInit, request } from '../../src/utils/request';
+import { ApiResponse, ERROR, SkinClass, TBaseConfig, TConfigSource, THydraResponse } from '../../types';
 import { Channels } from '../../types/channel';
 import { MediaFile } from '../../types/MediaFile';
 import { MediascopeCounterResponse } from '../../types/MediascopeCounter';
@@ -11,7 +12,6 @@ import { SubscriptionTariffs } from '../../types/SubscriptionTariffs';
 import { TrackInfoData } from '../../types/TrackInfo';
 import { ResponseMany, ResponseOne, TrackMeta } from '../../types/TrackMeta';
 import { UserSubscription } from '../../types/UserSubscription';
-import { IS_DEV } from '../server';
 import { buildRequstByConfigSource, DATA_REQUEST_TIMEOUT, TParams } from '.';
 import { RequestError } from './error';
 
@@ -28,26 +28,26 @@ export const hydraRequest = async (partnerId: string, options: TOptions = {}) =>
     const data: THydraResponse = await response.json();
     return data;
   } catch (err) {
-    logger.error('[hydraRequest]', err);
-    return null;
+    if (err instanceof HTTPResponseError) throw new RequestError(ERROR.HYDRA_UNAVAILABLE, err.status, err.message);
+    throw err;
   }
 };
 
-export const configRequest = async (
-  req: express.Request,
+export const configRequest = async <T>(
+  req: express.Request<T>,
   configSource: TConfigSource,
   params: TParams,
   options: TOptions = {}
 ) => {
   try {
     const config = buildRequstByConfigSource(configSource, params);
-    if (!config) return null;
+    if (!config) throw new RequestError(ERROR.INVALID_CONFIG_SOURCE, 400, 'buildRequstByConfigSource failed');
 
     const xRef = req.get('X-Referer');
     const ref = req.get('Referer');
     const origin = req.get('Origin');
     const host = `${req.protocol}://${req.get('host')}`;
-    const reqIp = IS_DEV ? '88.214.33.5' : req.clientIp; //'88.214.33.5' 95.165.136.7
+    const reqIp = '88.214.33.5'; //'88.214.33.5' 95.165.136.7
 
     const finallyRef = xRef ?? ref ?? origin ?? host;
     const userAgent = req.get('User-Agent');
@@ -72,8 +72,8 @@ export const configRequest = async (
     const { data }: ApiResponse<TBaseConfig> = await response.json();
     return data;
   } catch (err) {
-    logger.error('[configRequest]', err);
-    return null;
+    if (err instanceof HTTPResponseError) throw new RequestError(ERROR.SIREN_UNAVAILABLE, err.status, err.message);
+    throw err;
   }
 };
 
@@ -106,6 +106,8 @@ export const serviceTariffsRequest = async (
     return data;
   } catch (err) {
     logger.error('[serviceTariffsRequest]', err);
+
+    if (err instanceof PlayerError) throw err;
     return null;
   }
 };
@@ -136,6 +138,8 @@ export const trackInfoRequest = async (trackId: string, theme: SkinClass, option
     return data;
   } catch (err) {
     logger.error('[trackInfoRequest]', err);
+
+    if (err instanceof PlayerError) throw err;
     return null;
   }
 };
@@ -168,6 +172,8 @@ export const userSubscriptionRequest = async (
     return data;
   } catch (err) {
     logger.error('[userSubscriptionRequest]', err);
+
+    if (err instanceof PlayerError) throw err;
     return null;
   }
 };
@@ -193,6 +199,8 @@ export const mediascopeCounterRequest = async (serviceId: number | undefined, op
     return data;
   } catch (err) {
     logger.error('[mediascopeCounterRequest]', err);
+
+    if (err instanceof PlayerError) throw err;
     return null;
   }
 };
@@ -209,6 +217,8 @@ export const getChannels = async (): Promise<Record<string, string> | null> => {
     return data.reduce((acc, { id, playerURI }) => ({ ...acc, [id]: playerURI }), {});
   } catch (err) {
     logger.error('[getChannels]', err);
+
+    if (err instanceof PlayerError) throw err;
     return null;
   }
 };

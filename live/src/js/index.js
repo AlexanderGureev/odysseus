@@ -1,8 +1,8 @@
 import '../css/all.css';
 
-import { version as appVersion } from './../../../package.json';
+import pkg from './../../../package.json';
 import { PlayerManager } from './modules/player-manager';
 
-window.appVersion = appVersion;
+window.appVersion = pkg.version;
 
 new PlayerManager();

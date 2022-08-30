@@ -1,8 +1,9 @@
-import { isNil } from 'lodash';
 import { Nullable } from 'types';
+import { isNil } from 'utils';
 import { logger } from 'utils/logger';
 import { request as httpRequest } from 'utils/request';
 import { retry, runInterval, sleep } from 'utils/retryUtils';
+import { v4 as uuidv4 } from 'uuid';
 
 import { IDBService } from '../../services/IDBService';
 import { CollectionName, Indexes } from '../IDBService/types';
@@ -62,28 +63,40 @@ const HorusService = () => {
 
     // запрос конфига из хоруса
     runInterval(async () => {
-      const data = await fetchConfig();
+      try {
+        const data = await fetchConfig();
 
-      if (data) {
-        logger.log('[HorusService]', 'update config', JSON.stringify(data, null, 2));
-        config = data;
+        if (data) {
+          logger.log('[HorusService]', 'update config', JSON.stringify(data, null, 2));
+          config = data;
+        }
+      } catch (err) {
+        logger.error('[HorusService]', err);
       }
     }, CONFIG_FETCH_TIMEOUT);
 
     // основной цикл отправки ивентов
     runInterval(async () => {
-      if (isStopSending || !(await WindowController.isMaster())) return;
-      await sendEvents();
+      try {
+        if (isStopSending || !(await WindowController.isMaster())) return;
+        await sendEvents();
+      } catch (err) {
+        logger.error('[HorusService]', err);
+      }
     }, config.flush_buffer_period * 1000);
 
     // cброс зависших ивентов (если прошлый мастер отвалился на этапе отправки ивентов)
     runInterval(async () => {
-      if (isStopSending || !(await WindowController.isMaster())) return;
-      const events = await selectEventsByStatus(EventStatus.PENDING);
+      try {
+        if (isStopSending || !(await WindowController.isMaster())) return;
+        const events = await selectEventsByStatus(EventStatus.PENDING);
 
-      const pendingEvents = events.filter((ev) => Date.now() - ev.updatedAt > DEFAULT_PENDING_TTL);
-      if (pendingEvents.length) {
-        await setEventsStatus(pendingEvents, EventStatus.IDLE);
+        const pendingEvents = events.filter((ev) => Date.now() - ev.updatedAt > DEFAULT_PENDING_TTL);
+        if (pendingEvents.length) {
+          await setEventsStatus(pendingEvents, EventStatus.IDLE);
+        }
+      } catch (err) {
+        logger.error('[HorusService]', err);
       }
     }, config.flush_buffer_period * 1000 * 2);
   };
@@ -169,11 +182,11 @@ const HorusService = () => {
 
         if (count > MAX_BUFFER_LIMIT) {
           const [event] = await getAll<TDBEvent[]>();
-          await deleteRecord(event.timestamp);
+          await deleteRecord(event.id);
         }
 
         dbStore.add({
-          timestamp: Date.now(),
+          id: uuidv4(),
           status: EventStatus.IDLE,
           payload,
         });
@@ -200,14 +213,13 @@ const HorusService = () => {
   const deletePendingEvents = async (events: TDBEvent[]) => {
     logger.log('[HorusService]', 'deletePendingEvents', JSON.stringify({ count: events.length }, null, 2));
 
-    await IDBService.runTransaction(
-      CollectionName.EVENTS,
-      'readwrite',
-      async (dbStore, done, { delete: deleteRecords }) => {
-        await deleteRecords(IDBKeyRange.bound(events[0].timestamp, events[events.length - 1].timestamp));
-        done();
+    await IDBService.runTransaction(CollectionName.EVENTS, 'readwrite', async (_, done, { delete: deleteRecord }) => {
+      for (const { id } of events) {
+        deleteRecord(id);
       }
-    );
+
+      done();
+    });
   };
 
   const isNeedToSend = async () => {

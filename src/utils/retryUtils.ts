@@ -1,13 +1,13 @@
 import { Nullable } from '../../types';
 
-export const sleep = (timeout: number) => new Promise((resolve) => setTimeout(resolve, timeout));
+export const sleep = (timeout: number) => new Promise<boolean>((resolve) => setTimeout(() => resolve(true), timeout));
 
 export const runInterval = async <T extends () => Promise<void>>(fn: T, interval: number) => {
   await fn();
-  await sleep(interval);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  runInterval(fn, interval);
+  while (await sleep(interval)) {
+    await fn();
+  }
 };
 
 export const DEFAULT_RETRY_ATTEMPTS = 5;

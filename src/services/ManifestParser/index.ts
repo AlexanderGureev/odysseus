@@ -14,6 +14,7 @@ import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
 import { request } from 'utils/request';
 
+import { testManifest } from './manifest';
 import { RawManifest, TManifestData, TParsedManifest, TParserMap } from './types';
 
 export const getAudioFormat = (manifest: RawManifest) => {
@@ -135,6 +136,9 @@ const ManifestParser = () => {
     }
   };
 
+  const createDataURL = (protocol: StreamProtocol, text: string) =>
+    `data:${VIDEO_EXTENSION[protocol]};base64,${Base64.encode(text)}`;
+
   const fetchManifest = async (source: TStreamItem): Promise<TManifestData> => {
     const response = await requestManifest(source.url);
 
@@ -151,7 +155,7 @@ const ManifestParser = () => {
       const manifestText = modifyManifest(response.url, text, source.protocol);
       const parsedManifest = parse(source.protocol, manifestText);
       const manifestData = {
-        url: `data:${VIDEO_EXTENSION[source.protocol]};base64,${Base64.encode(manifestText)}`,
+        url: createDataURL(source.protocol, manifestText),
         responseUrl: response.url,
         manifestText,
         parsedManifest,
@@ -164,7 +168,22 @@ const ManifestParser = () => {
     }
   };
 
-  // const getManifest = (): Nullable<TManifestData> => manifestData;
+  const buildHLSManifestByQuality = (baseManifest: string, uri: string) => {
+    let idx = 0;
+    const data = baseManifest.split('\n');
+    const result = [];
+
+    while (idx < data.length) {
+      if (data[idx].indexOf('#EXT-X-STREAM-INF') === 0 && data[idx + 1] !== uri) {
+        idx += 2;
+      } else {
+        result.push(data[idx]);
+        idx += 1;
+      }
+    }
+
+    return result.join('\n');
+  };
 
   const parse = (protocol: StreamProtocol, text: string): TParsedManifest => {
     const parser = ParserByProtocol[protocol];
@@ -173,10 +192,15 @@ const ManifestParser = () => {
 
     return {
       audioFormat: getAudioFormat(data),
-      playlists: data.playlists.map((p) => ({
-        attributes: p.attributes,
-        uri: p.uri,
-      })),
+      playlists: data.playlists.map((p) => {
+        return {
+          attributes: p.attributes,
+          uri:
+            protocol === StreamProtocol.HLS
+              ? createDataURL(StreamProtocol.HLS, buildHLSManifestByQuality(text, p.uri))
+              : p.uri,
+        };
+      }),
     };
   };
 

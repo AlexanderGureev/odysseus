@@ -15,6 +15,7 @@ import beholder from './slices/beholder/reducer';
 import buffering from './slices/buffering/reducer';
 import changeTrack from './slices/changeTrack/reducer';
 import error from './slices/error/reducer';
+import errorReports from './slices/errorReports/reducer';
 import experiments from './slices/experiments/reducer';
 import favourites from './slices/favourites/reducer';
 import favouritesController from './slices/favouritesController/reducer';
@@ -145,6 +146,7 @@ const rootReducer = combineReducers({
   //
   payNotify: payNotify.reducer,
   audioTracks: audioTracks.reducer,
+  errorReports: errorReports.reducer,
   // модуль сбора ошибок
   error: error.reducer,
 });
@@ -190,6 +192,7 @@ payButton.addMiddleware();
 paywall.addMiddleware();
 payNotify.addMiddleware();
 audioTracks.addMiddleware();
+errorReports.addMiddleware();
 error.addMiddleware();
 
 // console.log(

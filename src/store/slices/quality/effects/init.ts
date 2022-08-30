@@ -1,5 +1,6 @@
 import { EffectOpts } from 'interfaces';
 import { isIOS, isSafari } from 'react-device-detect';
+import { getViewportHeight, getViewportWidth } from 'services/HorusService/selectors';
 import { sendEvent } from 'store/actions';
 import { ERROR_CODES } from 'types/errors';
 import { PlayerError } from 'utils/errors';
@@ -12,12 +13,16 @@ export const init = ({ getState, dispatch, services: { qualityService } }: Effec
     if (!manifestData || !currentStream)
       throw new PlayerError(ERROR_CODES.UNKNOWN, 'manifestData or currentStream is undefined');
 
-    const { qualityRecord, currentQualityMark, qualityList } = qualityService.init({
+    const { qualityRecord, currentQualityMark, auto, qualityList } = qualityService.init({
       playlist: manifestData.parsedManifest.playlists,
       url: manifestData.url,
+      height: getViewportHeight(),
+      width: getViewportWidth(),
     });
 
-    const currentURL = isSafari || isIOS ? qualityRecord[currentQualityMark]?.uri : manifestData.url;
+    const currentURL =
+      isSafari || isIOS ? qualityRecord[currentQualityMark]?.uri || manifestData.url : manifestData.url;
+
     if (!currentURL) throw new PlayerError(ERROR_CODES.UNKNOWN, `url by quality ${currentQualityMark} not found`);
 
     dispatch(
@@ -28,6 +33,7 @@ export const init = ({ getState, dispatch, services: { qualityService } }: Effec
           currentQualityMark,
           qualityList,
           currentURL,
+          isAutoQualityMode: auto,
         },
       })
     );

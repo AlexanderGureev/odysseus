@@ -1,7 +1,7 @@
 import { Experiments } from '@moretv/types';
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
 import { TS_TRIGGER } from 'store/slices/trialSuggestion/utils';
-import { TLinkedTrackConfig } from 'types';
+import { TLinkedTrackConfig, TLinkedTracks } from 'types';
 import { AdCategory } from 'types/ad';
 import { ERROR_TYPE } from 'types/errors';
 
@@ -54,7 +54,7 @@ export type OutputEvents = {
     }>
   ) => void;
 
-  inited: (data: Payload<{ adv: boolean }>) => void;
+  inited: (data: Payload<{ adv: boolean; tracks: TLinkedTracks | null }>) => void;
   'inited-player': () => void;
   started: (data: { time: number }) => void;
   'video-started': () => void;

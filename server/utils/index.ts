@@ -1,11 +1,12 @@
 import express from 'express';
 
+import { isNil } from '../../src/utils';
 import { TConfigSource, TEnvConfig } from '../../types';
 
 const base64RegExp = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
 export const isValidBase64 = (str: string): boolean => base64RegExp.test(str);
 
-export const createHeaders = (req: express.Request) => {
+export const createHeaders = <T>(req: express.Request<T>) => {
   const requestId = req.headers?.['x-request-id'];
   const headers: Record<string, any> = {};
   if (requestId) headers['x-request-id'] = requestId;
@@ -23,7 +24,7 @@ type TRequestConfig = { url: string; params: Record<string, string> } | undefine
 export type TParams = {
   partner_id: string;
   track_id: string;
-  user_token?: string | null;
+  user_token?: string | null | undefined;
   sign?: string;
   pf?: string;
   pt?: string;
@@ -78,7 +79,10 @@ export const toNumber = (value: string | number | null | undefined) => {
 
 export const toBool = (value?: string) => String(value)?.toLowerCase().trim() === 'true';
 
-export const createEnv = (req: express.Request): TEnvConfig => ({
+export const excludeNil = <T extends Record<string, unknown>>(obj: T) =>
+  Object.entries(obj).reduce<Partial<T>>((acc, [key, value]) => (isNil(value) ? acc : { ...acc, [key]: value }), {});
+
+export const createEnv = <T>(req: express.Request<T>): TEnvConfig => ({
   AD_FOX_OWNER_ID: process.env.AD_FOX_OWNER_ID,
   DEBUG_MODE: toBool(process.env.DEBUG_MODE),
   NODE_ENV: process.env.NODE_ENV,

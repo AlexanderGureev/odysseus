@@ -1,6 +1,7 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
+import { getViewportHeight } from 'services/HorusService/selectors';
 import { QUALITY_MARKS } from 'services/VigoService';
-import { FSM_EVENT } from 'store/actions';
+import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { toFixed } from 'utils';
@@ -36,21 +37,28 @@ const initialState: FSMState = {
     audio_codec: null,
     bitrate: null,
   },
+
+  isAutoQualityMode: true,
   currentURL: null,
 };
 
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
     FETCHING_MANIFEST_RESOLVE: 'QUALITY_INITIALIZATION',
+    START_PLAYBACK: 'READY',
   },
   QUALITY_INITIALIZATION: {
-    QUALITY_INITIALIZATION_RESOLVE: 'READY',
+    QUALITY_INITIALIZATION_RESOLVE: 'IDLE',
     QUALITY_INITIALIZATION_REJECT: 'ERROR',
   },
   READY: {
     CHANGE_CURRENT_QUALITY: 'QUALITY_CHANGE_PENDING',
     TIME_UPDATE: 'GET_VIDEO_META',
-    // CHECK_MANIFEST_RESOLVE: "QUALITY_INITIALIZATION"
+    RESIZE: null,
+  },
+  AUTO_SELECT_QUALITY: {
+    AUTO_CHANGE_CURRENT_QUALITY: 'QUALITY_CHANGE_PENDING',
+    AUTO_SELECT_QUALITY_RESOLVE: 'READY',
   },
   GET_VIDEO_META: {
     GET_VIDEO_META_RESOLVE: 'READY',
@@ -93,6 +101,9 @@ const quality = createSlice({
       logger.log('[FSM]', 'quality', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
+        case 'RESIZE':
+          state.step = state.isAutoQualityMode ? 'AUTO_SELECT_QUALITY' : state.step;
+          break;
         case 'TIME_UPDATE':
           const diff = Math.abs(payload.currentTime - state.previousTime);
           if (diff < 1) {
@@ -104,8 +115,10 @@ const quality = createSlice({
           break;
         case 'FETCHING_MANIFEST_RESOLVE':
           return { ...state, step };
-        case 'CHANGE_CURRENT_QUALITY':
+        case 'AUTO_CHANGE_CURRENT_QUALITY':
           return { ...state, step, currentQualityMark: payload.value };
+        case 'CHANGE_CURRENT_QUALITY':
+          return { ...state, step, currentQualityMark: payload.value, isAutoQualityMode: false };
         default:
           return { ...state, step, ...payload };
       }
@@ -139,6 +152,22 @@ const addMiddleware = () =>
         QUALITY_INITIALIZATION: () => init(opts),
         QUALITY_CHANGE_PENDING: () => changeQuality(opts),
         GET_VIDEO_META: () => getVideoMeta(opts),
+        AUTO_SELECT_QUALITY: () => {
+          const { qualityRecord, currentQualityMark } = getState().quality;
+          const videoHeight = getViewportHeight();
+
+          if (!videoHeight) {
+            return dispatch(sendEvent({ type: 'AUTO_SELECT_QUALITY_RESOLVE' }));
+          }
+
+          const mark = services.qualityService.selectQualityByHeight(qualityRecord, videoHeight);
+
+          if (mark !== currentQualityMark) {
+            dispatch(sendEvent({ type: 'AUTO_CHANGE_CURRENT_QUALITY', payload: { value: mark } }));
+          } else {
+            dispatch(sendEvent({ type: 'AUTO_SELECT_QUALITY_RESOLVE' }));
+          }
+        },
       };
 
       const effect = handler[step];

@@ -92,6 +92,8 @@ export type TFeatureConfig = {
   AD_PAUSE_BANNER_PARAMS?: string; // текст
   TRIAL_SUGGESTION?: TrialSuggestionCfg;
   FEATURE_OFF_ADS_DISPLAY_TIME?: number;
+  FEATURE_COMPLAIN?: boolean;
+  EMAIL_FOR_COMPLAINTS?: string;
 
   AUTH_URL?: string; // используется для открытия страницы авторизации в эмбедах
 

@@ -6,7 +6,7 @@ import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
 import { request } from 'utils/request';
 
-import { NextTrackConfig } from './types';
+import { MailData, NextTrackConfig } from './types';
 
 export const fetchBaseConfig = async (params: TrackParams, meta: Meta, source: TConfigSource) => {
   const { sign, pf, pt } = params;
@@ -64,4 +64,13 @@ export const fetchConfig = async (sirenURL: string, outerHost: string | null) =>
     logger.error('[fetchConfig]', err);
     throw new PlayerError(err.code || ERROR_CODES.ERROR_NOT_AVAILABLE, err?.message);
   }
+};
+
+export const sendEmail = async ({ clientIp, ...data }: MailData): Promise<void> => {
+  await request.post(`${window.ENV.PUBLIC_BE_ENDPOINT}/mercury/v1/send/web/error-reports`, {
+    json: data,
+    headers: {
+      'X-Real-IP': clientIp,
+    },
+  });
 };

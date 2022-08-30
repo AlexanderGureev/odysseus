@@ -46,7 +46,7 @@ const getPreviewNotifyText = (state: AppState) => {
 const initialState: FSMState = {
   step: 'IDLE',
   text: '',
-  buttonText: '',
+  btnText: '',
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -122,10 +122,10 @@ const addMiddleware = () => {
           const type = isTrialAvailable ? 'TRIAL' : 'FULL_PRICE';
 
           const text = previews ? getPreviewNotifyText(state) : adConfig ? SUBSCRIPTION_TEXT : null;
-          const buttonText = getButtonTextBySkin(state, type);
+          const btnText = getButtonTextBySkin(state, type);
 
-          if (text && buttonText) {
-            dispatch(sendEvent({ type: 'SETUP_PAY_NOTIFY_RESOLVE', payload: { text, buttonText } }));
+          if (text && btnText) {
+            dispatch(sendEvent({ type: 'SETUP_PAY_NOTIFY_RESOLVE', payload: { text, btnText } }));
           } else {
             dispatch(sendEvent({ type: 'SETUP_PAY_NOTIFY_REJECT' }));
           }

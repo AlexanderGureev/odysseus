@@ -178,6 +178,11 @@ body {
   position: absolute;
   bottom: 100px;
   width: 100%;
+  display: none;
+}
+
+.ad-banner-wrapper.active {
+  display: block;
 }
 
 #ad-banner {

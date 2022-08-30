@@ -105,7 +105,7 @@ const addMiddleware = () =>
           );
         },
         LOADING_META_PENDING: () => loadMeta(opts),
-        LAUNCH_SETUP: () => {
+        LAUNCH_SETUP: async () => {
           const {
             resumeVideoNotify: { isResetStartTime },
             playback: { currentTime, duration },
@@ -114,7 +114,9 @@ const addMiddleware = () =>
             root: {
               previews,
               params: { startAt },
+              currentStream,
             },
+            quality: { currentURL, currentQualityMark, qualityRecord },
           } = getState();
 
           const savedTime = getSavedProgressTime(getState(), services.localStorageService);
@@ -129,6 +131,9 @@ const addMiddleware = () =>
           services.playerService.setMute(muted);
           services.playerService.setVolume(volume);
           services.playerService.setPlaybackRate(currentSpeed);
+
+          const qualityCfg = qualityRecord[currentQualityMark];
+          if (qualityCfg) await services.qualityService.setInitialQuality(qualityCfg);
 
           const value = isResetStartTime || previews ? 0 : startAt ?? savedTime ?? currentTime ?? 0;
           const startPosition = value < (duration || 0) ? value : 0;

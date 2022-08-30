@@ -326,6 +326,27 @@ const Player = () => {
               </button>
             )}
 
+            <button
+              onClick={() => {
+                dispatch(
+                  sendEvent({
+                    type: 'SEND_ERROR_REPORT',
+                    meta: {
+                      description: 'test',
+                      problems: [
+                        {
+                          checked: true,
+                          labelText: 'test',
+                          name: 'not_play',
+                        },
+                      ],
+                    },
+                  })
+                );
+              }}>
+              send report
+            </button>
+
             {favourites.step === 'READY' && <FavouritesButton />}
           </div>
           {payNotify.step === 'READY' && <PayNotify />}
@@ -477,18 +498,11 @@ const Player = () => {
 const Autoswitch = () => {
   const dispatch = useAppDispatch();
   const autoSwitch = useAppSelector((state) => state.autoSwitch);
-  const adBreaksCount = useAppSelector((state) => state.adController.adBreaksCount);
 
   if (autoSwitch.autoswitchNotifyType === 'avod_popup') {
-    const text = declOfNum(adBreaksCount, [
-      'была показана [N] рекламная вставка',
-      'было показано [N] рекламные вставки',
-      'было показано [N] рекламных вставок',
-    ]);
-
     return (
       <div className="auto-switch">
-        <div className="title">За прошедшую серию {text.replace('[N]', `${adBreaksCount}`)}</div>
+        <div className="title">За прошедшую серию было показано несколько рекламных вставок</div>
         {autoSwitch.autoswitchNotifyText && (
           <div className="description" dangerouslySetInnerHTML={{ __html: autoSwitch.autoswitchNotifyText }} />
         )}
@@ -626,9 +640,14 @@ const AudioTracks: React.FC<{ config: LinkedAudioTrackItem }> = ({ config }) => 
 };
 
 const AdBanner = () => {
-  // todo скрыть баннер при показе trial notify
+  const adBanner = useAppSelector((state) => state.adBanner);
+  const trialSuggestion = useAppSelector((state) => state.trialSuggestion);
+
   return (
-    <div className="ad-banner-wrapper">
+    <div
+      className={cn('ad-banner-wrapper', {
+        active: adBanner.step === 'VISIBLE' && trialSuggestion.step !== 'SHOWING_TRIAL_NOTICE',
+      })}>
       <div id={AD_BANNER_CONTAINER_ID} />
     </div>
   );
@@ -723,7 +742,7 @@ const Paywall = () => {
 
 const PayNotify = () => {
   const dispatch = useAppDispatch();
-  const { text, buttonText } = useAppSelector((state) => state.payNotify);
+  const { text, btnText } = useAppSelector((state) => state.payNotify);
 
   return (
     <div className="pay-notify">
@@ -732,7 +751,7 @@ const PayNotify = () => {
         onClick={() => {
           dispatch(sendEvent({ type: 'CLICK_SUB_BUTTON' }));
         }}>
-        {buttonText}
+        {btnText}
       </button>
     </div>
   );

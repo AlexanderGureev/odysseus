@@ -15,6 +15,32 @@ export const horusStat = (
     visibility,
   } = getState();
 
+  if (quality.step !== 'QUALITY_CHANGE_PENDING') {
+    switch (payload.type) {
+      case 'DO_PLAY':
+        horusService.routeEvent('HORUS_CLICK_PLAY');
+        break;
+      case 'DO_PLAY_RESOLVE':
+        horusService.routeEvent('HORUS_VIDEO_STARTED');
+        break;
+      case 'DO_PAUSE':
+        horusService.routeEvent('HORUS_CLICK_PAUSE');
+        break;
+      case 'SET_PLAYING':
+        horusService.routeEvent('HORUS_VIDEO_STARTED');
+        break;
+      case 'SET_PAUSED':
+        const { isEnded } = payload.meta;
+        const isHidden = visibility.step === 'HIDDEN';
+        horusService.routeEvent(isEnded || isHidden ? 'HORUS_AUTO_PAUSE' : 'HORUS_CLICK_PAUSE');
+        break;
+      case 'SET_SEEKING':
+      case 'SEEK':
+        horusService.routeEvent('HORUS_GOTO');
+        break;
+    }
+  }
+
   switch (payload.type) {
     case 'RESET_PLAYBACK_RESOLVE':
     case 'PARSE_CONFIG_RESOLVE':
@@ -23,29 +49,8 @@ export const horusStat = (
     case 'START_PLAYBACK':
       horusService.routeEvent('HORUS_AUTO_PLAY');
       break;
-    case 'DO_PLAY':
-      horusService.routeEvent('HORUS_CLICK_PLAY');
-      break;
-    case 'DO_PLAY_RESOLVE':
-      horusService.routeEvent('HORUS_VIDEO_STARTED');
-      break;
-    case 'DO_PAUSE':
-      horusService.routeEvent('HORUS_CLICK_PAUSE');
-      break;
-    case 'SET_PLAYING':
-      horusService.routeEvent('HORUS_VIDEO_STARTED');
-      break;
     case 'AUTO_PAUSE_RESOLVE':
       horusService.routeEvent('HORUS_AUTO_PAUSE');
-      break;
-    case 'SET_PAUSED':
-      const { isEnded } = payload.meta;
-      const isHidden = visibility.step === 'HIDDEN';
-      horusService.routeEvent(isEnded || isHidden ? 'HORUS_AUTO_PAUSE' : 'HORUS_CLICK_PAUSE');
-      break;
-    case 'SET_SEEKING':
-    case 'SEEK':
-      horusService.routeEvent('HORUS_GOTO');
       break;
     case 'CHANGE_CURRENT_QUALITY':
       horusService.routeEvent('HORUS_CHANGE_QUALITY');
@@ -132,7 +137,6 @@ export const horusStat = (
 
     case 'BEFORE_UNLOAD':
       horusService.routeEvent('HORUS_SESSION_FINISHED');
-      // TODO в сафари ивент может не успеть отправиться (indexeddb transaction aborted)
       horusService.routeEvent('HORUS_CLOSE');
       break;
 

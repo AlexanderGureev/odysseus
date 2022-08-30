@@ -16,6 +16,7 @@ import { ERROR_CODES } from 'types/errors';
 import { UserSubscription } from 'types/UserSubscription';
 import { toNum } from 'utils';
 import { PlayerError } from 'utils/errors';
+import { logger } from 'utils/logger';
 import { getTokenExpiredTime } from 'utils/token';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -143,6 +144,8 @@ export const parseConfig = async (
       id: uuidv4(),
     },
   };
+
+  logger.log('[parseConfig]', 'new session:', payload.session);
 
   const error = getPlaylistError(config);
 

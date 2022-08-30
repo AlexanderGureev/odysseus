@@ -462,6 +462,43 @@ export const ERROR_TEXT_BY_TYPE: TErrorConfigByType = {
     ),
     btn_text: () => 'Попробовать снова',
   }),
+  [ERROR_TYPE.WAF_ERROR]: () => ({
+    icon: error_icon,
+    text: (isM) => (
+      <>
+        Мы обнаружили проблему соединения:
+        <br />
+        попробуй подключиться к другой сети,{br(isM)}перезапусти
+        {br(!isM)}
+        приложение{br(isM)}или попробуй повторить позже
+      </>
+    ),
+    btn_text: () => 'Повторить',
+  }),
+  [ERROR_TYPE.NETWORK_TIMEOUT_ERROR]: () => ({
+    icon: error_icon,
+    text: (isM) => (
+      <>
+        Мы обнаружили проблему соединения:
+        <br />
+        попробуй подключиться к другой сети,{br(isM)}перезапусти
+        {br(!isM)}
+        приложение{br(isM)}или попробуй повторить позже
+      </>
+    ),
+    btn_text: () => 'Повторить',
+  }),
+  [ERROR_TYPE.STORMWALL_GEOBLOCK_ERROR]: (theme) => ({
+    icon: error_restriction_icon,
+    text: (isM) => (
+      <>
+        Региональные ограничения: в твоей{br(isM)}стране нет
+        <br />
+        доступа к {HostMap[theme]}. А еще не{br(isM)}забудь отключить VPN.
+      </>
+    ),
+    btn_text: () => 'Повторить',
+  }),
   [ERROR_TYPE.UNKNOWN]: () => ({
     icon: error_icon,
     text: () => (

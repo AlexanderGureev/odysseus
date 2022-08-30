@@ -25,6 +25,7 @@ const config: FSMConfig<State, AppEvent> = {
   },
   HIDDEN: {
     DO_PAUSE: 'VISIBLE',
+    AUTO_PAUSE: 'VISIBLE',
     CHANGE_TRACK: 'DISPOSE_PENDING',
   },
   VISIBLE: {

@@ -44,6 +44,7 @@ export type ReqInit = Omit<RequestInit, 'headers'> & {
 
 export type Hooks = {
   networkError: () => void;
+  beforeResponse: (res: Response) => Promise<void>;
 };
 
 export type HookType = keyof Hooks;
@@ -55,6 +56,7 @@ export type RequestHooks = {
 const request = () => {
   let hooks: RequestHooks = {
     networkError: [],
+    beforeResponse: [],
   };
 
   let requestOpts: RequestOpts = {
@@ -124,6 +126,7 @@ const request = () => {
           ...extendedOpts,
         });
 
+        for (const h of hooks.beforeResponse) await h(response);
         checkStatus(response);
 
         logger.log('[http request]', 'before response', { method, url, status: response.status });

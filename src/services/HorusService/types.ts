@@ -19,7 +19,7 @@ export type THorusEvent = {
 
 export type TDBEvent = {
   key: string;
-  timestamp: number;
+  id: string;
   updatedAt: number;
   status: string;
   payload: THorusEvent;

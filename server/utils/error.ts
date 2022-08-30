@@ -1,8 +1,9 @@
+import { PlayerError } from '../../src/utils/errors';
 import { ConfigErrors, ERROR } from '../../types';
 import { ERROR_ITEM_MAP, ERROR_TYPE, RawPlayerError } from '../../types/errors';
 
 export class BaseError extends Error {
-  status = -1;
+  status = 500;
 
   constructor(message?: string) {
     super(message);
@@ -28,14 +29,21 @@ export const SERVER_ERR_MAP: Record<ERROR, RawPlayerError> = {
   [ERROR.INVALID_CONFIG_SOURCE]: ERROR_ITEM_MAP[100],
 };
 
-export const createError = (e: RequestError): { status: number; errors: ConfigErrors } => {
-  const error = SERVER_ERR_MAP[e.name as ERROR] || {
-    code: -1,
-    title: ERROR_TYPE.UNKNOWN,
-  };
+export const createError = (e: RequestError | PlayerError | Error): { status: number; errors: ConfigErrors } => {
+  let error: RawPlayerError | null = null;
+
+  if (e instanceof PlayerError) error = e.serialize();
+  if (e instanceof RequestError) error = SERVER_ERR_MAP[e.name as ERROR];
+
+  if (!error) {
+    error = {
+      code: -1,
+      title: ERROR_TYPE.UNKNOWN,
+    };
+  }
 
   return {
-    status: e.status || 500,
+    status: 'status' in e ? e.status : 500,
     errors: [{ ...error, details: e.message }],
   };
 };

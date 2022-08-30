@@ -2,10 +2,17 @@ import { TQualityList, TQualityRecord } from 'services/StreamQualityManager/type
 import { QUALITY_MARKS } from 'services/VigoService';
 import { DefaultPayload, ErrorPayload, WithoutPayload } from 'store/types';
 
-export type State = 'IDLE' | 'QUALITY_INITIALIZATION' | 'QUALITY_CHANGE_PENDING' | 'READY' | 'GET_VIDEO_META' | 'ERROR';
+export type State =
+  | 'IDLE'
+  | 'QUALITY_INITIALIZATION'
+  | 'QUALITY_CHANGE_PENDING'
+  | 'READY'
+  | 'AUTO_SELECT_QUALITY'
+  | 'GET_VIDEO_META'
+  | 'ERROR';
 
 export type EventsWithPayload =
-  | WithoutPayload<'QUALITY_CHANGE_REJECT'>
+  | WithoutPayload<'QUALITY_CHANGE_REJECT' | 'AUTO_SELECT_QUALITY_RESOLVE'>
   | ErrorPayload<'QUALITY_INITIALIZATION_REJECT'>
   | {
       type: 'QUALITY_INITIALIZATION_RESOLVE';
@@ -14,10 +21,11 @@ export type EventsWithPayload =
         qualityList: TQualityList;
         currentQualityMark: QUALITY_MARKS;
         currentURL: string;
+        isAutoQualityMode: boolean;
       };
     }
   | {
-      type: 'CHANGE_CURRENT_QUALITY';
+      type: 'CHANGE_CURRENT_QUALITY' | 'AUTO_CHANGE_CURRENT_QUALITY';
       payload: { value: QUALITY_MARKS };
     }
   | {
@@ -58,4 +66,5 @@ export type FSMState = {
   };
 
   videoMeta: VideoMeta;
+  isAutoQualityMode: boolean;
 };

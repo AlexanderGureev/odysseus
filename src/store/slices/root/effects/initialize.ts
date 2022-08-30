@@ -7,9 +7,11 @@ import { sendEvent } from 'store/actions';
 import { featuresSelector } from 'store/selectors';
 import { ERROR_CODES } from 'types/errors';
 import { on } from 'utils';
+import { debounce } from 'utils/debounce';
 import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
 import { randomHash12 } from 'utils/randomHash';
+import { request } from 'utils/request';
 
 import { DeviceInfo, DeviceType, OS } from '../types';
 
@@ -48,7 +50,7 @@ const createAppDatabase = async ({ services: { dbService, windowService } }: Eff
       },
       {
         name: CollectionName.EVENTS,
-        keyPath: 'timestamp',
+        keyPath: 'id',
         indexes: [
           {
             name: Indexes.BY_STATUS,
@@ -82,6 +84,34 @@ const registerListeners = ({ dispatch }: EffectOpts) => {
   on(window, 'beforeunload', () => {
     dispatch(sendEvent({ type: 'BEFORE_UNLOAD' }));
   });
+
+  on(
+    window,
+    'resize',
+    debounce(() => {
+      dispatch(sendEvent({ type: 'RESIZE' }));
+    }, 300)
+  );
+};
+
+const setupRequest = () => {
+  request.addHook('beforeResponse', async (response) => {
+    if (response.status === 403) {
+      const text = await response.text();
+
+      if (text.toLowerCase().includes('access to resource was blocked')) {
+        throw new PlayerError(ERROR_CODES.WAF_ERROR);
+      }
+    }
+
+    if (response.status === 429) {
+      throw new PlayerError(ERROR_CODES.NETWORK_TIMEOUT_ERROR);
+    }
+
+    if (response.status === 451) {
+      throw new PlayerError(ERROR_CODES.STORMWALL_GEOBLOCK_ERROR);
+    }
+  });
 };
 
 export const initialize = async (opts: EffectOpts) => {
@@ -102,6 +132,7 @@ export const initialize = async (opts: EffectOpts) => {
   try {
     await createAppDatabase(opts);
     registerListeners(opts);
+    setupRequest();
 
     const [isEmbedded] = await Promise.all([
       embeddedCheckService.getEmbededStatus(),

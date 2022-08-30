@@ -5,6 +5,8 @@ import { Nullable } from 'types';
 export type TMeta = {
   playlist: Playlist[];
   url: string;
+  width: number | null;
+  height: number | null;
 };
 
 export type TInitOptions = {

@@ -26,6 +26,7 @@ import {
   YMService,
 } from 'services';
 import { AdService } from 'services/AdService/controller';
+import { MailService } from 'services/MailService';
 
 import type { AppDispatch, AppState } from '.';
 import { createDispatch, CreateDispatchOpts, SessionDispatch } from './dispatch';
@@ -62,6 +63,7 @@ const opts: CreateListenerMiddlewareOptions<MiddlewareDeps> = {
       mediascopeCounter: MediascopeCounter,
       p2pService: P2PManager,
       bannerService: AdBannerManager,
+      mailService: MailService,
     },
   },
 };
