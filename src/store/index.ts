@@ -6,6 +6,7 @@ import adBanner from './slices/adBanner/reducer';
 import adBlock from './slices/adBlock/reducer';
 import adBlockVolume from './slices/adBlockVolume/reducer';
 import adController from './slices/adController/reducer';
+import adDisableSuggestion from './slices/adDisableSuggestion/reducer';
 import adTimeNotify from './slices/adTimeNotify/reducer';
 import adultNotify from './slices/adultNotify/reducer';
 import analytics from './slices/analytics/reducer';
@@ -72,6 +73,7 @@ const rootReducer = combineReducers({
   // управление рекламными баннерами
   adBanner: adBanner.reducer,
   trialSuggestion: trialSuggestion.reducer,
+  adDisableSuggestion: adDisableSuggestion.reducer,
 
   /* 
   корневой автомат, точка входа в приложение:
@@ -156,6 +158,7 @@ analytics.addMiddleware();
 postMessages.addMiddleware();
 adBanner.addMiddleware();
 trialSuggestion.addMiddleware();
+adDisableSuggestion.addMiddleware();
 
 root.addMiddleware();
 resumeVideo.addMiddleware();

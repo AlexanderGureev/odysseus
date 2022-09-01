@@ -1,4 +1,4 @@
-import { createAction, createSlice } from '@reduxjs/toolkit';
+import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
@@ -30,9 +30,17 @@ const config: FSMConfig<State, AppEvent> = {
     CHANGE_AUDIO_TRACK_REJECT: 'ERROR',
     NETWORK_ERROR: 'NETWORK_ERROR',
     BEFORE_UNLOAD: 'DISABLED', // мы не хотим отправлять ошибки об aborted запросах
+    SHOW_ERROR: 'ERROR',
   },
   ERROR: {
-    RELOAD: 'IDLE',
+    RELOAD: 'RELOADING',
+    OPEN_URL: 'OPENING_NEW_PAGE',
+  },
+  OPENING_NEW_PAGE: {
+    OPENING_NEW_PAGE_RESOLVE: 'ERROR',
+  },
+  RELOADING: {
+    RELOADING_RESOLVE: 'IDLE',
   },
   NETWORK_ERROR: {
     GO_ONLINE: 'IDLE',
@@ -56,13 +64,11 @@ const error = createSlice({
       const step = next || state.step;
 
       switch (type) {
-        case 'BEFORE_UNLOAD':
-          return { ...state, step };
         case 'GO_ONLINE':
           return initialState;
         default:
-          const { error } = meta as { error: RawPlayerError };
-          return { ...state, step, error };
+          const m = meta as { error: RawPlayerError };
+          return m?.error ? { ...state, step, error: m.error } : { ...state, step };
       }
     });
   },
@@ -91,6 +97,20 @@ const addMiddleware = () =>
       };
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
+        RELOADING: () => {
+          window.location.reload();
+          dispatch(sendEvent({ type: 'RELOADING_RESOLVE' }));
+        },
+        OPENING_NEW_PAGE: () => {
+          const {
+            payload: {
+              meta: { url, target },
+            },
+          } = action as PayloadAction<{ meta: { url: string; target?: string } }>;
+
+          window.open(url, target);
+          dispatch(sendEvent({ type: 'OPENING_NEW_PAGE_RESOLVE' }));
+        },
         ERROR: () => {
           dispatch(sendEvent({ type: 'ERROR_SHOWN' }));
         },

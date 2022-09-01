@@ -1,6 +1,7 @@
 import React from 'react';
 import { isAndroid, isIOS } from 'react-device-detect';
-import { Nullable, SkinClass } from 'types';
+import { sendEvent } from 'store';
+import { SkinClass } from 'types';
 import { ERROR_CODES, ERROR_TYPE } from 'types/errors';
 
 import app_store_black_icon from './icons/app_store_black_icon.svg';
@@ -17,22 +18,7 @@ import error_restriction_icon from './icons/error_restriction_icon.svg';
 import google_play_icon from './icons/google_play_icon.svg';
 import more_logo_icon from './icons/more_logo_icon.svg';
 import Styles from './index.module.css';
-
-type TErrorConfigByType = {
-  [key in ERROR_TYPE]: (
-    theme: SkinClass,
-    isEmbeded: boolean
-  ) => {
-    icon: string;
-    text: (isMobile: boolean) => React.ReactNode;
-    btn_text?: Nullable<() => React.ReactNode | null>;
-    footer_icons?: () => {
-      src: string;
-      href: string;
-    }[];
-    onClick?: () => void;
-  };
-};
+import { ErrorConfigByType, MailData, MailOpts } from './types';
 
 const HostMap = {
   [SkinClass.MORE_TV]: 'more.tv',
@@ -69,7 +55,7 @@ const EmailMap = {
   [SkinClass.DOMASHNIY]: 'info@domashniy.ru',
 };
 
-const IconLogoMap = {
+export const IconLogoMap = {
   [SkinClass.MORE_TV]: more_logo_icon,
   [SkinClass.DEFAULT]: more_logo_icon,
   [SkinClass.VIDEOMORE]: more_logo_icon,
@@ -125,15 +111,18 @@ const StoreIconMap: Record<string, any> = {
   },
 };
 
-const createMailLink = (subject: string, code: number, theme: SkinClass) => {
-  const mailOptions = collectMailOptions({
-    subject,
-    code,
-  });
+const createMailLink = (data: { subject: string; code: number; theme: SkinClass; mailOpts: MailOpts }) => {
+  const mailOptions = collectMailOptions(
+    {
+      subject: data.subject,
+      code: data.code,
+    },
+    data.mailOpts
+  );
 
   const TEXT = {
-    EMAIL: EmailMap[theme],
-    MAIL_OPTIONS: `mailto:${EmailMap[theme]}${mailOptions ? `?${mailOptions}` : ''}`,
+    EMAIL: EmailMap[data.theme],
+    MAIL_OPTIONS: `mailto:${EmailMap[data.theme]}${mailOptions ? `?${mailOptions}` : ''}`,
   };
 
   return (
@@ -143,29 +132,26 @@ const createMailLink = (subject: string, code: number, theme: SkinClass) => {
   );
 };
 
-export const collectMailOptions = ({ subject, code }: { subject: string; code: number }) => {
-  //   const partnerId = get(store.getState(), ['config', 'video_data', 'partnerId'], '');
-  //   const userId = get(store.getState(), ['config', 'video_data', 'userId'], '');
-  //   const videoId = get(store.getState(), ['config', 'video_data', 'videoId'], '');
-  //   const trackTitle = get(store.getState(), ['config', 'video_data', 'trackTitle'], '');
-  //   const params = {
-  //     code,
-  //     partnerId,
-  //     userId: userId || sid,
-  //     ssid: store.getState()?.config?.video_data?.sessionId,
-  //     videoId,
-  //     'User-Agent': navigator ? navigator.userAgent : '',
-  //     Resolution: window ? `${window.screen.availWidth}x${window.screen.availHeight}` : '',
-  //     webVersion: store.getState()?.config?.video_data?.webVersion ?? '',
-  //   };
-  //   const body = Object.keys(params)
-  //     .reduce((acc, key) => acc.concat(`${key}: ${params[key]}`), [])
-  //     .join('%0A');
-  //   return `subject=${encodeURIComponent(
-  //     `${subject}. Код: ${code}. ${trackTitle}`
-  //   )}&body=Оставьте дополнительную информацию, если необходимо.%0A%0A%0A%0A%0AТехническая информация для поддержки:%0A${body}`;
+export const collectMailOptions = ({ subject, code }: MailData, opts: MailOpts) => {
+  const params: Record<string, any> = {
+    code,
+    partnerId: opts.partnerId,
+    userId: opts.userId || opts.sid,
+    ssid: opts.ssid,
+    videoId: opts.trackId,
+    'User-Agent': navigator ? navigator.userAgent : '',
+    Resolution: window ? `${window.screen.availWidth}x${window.screen.availHeight}` : '',
+    webVersion: opts.webVersion ?? '',
+  };
 
-  return null;
+  const title = [opts.projectName, opts.seasonName, opts.episodeName].filter(Boolean).join('/');
+
+  const body = Object.keys(params)
+    .reduce((acc: string[], key) => acc.concat(`${key}: ${params[key]}`), [])
+    .join('%0A');
+  return `subject=${encodeURIComponent(
+    `${subject}. Код: ${code}. ${title}`
+  )}&body=Оставьте дополнительную информацию, если необходимо.%0A%0A%0A%0A%0AТехническая информация для поддержки:%0A${body}`;
 };
 
 const br = (isM: boolean) =>
@@ -174,28 +160,35 @@ const br = (isM: boolean) =>
     false: ' ',
   }[`${isM}`]);
 
-export const ERROR_TEXT_BY_TYPE: TErrorConfigByType = {
-  [ERROR_TYPE.CUSTOM]: (theme) => ({
+export const ERROR_TEXT_BY_TYPE: ErrorConfigByType = {
+  [ERROR_TYPE.CUSTOM]: ({ theme, mailOpts }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
         <br />
-        {createMailLink('Внутренняя ошибка', ERROR_CODES[ERROR_TYPE.CUSTOM], theme)}
+        {createMailLink({
+          subject: 'Внутренняя ошибка',
+          code: ERROR_CODES.ERROR_CUSTOM,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => <>Попробовать снова</>,
   }),
-  [ERROR_TYPE.PARTNER_ERROR]: (theme, isEmbeded) => ({
+  [ERROR_TYPE.PARTNER_ERROR]: ({ theme, isEmbedded, sharingUrl }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         К сожалению, данное видео недоступно{br(isM)}для{br(!isM)}просмотра на этом ресурсе
       </>
     ),
-    btn_text: () => (isEmbeded ? `Смотреть на ${HostMap[theme]}` : null),
-    onClick: () => {
-      //   window.open(store.getState()?.config?.video_data?.sharingUrl ?? `https://${HostMap[theme]}`, '_blank');
+    btn_text: () => (isEmbedded ? `Смотреть на ${HostMap[theme]}` : null),
+    onClick: (dispatch) => {
+      dispatch(
+        sendEvent({ type: 'OPEN_URL', meta: { url: sharingUrl ?? `https://${HostMap[theme]}`, target: '_blank' } })
+      );
     },
   }),
   [ERROR_TYPE.GEOBLOCK_ERROR]: () => ({
@@ -206,7 +199,7 @@ export const ERROR_TEXT_BY_TYPE: TErrorConfigByType = {
       </>
     ),
   }),
-  [ERROR_TYPE.EMBED_ERROR]: (theme, isEmbeded) => ({
+  [ERROR_TYPE.EMBED_ERROR]: ({ theme, isEmbedded, sharingUrl }) => ({
     icon: IconLogoMap[theme],
     text: () => (
       <>
@@ -215,51 +208,75 @@ export const ERROR_TEXT_BY_TYPE: TErrorConfigByType = {
         только на сайте {HostMap[theme]}
       </>
     ),
-    btn_text: () => (isEmbeded ? 'Перейти и смотреть' : null),
-    onClick: () => {
-      //   window.open(store.getState()?.config?.video_data?.sharingUrl ?? `https://${HostMap[theme]}`, '_blank');
+    btn_text: () => (isEmbedded ? 'Перейти и смотреть' : null),
+    onClick: (dispatch) => {
+      dispatch(
+        sendEvent({ type: 'OPEN_URL', meta: { url: sharingUrl ?? `https://${HostMap[theme]}`, target: '_blank' } })
+      );
     },
   }),
-  [ERROR_TYPE.NOT_ALLOWED_ERROR]: (theme) => ({
+  [ERROR_TYPE.NOT_ALLOWED_ERROR]: ({ theme, mailOpts }) => ({
+    icon: error_icon,
+    text: (isM) => {
+      return (
+        <>
+          Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
+          <br />
+          {createMailLink({
+            subject: 'Ошибка загрузки видео',
+            code: ERROR_CODES.NOT_ALLOWED_ERROR,
+            theme,
+            mailOpts,
+          })}
+        </>
+      );
+    },
+    btn_text: () => 'Попробовать снова',
+  }),
+  [ERROR_TYPE.TECHNICAL_ERROR]: ({ theme, mailOpts }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
         <br />
-        {createMailLink('Ошибка загрузки видео', ERROR_CODES[ERROR_TYPE.NOT_ALLOWED_ERROR], theme)}
+        {createMailLink({
+          subject: 'Ошибка загрузки видео',
+          code: ERROR_CODES.TECHNICAL_ERROR,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => 'Попробовать снова',
   }),
-  [ERROR_TYPE.TECHNICAL_ERROR]: (theme) => ({
+  [ERROR_TYPE.PROXY_ERROR]: ({ theme, mailOpts }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
         <br />
-        {createMailLink('Ошибка загрузки видео', ERROR_CODES[ERROR_TYPE.TECHNICAL_ERROR], theme)}
+        {createMailLink({
+          subject: 'Ошибка загрузки видео',
+          code: ERROR_CODES.PROXY_ERROR,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => 'Попробовать снова',
   }),
-  [ERROR_TYPE.PROXY_ERROR]: (theme) => ({
+  [ERROR_TYPE.TRACK_MISSING]: ({ theme, mailOpts }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
         <br />
-        {createMailLink('Ошибка загрузки видео', ERROR_CODES[ERROR_TYPE.PROXY_ERROR], theme)}
-      </>
-    ),
-    btn_text: () => 'Попробовать снова',
-  }),
-  [ERROR_TYPE.TRACK_MISSING]: (theme) => ({
-    icon: error_icon,
-    text: (isM) => (
-      <>
-        Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
-        <br />
-        {createMailLink('Ошибка загрузки видео', ERROR_CODES[ERROR_TYPE.TRACK_MISSING], theme)}
+        {createMailLink({
+          subject: 'Ошибка загрузки видео',
+          code: ERROR_CODES.TRACK_MISSING,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => 'Попробовать снова',
@@ -279,18 +296,23 @@ export const ERROR_TEXT_BY_TYPE: TErrorConfigByType = {
     text: () => 'Отсутствует подключение к интернету',
     btn_text: () => 'Попробовать снова',
   }),
-  [ERROR_TYPE.DATA_LOADING]: (theme) => ({
+  [ERROR_TYPE.DATA_LOADING]: ({ theme, mailOpts }) => ({
     icon: error_network_icon,
     text: (isM) => (
       <>
         Проблемы с соединением: попробуй{br(isM)}очистить кэш{br(!isM)}браузера и обновить{br(isM)}страницу. Если это не
         помогает{br(!isM)}свяжись{br(isM)}с нами:
-        {createMailLink('Ошибка сети', ERROR_CODES[ERROR_TYPE.DATA_LOADING], theme)}
+        {createMailLink({
+          subject: 'Ошибка сети',
+          code: ERROR_CODES.ERROR_DATA_LOADING,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => 'Перезагрузить страницу',
   }),
-  [ERROR_TYPE.SRC_NOT_SUPPORTED]: (theme) => ({
+  [ERROR_TYPE.SRC_NOT_SUPPORTED]: ({ theme }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
@@ -363,7 +385,7 @@ export const ERROR_TEXT_BY_TYPE: TErrorConfigByType = {
     ),
     btn_text: () => 'Попробовать снова',
   }),
-  [ERROR_TYPE.NO_RIGHTS]: (theme, isEmbeded) => ({
+  [ERROR_TYPE.NO_RIGHTS]: ({ theme, isEmbedded }) => ({
     icon: error_icon,
     text: () => (
       <>
@@ -372,92 +394,132 @@ export const ERROR_TEXT_BY_TYPE: TErrorConfigByType = {
         зашифрованного видео
       </>
     ),
-    btn_text: () => (isEmbeded ? `Смотреть на ${HostMap[theme]}` : null),
+    btn_text: () => (isEmbedded ? `Смотреть на ${HostMap[theme]}` : null),
   }),
-  [ERROR_TYPE.FETCH_LICENSE_ERROR]: (theme) => ({
+  [ERROR_TYPE.FETCH_LICENSE_ERROR]: ({ theme, mailOpts }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
         <br />
-        {createMailLink('Ошибка загрузки видео', ERROR_CODES[ERROR_TYPE.FETCH_LICENSE_ERROR], theme)}
+        {createMailLink({
+          subject: 'Ошибка загрузки видео',
+          code: ERROR_CODES.FETCH_LICENSE_ERROR,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => 'Попробовать снова',
   }),
-  [ERROR_TYPE.HYDRA_UNAVAILABLE]: (theme) => ({
+  [ERROR_TYPE.HYDRA_UNAVAILABLE]: ({ theme, mailOpts }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
         <br />
-        {createMailLink('Ошибка загрузки видео', ERROR_CODES[ERROR_TYPE.NOT_AVAILABLE], theme)}
+        {createMailLink({
+          subject: 'Ошибка загрузки видео',
+          code: ERROR_CODES.ERROR_NOT_AVAILABLE,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => 'Попробовать снова',
   }),
-  [ERROR_TYPE.NOT_AVAILABLE]: (theme) => ({
+  [ERROR_TYPE.NOT_AVAILABLE]: ({ theme, mailOpts }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
         <br />
-        {createMailLink('Ошибка загрузки видео', ERROR_CODES[ERROR_TYPE.NOT_AVAILABLE], theme)}
+        {createMailLink({
+          subject: 'Ошибка загрузки видео',
+          code: ERROR_CODES.ERROR_NOT_AVAILABLE,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => 'Попробовать снова',
   }),
-  [ERROR_TYPE.CDN_UNAVAILABLE]: (theme) => ({
+  [ERROR_TYPE.CDN_UNAVAILABLE]: ({ theme, mailOpts }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
         <br />
-        {createMailLink('Ошибка расшифровки', ERROR_CODES[ERROR_TYPE.DECODE], theme)}
+        {createMailLink({
+          subject: 'Ошибка расшифровки',
+          code: ERROR_CODES.ERROR_DECODE,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => 'Попробовать снова',
   }),
-  [ERROR_TYPE.CDN_REQUEST_FAILED]: (theme) => ({
+  [ERROR_TYPE.CDN_REQUEST_FAILED]: ({ theme, mailOpts }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
         <br />
-        {createMailLink('Ошибка расшифровки', ERROR_CODES[ERROR_TYPE.DECODE], theme)}
+        {createMailLink({
+          subject: 'Ошибка расшифровки',
+          code: ERROR_CODES.ERROR_DECODE,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => 'Попробовать снова',
   }),
-  [ERROR_TYPE.DECODE]: (theme) => ({
+  [ERROR_TYPE.DECODE]: ({ theme, mailOpts }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
         <br />
-        {createMailLink('Ошибка расшифровки', ERROR_CODES[ERROR_TYPE.DECODE], theme)}
+        {createMailLink({
+          subject: 'Ошибка расшифровки',
+          code: ERROR_CODES.ERROR_DECODE,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => 'Попробовать снова',
   }),
-  [ERROR_TYPE.ENCRYPTED]: (theme) => ({
+  [ERROR_TYPE.ENCRYPTED]: ({ theme, mailOpts }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
         <br />
-        {createMailLink('Ошибка расшифровки', ERROR_CODES[ERROR_TYPE.ENCRYPTED], theme)}
+        {createMailLink({
+          subject: 'Ошибка расшифровки',
+          code: ERROR_CODES.ERROR_ENCRYPTED,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => 'Попробовать снова',
   }),
-  [ERROR_TYPE.ABORTED]: (theme) => ({
+  [ERROR_TYPE.ABORTED]: ({ theme, mailOpts }) => ({
     icon: error_icon,
     text: (isM) => (
       <>
         Невозможно загрузить видео:{br(isM)}рекомендуем{br(!isM)}попробовать позже{br(isM)}или связаться с нами:
         <br />
-        {createMailLink('Ошибка расшифровки', ERROR_CODES[ERROR_TYPE.ABORTED], theme)}
+        {createMailLink({
+          subject: 'Ошибка расшифровки',
+          code: ERROR_CODES.ERROR_ABORTED,
+          theme,
+          mailOpts,
+        })}
       </>
     ),
     btn_text: () => 'Попробовать снова',
@@ -488,12 +550,12 @@ export const ERROR_TEXT_BY_TYPE: TErrorConfigByType = {
     ),
     btn_text: () => 'Повторить',
   }),
-  [ERROR_TYPE.STORMWALL_GEOBLOCK_ERROR]: (theme) => ({
+  [ERROR_TYPE.STORMWALL_GEOBLOCK_ERROR]: ({ theme }) => ({
     icon: error_restriction_icon,
     text: (isM) => (
       <>
         Региональные ограничения: в твоей{br(isM)}стране нет
-        <br />
+        {br(!isM)}
         доступа к {HostMap[theme]}. А еще не{br(isM)}забудь отключить VPN.
       </>
     ),

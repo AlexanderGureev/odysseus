@@ -236,6 +236,9 @@ export type OutputEvents = {
   on_open_off_ads_experiment: () => void;
   on_close_off_ads_experiment: () => void;
 
+  on_open_off_ads_before_preroll_experiment: () => void;
+  on_close_off_ads_before_preroll_experiment: () => void;
+
   ad_manifest: (data: Payload<{ numBreaks: number; numExpectedBreaks: number; breaksTimeLimit: number[] }>) => void;
   ad_break_start: (data: Payload<{ category: AdCategory; limit: number; point: number }>) => void;
   ad_start: (data: Payload<{ category: AdCategory; position: number }>) => void;
@@ -289,6 +292,7 @@ export type INPUT_PLAYER_POST_MESSAGE = {
   set_experiment_group: (p: { data: { name: Experiments; group: string } }) => void;
 
   on_close_off_ads_experiment: () => void;
+  on_close_off_ads_before_preroll_experiment: () => void;
 };
 
 export type TMessage = {

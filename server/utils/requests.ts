@@ -1,7 +1,7 @@
 import express from 'express';
 import FormData from 'form-data';
-import { PlayerError } from 'utils/errors';
 
+import { PlayerError } from '../../src/utils/errors';
 import { logger } from '../../src/utils/logger';
 import { HTTPResponseError, ReqInit, request } from '../../src/utils/request';
 import { ApiResponse, ERROR, SkinClass, TBaseConfig, TConfigSource, THydraResponse } from '../../types';

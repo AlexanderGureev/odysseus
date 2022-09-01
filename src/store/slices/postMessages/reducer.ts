@@ -4,10 +4,12 @@ import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
+import { adDisableSuggestion } from './effects/adDisableSuggestion';
 import { adEvents } from './effects/adEvents';
 import { adultNotify } from './effects/adultNotify';
 import { autoswitchPopup } from './effects/autoswitchPopup';
 import { baseEvents } from './effects/baseEvents';
+import { errors } from './effects/errors';
 import { resumeNotify } from './effects/resumeNotify';
 import { trialSuggestion } from './effects/trialSuggestion';
 import { FSMState, State } from './types';
@@ -161,11 +163,14 @@ const addMiddleware = () => {
       const event = action as PayloadAction<EventPayload>;
 
       autoswitchPopup(event, opts);
+      adDisableSuggestion(event, opts);
+
       baseEvents(event, opts);
       adEvents(event, opts);
       resumeNotify(event, opts);
       adultNotify(event, opts);
       trialSuggestion(event, opts);
+      errors(event, opts);
     },
   });
 };

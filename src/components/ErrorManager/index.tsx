@@ -2,36 +2,56 @@ import cn from 'classnames';
 import { useAppDispatch, useAppSelector } from 'hooks/store';
 import useMediaQuery from 'hooks/useMedia';
 import React, { useEffect } from 'react';
-import { SkinClass } from 'types';
-import { ERROR_CODES, ERROR_ITEM_MAP, RawPlayerError } from 'types/errors';
+import { sendEvent } from 'store';
+import { selectMailOptions } from 'store/selectors';
+import { AppThemeBySkin, SkinClass } from 'types';
+import { ERROR_CODES, ERROR_ITEM_MAP, ERROR_TYPE, RawPlayerError } from 'types/errors';
 
 import Styles from './index.module.css';
 import { ERROR_TEXT_BY_TYPE } from './templates';
 
 const ErrorTemplate: React.FC<{ error: RawPlayerError }> = ({ error }) => {
-  const match = useMediaQuery('(max-width: 375px)');
+  const dispatch = useAppDispatch();
+  const match = useMediaQuery('(max-width: 425px)');
   const {
     session,
-    meta: { isEmbedded },
+    meta: { isEmbedded, skin },
+    config,
   } = useAppSelector((state) => state.root);
 
-  const { icon, text, btn_text, footer_icons, onClick } = ERROR_TEXT_BY_TYPE[error.title](
-    SkinClass.MORE_TV,
-    isEmbedded
-  );
+  const mailOpts = useAppSelector((state) => selectMailOptions(state));
+
+  const { icon, text, btn_text, footer_icons, onClick } = ERROR_TEXT_BY_TYPE[error.title]({
+    isEmbedded,
+    theme: skin || SkinClass.DEFAULT,
+    sharingUrl: config?.playlist?.items?.[0]?.sharing_url,
+    mailOpts,
+  });
 
   return (
-    <div className={cn(Styles.error_container, `code_${ERROR_CODES[error.title]}`)}>
-      <div className={Styles.error_modal}>
-        <div className={Styles.error_modal__header}>
+    <div
+      className={cn(
+        Styles['error-container'],
+        Styles[`code-${ERROR_CODES[error.title]}`],
+        Styles[`${AppThemeBySkin[skin || SkinClass.DEFAULT]}`]
+      )}>
+      <div className={Styles['error-modal']}>
+        <div className={Styles.header}>
           <img src={`${icon}`} />
         </div>
-        <div className={Styles.error_modal__body}>{text(match)}</div>
-        <div className={Styles.error_modal__footer}>
+        <div className={Styles.body}>{text(match)}</div>
+        <div className={Styles.footer}>
           {btn_text?.() ? (
-            <div className={Styles.footer_btn} onClick={onClick}>
+            <button
+              className={Styles['footer-btn']}
+              onClick={() => {
+                if (onClick) onClick?.(dispatch);
+                else {
+                  dispatch(sendEvent({ type: 'RELOAD' }));
+                }
+              }}>
               {btn_text()}
-            </div>
+            </button>
           ) : null}
           {footer_icons?.().map(({ src, href }) => (
             <a href={href} target="_blank" rel="noreferrer" key={href}>
@@ -39,10 +59,10 @@ const ErrorTemplate: React.FC<{ error: RawPlayerError }> = ({ error }) => {
             </a>
           ))}
         </div>
-        <div className={Styles.error_code}>Код ошибки: {ERROR_CODES[error.title]}</div>
-        <div className={Styles.meta_container}>
-          <div className={Styles.videosession_id}>ssid: {session.sid}</div>
-          <div>app version: 2.53.0</div>
+        <div className={Styles['error-code']}>Код ошибки: {ERROR_CODES[error.title]}</div>
+        <div className={Styles['meta-container']}>
+          <div className={Styles['videosession-id']}>ssid: {session.sid}</div>
+          {mailOpts.webVersion && <div>app version: {mailOpts.webVersion}</div>}
         </div>
       </div>
     </div>
@@ -50,22 +70,26 @@ const ErrorTemplate: React.FC<{ error: RawPlayerError }> = ({ error }) => {
 };
 
 const ErrorManager = ({ children }: React.PropsWithChildren) => {
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
+  // const root = useAppSelector((state) => state.root);
+
   const { step, error } = useAppSelector((state) => state.error);
 
-  useEffect(() => {
-    // dispatch(
-    //   sendEvent({
-    //     type: 'SHOW_ERROR',
-    //     payload: {
-    //       error: {
-    //         code: 105,
-    //         title: ERROR_TYPE.ENCRYPTED,
-    //       },
-    //     },
-    //   })
-    // );
-  }, [dispatch]);
+  // useEffect(() => {
+  //   if (root.step === 'INIT_ANALYTICS_PENDING') {
+  //     dispatch(
+  //       sendEvent({
+  //         type: 'SHOW_ERROR',
+  //         meta: {
+  //           error: {
+  //             code: ERROR_CODES.STORMWALL_GEOBLOCK_ERROR,
+  //             title: ERROR_TYPE.STORMWALL_GEOBLOCK_ERROR,
+  //           },
+  //         },
+  //       })
+  //     );
+  //   }
+  // }, [root.step, dispatch]);
 
   if (error && step === 'ERROR') {
     return <ErrorTemplate error={ERROR_ITEM_MAP[error.code]} />;

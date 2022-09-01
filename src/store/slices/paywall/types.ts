@@ -23,7 +23,7 @@ export type SubType = 'FULL_PRICE' | 'TRIAL';
 
 export type FSMState = {
   step: State;
-  title: string;
+  title: string | null;
   description: string | null;
-  paywallButtonText: string;
+  paywallButtonText: string | null;
 };

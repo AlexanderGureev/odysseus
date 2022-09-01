@@ -25,4 +25,5 @@ export enum STORAGE_SETTINGS {
   BEFORE_PAUSEROLL_TIMESTAMP = '@trial_suggestion/before_pauseroll_ts',
 
   AUTOSWITCH_AVOD_POPUP = '@autoswitch/avod_popup',
+  AD_DISABLE_SUGGESTION_BEFORE_PREROLL = '@notice/ad_disable_suggestion_before_preroll',
 }

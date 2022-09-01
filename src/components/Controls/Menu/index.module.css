@@ -1,0 +1,5 @@
+.menu {
+  composes: btn-hover icon from global;
+  position: relative;
+  margin-left: 20px;
+}

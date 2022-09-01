@@ -10,6 +10,7 @@ import { FSMState, State } from './types';
 const initialState: FSMState = {
   step: 'IDLE',
 
+  unmuted: false,
   muted: true,
   volume: 0.5,
 };
@@ -72,6 +73,7 @@ const volume = createSlice({
         case 'SET_MUTE':
           state.step = step;
           state.muted = payload.value;
+          if (!payload.value) state.unmuted = true;
           break;
         case 'SET_VOLUME_AD_BLOCK':
         case 'SET_VOLUME':

@@ -1,10 +1,5 @@
-.vjs-text-track-display,
-.vjs-control-bar,
-.vjs-loading-spinner,
-.vjs-big-play-button,
-.vjs-modal-dialog {
-  display: none;
-}
+@import './variables.css';
+@import './fonts.css';
 
 html,
 body {
@@ -21,22 +16,46 @@ body {
   background: #000;
 }
 
+.wrapper,
 #root,
-.player-manager,
 #video-player,
 #video-player_html5_api {
   width: 100%;
   height: 100%;
+  outline: none;
 }
 
-.controls {
-  background: rgba(255, 255, 255, 0.6);
+.icon {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  cursor: pointer;
+}
+
+.btn-hover {
+  opacity: var(--icon-opacity);
+}
+
+.btn-hover::before {
+  content: '';
   position: absolute;
-  left: 25px;
-  top: 25px;
-  z-index: 15;
+  border-radius: var(--hover-btn-border-radius);
+  background-color: var(--hover-control-color);
+  transition: var(--default-transition);
+  opacity: 0;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 8px;
+  width: 100%;
+  height: 100%;
 }
 
+.btn-hover:hover,
+.btn-hover:hover::before {
+  opacity: 1;
+}
+
+/* 
 .ad-notify,
 .auto-switch {
   position: absolute;
@@ -204,7 +223,14 @@ body {
   color: #fff;
 }
 
-.trial-suggestion .title,
-.description {
-  margin-bottom: 12px;
+.ad-disable-notice {
+  text-align: center;
+  color: #fff;
 }
+
+.ad-disable-notice .title,
+.ad-disable-notice .description,
+.trial-suggestion .title,
+.trial-suggestion .description {
+  margin-bottom: 12px;
+} */

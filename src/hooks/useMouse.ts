@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { off, on } from 'utils';
+import { throttle } from 'utils/debounce';
 
 type State = {
   docX: number;
@@ -106,6 +107,12 @@ export const useMouse = (ref: React.RefObject<Element>): State => {
 
     setState((prev) => ({ ...prev, ...getRect() }));
 
+    const onResize = throttle(() => {
+      setState((prev) => ({ ...prev, ...getRect() }));
+    }, 120);
+
+    on(window, 'resize', onResize);
+
     if (isMobile) {
       on(document, 'touchstart', moveHandler);
       on(document, 'touchmove', moveHandler);
@@ -114,6 +121,8 @@ export const useMouse = (ref: React.RefObject<Element>): State => {
     }
 
     return () => {
+      off(window, 'resize', onResize);
+
       if (isMobile) {
         off(document, 'touchstart', moveHandler);
         off(document, 'touchmove', moveHandler);

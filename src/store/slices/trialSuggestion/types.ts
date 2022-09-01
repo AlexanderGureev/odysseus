@@ -1,6 +1,6 @@
 import { DefaultPayload } from 'store/types';
 
-import { ContentByType, TS_TRIGGER } from './utils';
+import { NoticeContent, TS_TRIGGER } from './utils';
 
 export type State =
   | 'IDLE'
@@ -13,6 +13,7 @@ export type State =
   | 'INITIALIZING_NOTICE_LISTENERS'
   | 'AWAITING_START_PLAYBACK'
   | 'AUTO_CLOSE'
+  | 'CLICK_PAY_BUTTON_TRIAL_NOTICE_PROCESSING'
   | 'DISABLED';
 
 export type EventsWithPayload =
@@ -28,13 +29,14 @@ export type EventsWithPayload =
         | 'INITIALIZING_TRIAL_NOTICE_REJECT'
         | 'INITIALIZING_NOTICE_LISTENERS_RESOLVE'
         | 'DISPOSE_NOTICE_RESOLVE'
+        | 'CLICK_PAY_BUTTON_TRIAL_NOTICE_PROCESSING_RESOLVE'
         | 'TRIAL_NOTICE_SHOWN';
     }
   | {
       type: 'SHOW_TRIAL_NOTICE' | 'SET_TRIAL_NOTICE';
       payload: {
         notifyType: TS_TRIGGER;
-        notifyContent: ContentByType;
+        notifyContent: NoticeContent;
         timerId: string;
       };
     };
@@ -47,6 +49,6 @@ export type FSMState = {
   step: State;
   isInitialized: boolean;
   notifyType: TS_TRIGGER | null;
-  notifyContent: ContentByType | null;
+  notifyContent: NoticeContent | null;
   timerId: string | null;
 };

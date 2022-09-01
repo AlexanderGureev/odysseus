@@ -28,7 +28,7 @@ export enum SkinClass {
   DEFAULT = 'DEFAULT',
 }
 
-export const APP_CLASSNAME = {
+export const AppNameBySkin: { [key in SkinClass]?: string } = {
   [SkinClass.VIDEOMORE]: 'moretv',
   [SkinClass.CTC]: 'ctc',
   [SkinClass.CTC_LOVE]: 'ctc_love',
@@ -37,6 +37,17 @@ export const APP_CLASSNAME = {
   [SkinClass.CHE]: 'che',
   [SkinClass.CTC_KIDS]: 'ctc_kids',
   [SkinClass.DEFAULT]: 'default',
+};
+
+export const AppThemeBySkin: Record<SkinClass, string> = {
+  [SkinClass.VIDEOMORE]: 'theme-vm',
+  [SkinClass.CTC]: 'theme-ctc',
+  [SkinClass.CTC_LOVE]: 'theme-ctc-love',
+  [SkinClass.MORE_TV]: 'theme-more-tv',
+  [SkinClass.DOMASHNIY]: 'theme-home',
+  [SkinClass.CHE]: 'theme-che',
+  [SkinClass.DEFAULT]: 'theme-default',
+  [SkinClass.CTC_KIDS]: 'theme-ctc-kids',
 };
 
 export enum DOMAINS {
@@ -317,6 +328,8 @@ export type TPlaylistItem = {
   preview_duration?: PreviewDurationOpts;
   project_id: number;
   project_name: string;
+  project_url?: string;
+  season_url?: string;
   season_name: string;
   sharing_url: string;
   streaming_origin: 'HUB' | 'PAK';

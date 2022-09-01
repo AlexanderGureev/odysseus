@@ -79,6 +79,7 @@ export enum PLAYER_TYPE {
 
 export type Hooks = {
   beforeSetSource: (type: VIDEO_TYPE) => Promise<void> | void;
+  beforeLaunch: () => Promise<void> | void;
 };
 
 export type SetSourceOpts = { type?: VIDEO_TYPE; timeout?: number };

@@ -38,6 +38,7 @@ const VIGO_SCRIPT_ID = 'v_vigo_script';
 
 const VigoService = (playerService: IPlayerService): TVigoService => {
   let vigoStat: VigoSDK | null = null;
+  let isHookInitialized = false;
 
   const getBitrate = () => {
     const tech = playerService.getTech();
@@ -109,11 +110,15 @@ const VigoService = (playerService: IPlayerService): TVigoService => {
       quality: qualityMark ? VIGO_QUALITY_INDEX[qualityMark] : 0,
     };
 
-    playerService.addHook('beforeSetSource', (type) => {
-      if (type === VIDEO_TYPE.FAKE_VIDEO) {
-        vigoStat?.suspendStats();
-      }
-    });
+    if (!isHookInitialized) {
+      playerService.addHook('beforeSetSource', (type) => {
+        if (type === VIDEO_TYPE.FAKE_VIDEO) {
+          vigoStat?.suspendStats();
+        }
+      });
+
+      isHookInitialized = true;
+    }
 
     if (window.V_VIGO_SCRIPT_LOADED) {
       initializeVigo(playerId, info);

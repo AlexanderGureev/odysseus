@@ -1,3 +1,4 @@
+import { Experiments } from '@moretv/types';
 import { NextTrackConfig } from 'api/types';
 import { TParams } from 'server/utils';
 import { TManifestData } from 'services/ManifestParser/types';
@@ -40,7 +41,8 @@ export type State =
   | 'INITIALIZING_QUALITY_SERVICE'
   | 'INITIAL_SELECT_MANIFEST_PENDING'
   | 'SELECT_MANIFEST_PENDING'
-  | 'SETUP_INITIAL_VOLUME';
+  | 'SETUP_INITIAL_VOLUME'
+  | 'DISPOSED';
 
 export type ParsedConfigData = {
   config: TExtendedConfig;
@@ -65,7 +67,6 @@ export type EventsWithPayload =
       | 'FETCH_CONFIG_REJECT'
       | 'DO_INIT'
       | 'SET_SOURCE'
-      | 'RELOAD'
       | 'LOAD_META'
       | 'CLICK_BIG_PLAY_BUTTON'
       | 'CHECK_AUTOPLAY_RESOLVE'
@@ -75,6 +76,7 @@ export type EventsWithPayload =
       | 'BEFORE_UNLOAD'
       | 'PAYWALL_SHOWN'
       | 'RESIZE'
+      | 'DISPOSE_PLAYER'
     >
   | ErrorPayload<
       | 'CHECK_ERROR_REJECT'
@@ -82,7 +84,6 @@ export type EventsWithPayload =
       | 'INIT_ANALYTICS_REJECT'
       | 'INIT_REJECT'
       | 'PLAYER_INIT_REJECT'
-      | 'SHOW_ERROR'
       | 'CHECK_CAPABILITIES_REJECT'
       | 'SELECT_SOURCE_ERROR'
       | 'FETCHING_MANIFEST_REJECT'
@@ -225,6 +226,8 @@ export type TrackParams = {
   trial_available?: boolean;
   startAt?: number | null;
   isVkApp?: boolean;
+  web_version?: string;
+  experiments?: { [key in Experiments]?: string };
 };
 
 export enum SubscriptionState {

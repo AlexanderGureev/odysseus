@@ -5,6 +5,7 @@ import { getPlaylistItem } from 'store/selectors';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { logger } from 'utils/logger';
 
+import { clickSubscribeButton } from '../adDisableSuggestion/effects/clickSubscribeButton';
 import { FSMState, State } from './types';
 
 const initialState: FSMState = {
@@ -68,6 +69,12 @@ const addMiddleware = () => {
         dispatch: api.dispatch,
       });
 
+      const opts = {
+        dispatch,
+        getState,
+        services,
+      };
+
       const { step } = getState().payButton;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
@@ -94,25 +101,7 @@ const addMiddleware = () => {
           }
         },
         CLICK_PAY_BUTTON_PROCESSING: () => {
-          const {
-            root: {
-              config,
-              meta: { isEmbedded, trackId },
-            },
-          } = getState();
-
-          const item = getPlaylistItem(getState());
-
-          if (item.sharing_url && isEmbedded) {
-            const queryParams = services.utmService.buildUTMQueryParams({
-              term: 'subscribe_cta',
-              trackId,
-              skinId: config.config.skin_id,
-            });
-
-            window.open(`${item.sharing_url}?${queryParams}`, '_blank');
-          }
-
+          clickSubscribeButton(opts);
           dispatch(sendEvent({ type: 'CLICK_PAY_BUTTON_PROCESSING_RESOLVE' }));
         },
       };

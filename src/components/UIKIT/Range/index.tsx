@@ -7,8 +7,6 @@ import { off, on } from 'utils';
 
 type Props = {
   direction?: 'horisontal' | 'vertical';
-  width?: string;
-  height?: string;
   radius?: string;
   value: number;
   max: number;
@@ -20,6 +18,7 @@ type Props = {
   getFormattedLabel?: (value: number) => React.ReactNode;
   ariaLabel?: string;
   onDragEnd?: (value: number) => void;
+  onDrag?: (status: boolean) => void;
   bufferValue?: number;
 };
 
@@ -30,20 +29,19 @@ const GRADIENT_DEG: Record<'horisontal' | 'vertical', string> = {
 
 export const Range = ({
   direction = 'horisontal',
-  width = '100%',
-  height = '10px',
   radius = '10px',
   value: initialValue,
   max,
   step = 1,
   onChange,
-  hoverColor = 'rgba(255,255,255,.7)',
-  progressColor = '#fe1717',
-  bufferColor = 'rgba(255,255,255,.5)',
+  hoverColor = '--hover-color',
+  progressColor = '--progress-color',
+  bufferColor = '--buffer-color',
   getFormattedLabel = (label) => label,
   ariaLabel,
   onDragEnd,
   bufferValue,
+  onDrag,
 }: React.PropsWithChildren<Props>) => {
   const [currentValue, setValue] = useState(initialValue);
   const inputRef = useRef<HTMLDivElement>(null);
@@ -58,13 +56,17 @@ export const Range = ({
   const x = direction === 'horisontal' ? elX : elH - elY;
   const pos = x > w ? w : x > 0 ? x : 0;
   const gradientPercent = (x / w) * 100;
-  const value = Number(((pos / w) * max).toFixed(1));
+  const value = Number(((pos / w) * max).toFixed(3));
   const progressValue = w * (currentValue / max);
   const bufferPx = bufferValue ? w * (bufferValue / max) : null;
 
   useUpdateEffect(() => {
     if (!isDrag) setValue(initialValue);
   }, [isDrag, initialValue]);
+
+  useEffect(() => {
+    onDrag?.(isDrag);
+  }, [isDrag, onDrag]);
 
   useEffect(() => {
     if (isKeyboardEvent.current) {
@@ -140,45 +142,51 @@ export const Range = ({
     <div
       className={cn('range-input', direction)}
       ref={inputRef}
-      style={{ width, height }}
       role="slider"
       tabIndex={0}
       aria-valuemin={0}
       aria-valuenow={currentValue}
       aria-valuemax={max}
       aria-label={ariaLabel}>
-      <div className="range-input-track" style={{ borderRadius: radius }} />
-      {bufferPx && (
+      <div className="range-input-track" style={{ borderRadius: radius }}>
+        {bufferPx && (
+          <div
+            className="range-input-buffer"
+            style={{
+              borderRadius: radius,
+              background: `linear-gradient(${
+                GRADIENT_DEG[direction]
+              },  ${`var(${bufferColor})`} ${bufferPx}px,  transparent ${bufferPx}px)`,
+            }}
+          />
+        )}
         <div
-          className="range-input-buffer"
+          className="range-input-progress"
           style={{
             borderRadius: radius,
-            background: `linear-gradient(${GRADIENT_DEG[direction]},  ${bufferColor} ${bufferPx}px,  transparent ${bufferPx}px)`,
+            background: `linear-gradient(${
+              GRADIENT_DEG[direction]
+            },  ${`var(${progressColor})`} ${progressValue}px,  transparent ${progressValue}px)`,
           }}
         />
-      )}
-      <div
-        className="range-input-progress"
-        style={{
-          borderRadius: radius,
-          background: `linear-gradient(${GRADIENT_DEG[direction]},  ${progressColor} ${progressValue}px,  transparent ${progressValue}px)`,
-        }}
-      />
-      <div
-        className={cn('range-input-hover', {
-          active: isEnter,
-        })}
-        style={{
-          borderRadius: radius,
-          background: `linear-gradient(${GRADIENT_DEG[direction]},  ${hoverColor} ${gradientPercent}%,  transparent ${gradientPercent}%)`,
-        }}
-      />
+        <div
+          className={cn('range-input-hover')}
+          style={{
+            borderRadius: radius,
+            background: `linear-gradient(${
+              GRADIENT_DEG[direction]
+            },  ${`var(${hoverColor})`} ${gradientPercent}%,  transparent ${gradientPercent}%)`,
+          }}
+        />
+      </div>
+
       <div
         className="range-input-thumb"
         style={{
           [direction === 'horisontal' ? 'left' : 'bottom']: progressValue,
         }}
       />
+
       {thumbLabel && (
         <div
           ref={thumbLabelRef}

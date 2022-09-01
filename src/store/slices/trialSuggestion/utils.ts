@@ -41,7 +41,7 @@ export const keysByTrigger: {
   },
 };
 
-export type ContentByType = {
+export type NoticeContent = {
   title: string | null;
   description: string | null;
   payButtonText: string | null;
@@ -52,7 +52,7 @@ export const getContentByTrigger = (state: AppState, trigger: TS_TRIGGER) => {
   const text = getTrialDurationText(state);
 
   const map: {
-    [key in 'notify' | 'modal']: ContentByType;
+    [key in 'notify' | 'modal']: NoticeContent;
   } = {
     notify: {
       title: null,
@@ -104,6 +104,7 @@ export const selectActiveNotify = (state: AppState, category: AdCategory, servic
 
   if (!isValidSettings || !intervalValue) return false;
 
+  // TODO fix
   return trigger;
   // if (Date.now() - (lastActivatedAt || 0) > intervalValue * 60 * 60 * 1000) {
   //   return trigger;

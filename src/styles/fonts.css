@@ -1,6 +1,7 @@
 @font-face {
   font-family: 'Montserrat';
-  src: local('Montserrat-ExtraBold'), local(Montserrat ExtraBold), url('../assets/fonts/Montserrat ExtraBold.woff2') format('woff2'),
+  src: local('Montserrat-ExtraBold'), local(Montserrat ExtraBold),
+    url('../assets/fonts/Montserrat ExtraBold.woff2') format('woff2'),
     url('../assets/fonts/Montserrat ExtraBold.woff') format('woff');
   font-weight: 800;
   font-style: normal;
@@ -8,6 +9,7 @@
   unicode-range: U+000D-FB02;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Montserrat';
   src: local('Montserrat-Bold'), local(Montserrat Bold), url('../assets/fonts/Montserrat Bold.woff2') format('woff2'),
@@ -18,9 +20,11 @@
   unicode-range: U+000D-FB02;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Montserrat';
-  src: local('Montserrat-SemiBold'), local(Montserrat SemiBold), url('../assets/fonts/Montserrat SemiBold.woff2') format('woff2'),
+  src: local('Montserrat-SemiBold'), local(Montserrat SemiBold),
+    url('../assets/fonts/Montserrat SemiBold.woff2') format('woff2'),
     url('../assets/fonts/Montserrat SemiBold.woff') format('woff');
   font-weight: 600;
   font-style: normal;
@@ -28,9 +32,11 @@
   unicode-range: U+000D-FB02;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Montserrat';
-  src: local('Montserrat-Medium'), local(Montserrat Medium), url('../assets/fonts/Montserrat Medium.woff2') format('woff2'),
+  src: local('Montserrat-Medium'), local(Montserrat Medium),
+    url('../assets/fonts/Montserrat Medium.woff2') format('woff2'),
     url('../assets/fonts/Montserrat Medium.woff') format('woff');
   font-weight: 500;
   font-style: normal;
@@ -38,13 +44,121 @@
   unicode-range: U+000D-FB02;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Montserrat';
-  src: local('Montserrat-Regular'), local(Montserrat Regular), url('../assets/fonts/Montserrat Regular.woff2') format('woff2'),
+  src: local('Montserrat-Regular'), local(Montserrat Regular),
+    url('../assets/fonts/Montserrat Regular.woff2') format('woff2'),
     url('../assets/fonts/Montserrat Regular.woff') format('woff');
   font-weight: 400;
   font-style: normal;
   font-stretch: normal;
   unicode-range: U+000D-FB02;
+  font-display: swap;
+}
+
+/* universal fonts */
+@font-face {
+  font-family: 'SFProDisplay';
+  src: url('../assets/fonts/SFProDisplay-Regular.woff2') format('woff2'),
+    url('../assets/fonts/SFProDisplay-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SFProDisplay';
+  src: url('../assets/fonts/SFProDisplay-Medium.woff2') format('woff2'),
+    url('../assets/fonts/SFProDisplay-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SFProDisplay';
+  src: url('../assets/fonts/SFProDisplay-Light.woff2') format('woff2'),
+    url('../assets/fonts/SFProDisplay-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SFProDisplay';
+  src: url('../assets/fonts/SFProDisplay-Bold.woff2') format('woff2'),
+    url('../assets/fonts/SFProDisplay-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* ctc fonts */
+@font-face {
+  font-family: 'CTCSans';
+  src: url('../assets/fonts/CTCSans-Thin.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CTCSans';
+  src: url('../assets/fonts/CTCSans-Italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CTCSans';
+  src: url('../assets/fonts/CTCSans-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CTCSans';
+  src: url('../assets/fonts/CTCSans-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CTCSans';
+  src: url('../assets/fonts/CTCSans-MediumItalic.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CTCSans';
+  src: url('../assets/fonts/CTCSans-Bold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CTCSans';
+  src: url('../assets/fonts/CTCSans-BoldItalic.otf') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CTCSans';
+  src: url('../assets/fonts/CTCSans-ExtraBold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CTCSans';
+  src: url('../assets/fonts/CTCSans-ExtraBoldItalic.otf') format('opentype');
+  font-weight: 800;
+  font-style: italic;
   font-display: swap;
 }

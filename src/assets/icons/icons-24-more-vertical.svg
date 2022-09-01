@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>C6CCE8C3-A689-4DA7-89FE-1C54FBB989BB</title>
+    <defs>
+        <path d="M2,14 C3.10456667,14 4,14.8954 4,16 C4,17.1046 3.10456667,18 2,18 C0.895433333,18 -8.8817842e-16,17.1046 0,16 C0,14.8954 0.895433333,14 2,14 Z M2,7 C3.10456667,7 4,7.8954 4,9 C4,10.1046 3.10456667,11 2,11 C0.895433333,11 -8.8817842e-16,10.1046 0,9 C0,7.8954 0.895433333,7 2,7 Z M2,0 C3.10456667,2.02905605e-16 4,0.895433333 4,2 C4,3.10456667 3.10456667,4 2,4 C0.895433333,4 -8.8817842e-16,3.10456667 0,2 C0,0.895433333 0.895433333,-2.02905605e-16 2,0 Z" id="path-1"></path>
+    </defs>
+    <g id="web-player-(актуализация-2021.08:-новая-страница-проекта-и-стиль-кнопок)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="web-player-player-skin.-icon-pack" transform="translate(-223.000000, -737.000000)">
+            <g id="icons/24/more-vertical" transform="translate(223.000000, 737.000000)">
+                <g id="icon-more-vertical" transform="translate(10.000000, 3.000000)">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <use id="Mask" fill="#FFFFFF" fill-rule="nonzero" xlink:href="#path-1"></use>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

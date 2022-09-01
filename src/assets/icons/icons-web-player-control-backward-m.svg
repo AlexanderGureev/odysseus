@@ -1,0 +1,11 @@
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" fill-rule="evenodd">
+        <g stroke="#FFF" stroke-linecap="round">
+            <path d="M8.686 4.4H20c8.837 0 16 7.163 16 16s-7.163 16-16 16-16-7.163-16-16" stroke-width="2"/>
+            <path d="m11.942 6.771-4.74-2.37v-.002l4.74-2.37a.04.04 0 0 1 .058.036v4.67a.04.04 0 0 1-.058.036zM16.742 6.771l-4.74-2.37v-.002l4.74-2.37a.04.04 0 0 1 .058.036v4.67a.04.04 0 0 1-.058.036z" stroke-width="1.6" fill="#FFF"/>
+        </g>
+        <text font-family="Montserrat-Medium, Montserrat" font-size="13" font-weight="400" fill="#FFF">
+                    <tspan x="13.864" y="25">15</tspan>
+                </text>
+    </g>
+</svg>

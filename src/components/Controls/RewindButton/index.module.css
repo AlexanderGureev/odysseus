@@ -1,0 +1,24 @@
+.backward,
+.forward {
+  cursor: pointer;
+  position: relative;
+  color: #fff;
+  opacity: var(--icon-opacity);
+  transition: var(--default-transition);
+}
+
+.backward:hover,
+.forward:hover {
+  opacity: 1;
+}
+
+.acc {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.23;
+  top: -25px;
+  white-space: nowrap;
+}

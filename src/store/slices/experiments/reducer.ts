@@ -14,6 +14,7 @@ const initialState: FSMState = {
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
     DO_INIT: 'INIT_EXPERIMENTS_SUBSCRIBER',
+    PARSE_CONFIG_RESOLVE: null,
     SET_EXPERIMENT: null,
   },
   INIT_EXPERIMENTS_SUBSCRIBER: {
@@ -36,9 +37,13 @@ const experiments = createSlice({
       logger.log('[FSM]', 'experiments', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
+        case 'PARSE_CONFIG_RESOLVE':
+          state.experiments = { ...state.experiments, ...payload.params.experiments };
+          break;
         case 'SET_EXPERIMENT':
           const { name, group } = payload;
           state.experiments[name] = group;
+          break;
         default:
           return { ...state, step, ...payload };
       }

@@ -36,7 +36,15 @@ type ProjectData<T> = {
 };
 
 const LocalStorageService = (): TLocalStorageService => {
-  const storage = window?.localStorage || MockStorage();
+  let storage: Storage;
+
+  try {
+    storage = window?.localStorage || MockStorage();
+  } catch (err) {
+    logger.error('[LocalStorageService]', err?.message);
+    storage = MockStorage();
+  }
+
   let parentHost = 'odysseus';
 
   const init = (host: string | null) => {

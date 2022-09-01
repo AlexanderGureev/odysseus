@@ -37,4 +37,6 @@ const PostMessageService = () => {
 };
 
 const instance = PostMessageService();
+instance.init();
+
 export { instance as PostMessageService };

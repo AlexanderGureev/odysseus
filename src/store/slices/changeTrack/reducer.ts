@@ -14,8 +14,8 @@ import { FSMState, State } from './types';
 const initialState: FSMState = {
   step: 'IDLE',
 
-  prev: false,
-  next: false,
+  prev: null,
+  next: null,
   type: null,
   params: {},
 };
@@ -71,8 +71,20 @@ const changeTrack = createSlice({
 
           return {
             ...initialState,
-            prev: Boolean(NEXT_EPISODE === 'POSTMESSAGE' && linked_tracks?.previous),
-            next: Boolean(PREV_EPISODE === 'POSTMESSAGE' && linked_tracks?.next),
+            prev:
+              NEXT_EPISODE === 'POSTMESSAGE' && linked_tracks?.previous
+                ? {
+                    caption: linked_tracks.previous.caption,
+                    thumbnail: linked_tracks.previous.thumbnail,
+                  }
+                : null,
+            next:
+              PREV_EPISODE === 'POSTMESSAGE' && linked_tracks?.next
+                ? {
+                    caption: linked_tracks.next.caption,
+                    thumbnail: linked_tracks.next.thumbnail,
+                  }
+                : null,
           };
         }
         default:

@@ -1,3 +1,4 @@
+import { Experiments } from '@moretv/types';
 import { toNumber } from 'server/utils';
 import { TParsedFeatures } from 'types';
 import { isNil } from 'utils';
@@ -15,6 +16,8 @@ export type TQueryParams = Partial<{
   trial_available: boolean;
   startAt: number;
   isVkApp: boolean;
+  web_version: string;
+  experiments: { [key in Experiments]?: string };
 }>;
 
 export const VK_IOS = 'vk.iphone';
@@ -67,7 +70,7 @@ export const AUTOPLAY_MATRIX: TAutoPlayMatrix = {
   },
 };
 
-const PARSE_MAP: Record<string, (value?: string) => string | number | boolean | undefined | null> = {
+const PARSE_MAP: Record<string, (value?: string) => any> = {
   sign: (value?: string) => value,
   pf: (value?: string) => toNumber(value),
   pt: (value?: string) => toNumber(value),
@@ -79,6 +82,15 @@ const PARSE_MAP: Record<string, (value?: string) => string | number | boolean | 
   startAt: (value?: string) => {
     const num = toNumber(value);
     return typeof num === 'number' && num >= 0 ? num : null;
+  },
+  web_version: (value?: string) => value,
+  experiments: (value?: string) => {
+    try {
+      const data = JSON.parse(value || '{}');
+      return Object.keys(data).reduce((acc, key) => ({ ...acc, [`${key.toUpperCase()}`]: data[key] }), {});
+    } catch (err) {
+      return {};
+    }
   },
 };
 

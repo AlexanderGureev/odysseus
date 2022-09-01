@@ -1,0 +1,30 @@
+:root {
+  --font-default: 'SFProDisplay', Helvetica, Arial, sans-serif;
+
+  /* Buttons border radiuses related to height - https://jira.more.tv/browse/MOREFT-51 */
+  --border-radius-h32: 12px;
+  --border-radius-h40: 14px;
+  --border-radius-h54: 18px;
+
+  --default-transition: opacity 0.15s ease;
+  --icon-opacity: 0.87;
+  --text-color-87: rgba(255, 255, 255, 0.87);
+  --hover-control-color: rgba(255, 255, 255, 0.12);
+  --hover-btn-border-radius: 12px;
+
+  --icon-size: 24px;
+}
+
+.theme-more-tv {
+  --font-default: 'Montserrat';
+  --primary-color: #21a4f7;
+  --secondary-color: #1b1b1b;
+}
+
+.theme-ctc,
+.theme-ctc-love,
+.theme-home,
+.theme-che,
+.theme-ctc-kids {
+  --font-default: 'CTCSans';
+}

@@ -1,0 +1,70 @@
+.volume {
+  composes: btn-hover from global;
+
+  position: absolute;
+  left: 12px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 8px 8px;
+  pointer-events: none;
+}
+
+.volume::before {
+  padding: 0;
+}
+
+.volume :global .range-input {
+  height: 88px;
+  width: 6px;
+  opacity: 0;
+  transition: var(--default-transition);
+}
+
+.volume:hover {
+  pointer-events: all;
+}
+
+.volume.dragging::before,
+.volume:hover::before {
+  opacity: 1;
+}
+
+.volume.dragging :global .range-input,
+.volume:hover :global .range-input {
+  opacity: 1;
+}
+
+.mute-button {
+  composes: icon from global;
+  z-index: 1;
+  margin-top: 12px;
+  pointer-events: all;
+  transform: translate(2px, 0);
+  opacity: var(--icon-opacity);
+}
+
+.unmute-button {
+  cursor: pointer;
+  opacity: var(--icon-opacity);
+  transition: var(--default-transition);
+  position: absolute;
+  left: 12px;
+  bottom: 18px;
+  width: 36px;
+  height: 36px;
+}
+
+.unmute-button:hover {
+  opacity: 1;
+}
+
+.volume :global .range-input-thumb {
+  background: var(--primary-color);
+}
+
+.volume :global .range-input-track {
+  background-color: rgba(255, 255, 255, 0.4);
+}

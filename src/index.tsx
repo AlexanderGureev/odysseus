@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import './publicPath';
-import './styles/fonts.css';
 import './styles/index.css';
 
+import { App } from 'App';
 import cn from 'classnames';
 import { ErrorManager } from 'components/ErrorManager';
-import { SkinConstructor } from 'components/SkinConstructor';
 import { Range } from 'components/UIKIT/Range';
 import { useAppDispatch, useAppSelector } from 'hooks';
 import React, { useEffect } from 'react';
@@ -18,9 +17,9 @@ import { getTrackInfo } from 'store/selectors';
 import { AD_BANNER_CONTAINER_ID } from 'store/slices/adBanner';
 import { Lang, LinkedAudioTrackItem } from 'store/slices/audioTracks';
 import { Screens } from 'store/slices/splashscreen';
-import { ContentByType, TS_TRIGGER } from 'store/slices/trialSuggestion/utils';
+import { NoticeContent, TS_TRIGGER } from 'store/slices/trialSuggestion/utils';
+import { AppThemeBySkin, SkinClass } from 'types';
 import { secToHumanReadeable } from 'utils';
-import { declOfNum } from 'utils/declOfNum';
 import { sleep } from 'utils/retryUtils';
 
 // start app
@@ -92,6 +91,7 @@ const Player = () => {
   const payButton = useAppSelector((state) => state.payButton);
   const audioTracks = useAppSelector((state) => state.audioTracks);
   const trialSuggestion = useAppSelector((state) => state.trialSuggestion);
+  const adDisableSuggestion = useAppSelector((state) => state.adDisableSuggestion);
 
   useEffect(() => {
     dispatch(sendEvent({ type: 'DO_PLAYER_INIT' }));
@@ -99,7 +99,7 @@ const Player = () => {
 
   return (
     <div data-vjs-player>
-      <video id={DEFAULT_PLAYER_ID} preload="metadata" muted playsInline onError={(e) => console.log(e)} />
+      <video id={DEFAULT_PLAYER_ID} preload="metadata" muted playsInline />
 
       {root.step === 'READY' && adController.step !== 'AD_BREAK' && playback.duration && playback.duration > 0 && (
         <>
@@ -117,7 +117,7 @@ const Player = () => {
               <div className="range-container" style={{ margin: '12px 5px', display: 'flex', alignItems: 'center' }}>
                 <Range
                   ariaLabel="video progress slider"
-                  width="300px"
+                  // width="300px"
                   onDragEnd={(value) => {
                     dispatch(sendEvent({ type: 'SEEK', meta: { to: value } }));
                   }}
@@ -183,7 +183,7 @@ const Player = () => {
                   <div className="range-container" style={{ position: 'absolute', left: '80px' }}>
                     <Range
                       ariaLabel="volume slider"
-                      width="300px"
+                      // width="300px"
                       onChange={(value) => {
                         dispatch(sendEvent({ type: 'SET_VOLUME', payload: { value } }));
                       }}
@@ -358,7 +358,7 @@ const Player = () => {
           {trialSuggestion.step === 'SHOWING_TRIAL_NOTICE' &&
             trialSuggestion.notifyType &&
             trialSuggestion.notifyContent && (
-              <TrialSuggestionNotify type={trialSuggestion.notifyType} content={trialSuggestion.notifyContent} />
+              <TrialSuggestionNotice type={trialSuggestion.notifyType} content={trialSuggestion.notifyContent} />
             )}
         </>
       )}
@@ -385,7 +385,7 @@ const Player = () => {
               <div style={{ position: 'absolute', left: '80px' }}>
                 <Range
                   ariaLabel="volume slider"
-                  width="300px"
+                  // width="300px"
                   onChange={(value) => {
                     dispatch(sendEvent({ type: 'SET_VOLUME_AD_BLOCK', payload: { value } }));
                   }}
@@ -490,6 +490,9 @@ const Player = () => {
 
       <NetworkNotify />
 
+      {adDisableSuggestion.step === 'SHOWING_AD_DISABLE_SUGGESTION' && (
+        <AdDisableSuggestionNotice content={adDisableSuggestion} />
+      )}
       <AdBanner />
     </div>
   );
@@ -564,7 +567,42 @@ const Autoswitch = () => {
   );
 };
 
-const TrialSuggestionNotify: React.FC<{ type: TS_TRIGGER; content: ContentByType }> = ({ type, content }) => {
+const AdDisableSuggestionNotice: React.FC<{ content: NoticeContent }> = ({ content }) => {
+  const dispatch = useAppDispatch();
+
+  return (
+    <div className="overlay">
+      <div className="ad-disable-notice">
+        {content.title && <div className="title" dangerouslySetInnerHTML={{ __html: content.title }} />}
+        {content.description && (
+          <div className="description" dangerouslySetInnerHTML={{ __html: content.description }} />
+        )}
+
+        {content.closeButtonText && (
+          <button
+            className="close-btn"
+            onClick={() => {
+              dispatch(sendEvent({ type: 'CLICK_CLOSE_AD_DISABLE_SUGGESTION' }));
+            }}>
+            {content.closeButtonText}
+          </button>
+        )}
+
+        {content.payButtonText && (
+          <button
+            className="pay-btn"
+            onClick={() => {
+              dispatch(sendEvent({ type: 'CLICK_SUB_BUTTON' }));
+            }}>
+            {content.payButtonText}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const TrialSuggestionNotice: React.FC<{ type: TS_TRIGGER; content: NoticeContent }> = ({ type, content }) => {
   const dispatch = useAppDispatch();
 
   return (
@@ -773,25 +811,35 @@ const PayButton = () => {
   );
 };
 
-const PlayerManager: React.FC = () => {
-  const { isShowPlayerUI } = useAppSelector((state) => state.root);
+// const PlayerManager: React.FC = () => {
+//   const { isShowPlayerUI } = useAppSelector((state) => state.root);
 
-  return (
-    <div className="player-manager">
-      {isShowPlayerUI && (
-        <SkinConstructor>
-          <Player />
-        </SkinConstructor>
-      )}
-    </div>
-  );
-};
+//   return (
+//     <>
+//       {isShowPlayerUI && (
+//         <SkinConstructor>
+//           <Player />
+//         </SkinConstructor>
+//       )}
+//     </>
+//   );
+// };
+
+// const theme = AppThemeBySkin[window?.ODYSSEUS_PLAYER_CONFIG?.features?.skin_theme_class || SkinClass.DEFAULT];
+
+// root.render(
+//   <Provider store={store}>
+//     <div className={cn('wrapper', theme)}>
+//       <ErrorManager>
+//         <PlayerManager />
+//       </ErrorManager>
+//     </div>
+//   </Provider>
+// );
 
 root.render(
   <Provider store={store}>
-    <ErrorManager>
-      <PlayerManager />
-    </ErrorManager>
+    <App />
   </Provider>
 );
 

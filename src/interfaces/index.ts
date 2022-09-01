@@ -96,7 +96,7 @@ export interface IStreamService {
 }
 
 export interface IUTMService {
-  buildUTMQueryParams: (params: Params) => string;
+  buildUTMQueryParams: (params: Params) => URLSearchParams;
 }
 
 export interface IVigoService {
@@ -142,6 +142,7 @@ export interface IPlayerService {
   enterFullcreen: () => Promise<void>;
   exitFullcreen: () => Promise<void>;
   isEnded: () => boolean;
+  initLaunchHook: () => Promise<void>;
 }
 
 export interface ILocalStorageService {
@@ -156,7 +157,6 @@ export interface ILocalStorageService {
 
 export interface IAdService {
   init: (opts: InitOpts) => Promise<void>;
-  isInitialized: boolean;
   isCachedPoint: (config: TAdPointConfig) => boolean;
   getPreCachePoint: (points: TAdPointsConfig, currentTime: number) => TAdPointConfig | null;
   updatePreloadedBlocks: (currentTime: number) => void;
@@ -172,7 +172,7 @@ export interface IAdService {
   updateTimeout: () => void;
   isPreloadable: () => boolean;
   addHook: <T extends AdHookType, C extends AdServiceHooks[T]>(type: T, hook: C) => void;
-  startAdBreakHook: AdServiceHooks['beforeAdBreakStart'];
+  initAdBreakHook: AdServiceHooks['initAdBreak'];
 }
 
 export interface ITNSCounter {

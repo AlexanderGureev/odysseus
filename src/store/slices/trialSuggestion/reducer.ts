@@ -6,9 +6,11 @@ import { condition } from 'store/condition';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { AdCategory, TAdPointConfig } from 'types/ad';
+import { PlayerDisposeError } from 'utils/errors';
 import { logger } from 'utils/logger';
 import { randomHash12 } from 'utils/randomHash';
 
+import { clickSubscribeButton } from '../adDisableSuggestion/effects/clickSubscribeButton';
 import { FSMState, State } from './types';
 import { getContentByTrigger, getSettingByKey, keysByTrigger, notifyConditions, selectActiveNotify } from './utils';
 
@@ -46,13 +48,16 @@ const config: FSMConfig<State, AppEvent> = {
     START_PLAYBACK: 'SHOWING_TRIAL_NOTICE',
   },
   SHOWING_TRIAL_NOTICE: {
-    CLICK_PAY_BUTTON_TRIAL_NOTICE: 'DISPOSE_NOTICE',
+    CLICK_PAY_BUTTON_TRIAL_NOTICE: 'CLICK_PAY_BUTTON_TRIAL_NOTICE_PROCESSING',
     CLICK_CLOSE_TRIAL_NOTICE: 'DISPOSE_NOTICE',
     CLOSE_TRIAL_NOTICE: 'DISPOSE_NOTICE', // ивент о закрытии с веба
     AUTO_CLOSE_TRIAL_NOTICE: 'DISPOSE_NOTICE', // авто закрытие по таймауту
     SHOW_TRIAL_NOTICE: null, // в момент показа попапа может открыть другой (редкий кейс когда нет таймаутов между показами)
     AD_BREAK_STARTED: 'AD_BREAK',
     CHANGE_TRACK: null,
+  },
+  CLICK_PAY_BUTTON_TRIAL_NOTICE_PROCESSING: {
+    CLICK_PAY_BUTTON_TRIAL_NOTICE_PROCESSING_RESOLVE: 'DISPOSE_NOTICE',
   },
   AUTO_CLOSE: {
     DISPOSE_NOTICE_RESOLVE: 'IDLE',
@@ -132,7 +137,7 @@ const addMiddleware = () =>
           );
         },
         INITIALIZING_NOTICE_LISTENERS: () => {
-          services.adService.addHook('beforeAdBreakStart', async (category) => {
+          services.adService.addHook('initAdBreak', async ({ category }) => {
             if (category !== AdCategory.PAUSE_ROLL) return;
 
             const notifyType = selectActiveNotify(getState(), category, services);
@@ -154,7 +159,20 @@ const addMiddleware = () =>
               sendEvent({ type: 'SHOW_TRIAL_NOTICE', payload: { notifyType, notifyContent, timerId: randomHash12() } })
             );
 
-            await condition(({ trialSuggestion }) => trialSuggestion.step !== 'SHOWING_TRIAL_NOTICE');
+            await condition(
+              ({
+                trialSuggestion,
+                root: {
+                  meta: { isEmbedded },
+                },
+              }) => {
+                if (!isEmbedded && trialSuggestion.step === 'CLICK_PAY_BUTTON_TRIAL_NOTICE_PROCESSING') {
+                  throw new PlayerDisposeError('TRIAL_NOTICE condition');
+                }
+
+                return trialSuggestion.step !== 'SHOWING_TRIAL_NOTICE';
+              }
+            );
           });
 
           services.postMessageService.on('on_click_bt_close_trial_suggestion', () => {
@@ -207,6 +225,10 @@ const addMiddleware = () =>
               dispatch(sendEvent({ type: 'AUTO_CLOSE_TRIAL_NOTICE' }));
             }, timeout * 1000);
           }
+        },
+        CLICK_PAY_BUTTON_TRIAL_NOTICE_PROCESSING: () => {
+          clickSubscribeButton(opts);
+          dispatch(sendEvent({ type: 'CLICK_PAY_BUTTON_TRIAL_NOTICE_PROCESSING_RESOLVE' }));
         },
         DISPOSE_NOTICE: () => {
           const { notifyType } = getState().trialSuggestion;

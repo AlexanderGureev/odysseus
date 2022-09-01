@@ -20,10 +20,15 @@ export type Event = EventsWithPayload['type'];
 
 export type ActionPayload = DefaultPayload<Event> & EventsWithPayload;
 
+export type NextTrackInfo = {
+  thumbnail?: string;
+  caption?: string;
+};
+
 export type FSMState = {
   step: State;
-  prev: boolean;
-  next: boolean;
+  prev: Nullable<NextTrackInfo>;
+  next: Nullable<NextTrackInfo>;
   type: Nullable<'next' | 'previous'>;
   params: TrackParams;
 };

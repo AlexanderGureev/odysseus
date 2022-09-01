@@ -1,0 +1,8 @@
+.wrapper {
+  composes: btn-hover from global;
+  position: relative;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  margin-left: 24px;
+}

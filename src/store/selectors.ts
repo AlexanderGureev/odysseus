@@ -1,3 +1,4 @@
+import { MailOpts } from 'components/ErrorManager/types';
 import { ILocalStorageService } from 'interfaces';
 import { isIOS, isMobile } from 'react-device-detect';
 import { Device, FavouritesItemMeta } from 'services/FavouritesService/types';
@@ -22,12 +23,24 @@ export const getEpisodeName = (state: AppState) => getPlaylistItem(state).episod
 
 export const getTrackInfo = (state: AppState) => {
   const { project_name, min_age, season_name, episode_name, thumbnail_url } = getPlaylistItem(state);
+
   return {
     project_name,
     min_age,
     season_name,
     episode_name,
     thumbnail_url,
+  };
+};
+
+export const getTrackUrls = (state: AppState) => {
+  const { project_url, sharing_url, season_url } = getPlaylistItem(state);
+  const { origin } = new URL(sharing_url);
+
+  return {
+    project_url: project_url ? `${origin}${project_url}` : null,
+    season_url: season_url ? `${origin}${season_url}` : null,
+    track_url: sharing_url,
   };
 };
 
@@ -168,4 +181,27 @@ export const getSubPriceText = (state: AppState) => {
   const price = getSubPrice(state);
   const priceText = declOfNum(price, ['рубль', 'рубля', 'рублей']);
   return `${price} ${priceText}`;
+};
+
+export const selectMailOptions = (state: AppState): MailOpts => {
+  const { project_name, season_name, episode_name } = getTrackInfo(state);
+  const {
+    meta: { partnerId, trackId },
+    config,
+    session,
+    params,
+  } = state.root;
+
+  return {
+    projectName: project_name,
+    seasonName: season_name,
+    episodeName: episode_name,
+    partnerId,
+    trackId,
+    projectId: config.config?.project_id,
+    sid: session.sid,
+    ssid: session.id,
+    userId: config.config?.user_id,
+    webVersion: params.web_version,
+  };
 };

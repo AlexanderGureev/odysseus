@@ -9,6 +9,12 @@
   user-select: none;
 
   touch-action: none;
+
+  --hover-color: rgba(255, 255, 255, 0.6);
+  --progress-color: #fe1717;
+  --buffer-color: rgba(255, 255, 255, 0.5);
+
+  padding: 8px 0;
 }
 
 .range-input-track {
@@ -37,7 +43,7 @@
   }
 }
 
-.range-input-hover.active {
+.range-input:hover .range-input-hover {
   opacity: 1;
 }
 
@@ -52,6 +58,7 @@
   bottom: 50%;
   opacity: 0;
   transition: opacity 0.2s ease;
+  pointer-events: none;
 }
 
 .range-input-label {
@@ -62,6 +69,10 @@
   .range-input-label {
     display: block;
   }
+}
+
+.range-input.vertical {
+  padding: 0px 4px;
 }
 
 .range-input.vertical .range-input-label,

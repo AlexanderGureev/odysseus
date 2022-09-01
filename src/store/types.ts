@@ -4,6 +4,7 @@ import * as adBanner from './slices/adBanner';
 import * as adBlock from './slices/adBlock';
 import * as adBlockVolume from './slices/adBlockVolume';
 import * as adController from './slices/adController';
+import * as adDisableSuggestion from './slices/adDisableSuggestion';
 import * as adTimeNotify from './slices/adTimeNotify';
 import * as adultNotify from './slices/adultNotify';
 import * as analytics from './slices/analytics';
@@ -112,7 +113,8 @@ export type EventPayload =
   | adBanner.ActionPayload
   | audioTracks.ActionPayload
   | trialSuggestion.ActionPayload
-  | errorReports.ActionPayload;
+  | errorReports.ActionPayload
+  | adDisableSuggestion.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -157,4 +159,5 @@ export type AppEvent =
   | adBanner.Event
   | audioTracks.Event
   | trialSuggestion.Event
-  | errorReports.Event;
+  | errorReports.Event
+  | adDisableSuggestion.Event;

@@ -136,7 +136,6 @@ export const initialize = async (opts: EffectOpts) => {
 
     const [isEmbedded] = await Promise.all([
       embeddedCheckService.getEmbededStatus(),
-      postMessageService.init(),
       sauronService.init(),
       favouritesService.init(dbService, {
         getToken: () => getState().root.meta.userToken,

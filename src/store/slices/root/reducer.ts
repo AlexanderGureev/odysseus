@@ -174,6 +174,7 @@ const config: FSMConfig<State, AppEvent> = {
   },
 
   ERROR: {},
+  DISPOSED: {},
 };
 
 const initialState: FSMState = {
@@ -245,11 +246,12 @@ const root = createSlice({
       const { type, payload } = action.payload;
 
       const next = config[state.step]?.[type];
+      const step = next || state.step;
+
+      if (type === 'DISPOSE_PLAYER') return { ...state, isShowPlayerUI: false, step: 'DISPOSED' };
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'root', `${state.step} -> ${type} -> ${next}`);
-
-      const step = next || state.step;
 
       switch (type) {
         case 'QUALITY_INITIALIZATION_RESOLVE':
@@ -383,7 +385,8 @@ const addMiddleware = () =>
         SELECT_SOURCE_PENDING: () => selectSource(opts),
         FETCHING_MANIFEST: () => fetchManifest(opts),
         CHECK_PERMISSIONS_PENDING: () => checkPermissions(opts),
-        AD_INIT_PENDING: () => {
+        AD_INIT_PENDING: async () => {
+          await services.playerService.initLaunchHook();
           dispatch(
             sendEvent({
               type: 'AD_INIT',

@@ -13,6 +13,7 @@ import { FSMState, State } from './types';
 
 const initialState: FSMState = {
   step: 'IDLE',
+  isInitialized: false,
 };
 
 const VOLUME_STEP = 0.1;
@@ -20,11 +21,10 @@ const REWIND_STEP = 30;
 
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
-    PLAYER_INIT_RESOLVE: 'HOTKEYS_INIT',
-    START_PLAYBACK: 'READY',
+    START_PLAYBACK: null,
   },
   HOTKEYS_INIT: {
-    HOTKEYS_INIT_RESOLVE: 'IDLE',
+    HOTKEYS_INIT_RESOLVE: 'READY',
     HOTKEYS_INIT_REJECT: 'DISABLED',
   },
   READY: {
@@ -32,6 +32,7 @@ const config: FSMConfig<State, AppEvent> = {
     KEYBOARD_EVENT: 'PROCESSING_KEYBOARD_EVENT',
     NETWORK_ERROR: 'IDLE',
     DISABLE_HOTKEYS: 'IDLE',
+    CHANGE_TRACK: 'IDLE',
   },
   PROCESSING_KEYBOARD_EVENT: {
     PROCESSING_KEYBOARD_EVENT_RESOLVE: 'READY',
@@ -48,11 +49,21 @@ const hotkeys = createSlice({
       const { type, payload } = action.payload;
 
       const next = config[state.step]?.[type];
+      const step = next || state.step;
+
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'hotkeys', `${state.step} -> ${type} -> ${next}`);
 
-      return next ? { ...state, step: next, ...payload } : { ...state, ...payload };
+      switch (type) {
+        case 'HOTKEYS_INIT_RESOLVE':
+          return { ...state, isInitialized: true, step };
+        case 'START_PLAYBACK':
+          state.step = !state.isInitialized ? 'HOTKEYS_INIT' : 'READY';
+          break;
+        default:
+          return { ...state, step, ...payload };
+      }
     });
   },
 });

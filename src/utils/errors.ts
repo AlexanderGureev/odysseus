@@ -22,3 +22,9 @@ export class PlayerError extends Error {
     };
   }
 }
+
+export class PlayerDisposeError extends Error {
+  constructor(message?: string) {
+    super(message);
+  }
+}

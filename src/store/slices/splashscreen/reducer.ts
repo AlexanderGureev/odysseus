@@ -94,52 +94,54 @@ const addMiddleware = () =>
             },
           } = getState();
 
-          if (disabled) {
-            return dispatch(sendEvent({ type: 'INIT_SPLASHCREEN_REJECT' }));
-          }
+          return dispatch(sendEvent({ type: 'INIT_SPLASHCREEN_REJECT' })); // TODO FIX
 
-          const minAge = getMinAge(getState());
-          const screens: Screens = [];
+          // if (disabled) {
+          //   return dispatch(sendEvent({ type: 'INIT_SPLASHCREEN_REJECT' }));
+          // }
 
-          if (SPLASH_SCREEN_IMAGE) {
-            const d = toNumber(SPLASH_SCREEN_DURATION);
-            const duration = d ? d * 1000 : DEFAULT_SPLASH_SCREEN_DURATION;
+          // const minAge = getMinAge(getState());
+          // const screens: Screens = [];
 
-            screens.push({
-              img: SPLASH_SCREEN_IMAGE,
-              duration,
-            });
-          }
+          // if (SPLASH_SCREEN_IMAGE) {
+          //   const d = toNumber(SPLASH_SCREEN_DURATION);
+          //   const duration = d ? d * 1000 : DEFAULT_SPLASH_SCREEN_DURATION;
 
-          const images: Record<string, string> = DISCLAIMER_AGE_RESTRICTIONS?.images || {};
-          const image = images[`${minAge}`] || images.default;
+          //   screens.push({
+          //     img: SPLASH_SCREEN_IMAGE,
+          //     duration,
+          //   });
+          // }
 
-          if (image) {
-            const d = toNumber(DISCLAIMER_AGE_RESTRICTIONS?.show_duration);
-            const duration = d ? d * 1000 : DEFAULT_SPLASH_SCREEN_DURATION;
+          // const images: Record<string, string> = DISCLAIMER_AGE_RESTRICTIONS?.images || {};
+          // const image = images[`${minAge}`] || images.default;
 
-            screens.push({
-              img: image,
-              duration,
-            });
-          }
+          // if (image) {
+          //   const d = toNumber(DISCLAIMER_AGE_RESTRICTIONS?.show_duration);
+          //   const duration = d ? d * 1000 : DEFAULT_SPLASH_SCREEN_DURATION;
 
-          if (AD_SPLASH_SCREEN_IMAGE && [16, 18].includes(minAge)) {
-            const d = toNumber(AD_SPLASH_SCREEN_DURATION);
-            const duration = d ? d * 1000 : DEFAULT_AD_SPLASH_SCREEN_DURATION;
+          //   screens.push({
+          //     img: image,
+          //     duration,
+          //   });
+          // }
 
-            screens.push({
-              img: AD_SPLASH_SCREEN_IMAGE,
-              duration,
-            });
-          }
+          // if (AD_SPLASH_SCREEN_IMAGE && [16, 18].includes(minAge)) {
+          //   const d = toNumber(AD_SPLASH_SCREEN_DURATION);
+          //   const duration = d ? d * 1000 : DEFAULT_AD_SPLASH_SCREEN_DURATION;
 
-          dispatch(
-            sendEvent({
-              type: screens.length ? 'INIT_SPLASHCREEN_RESOLVE' : 'INIT_SPLASHCREEN_REJECT',
-              payload: { screens },
-            })
-          );
+          //   screens.push({
+          //     img: AD_SPLASH_SCREEN_IMAGE,
+          //     duration,
+          //   });
+          // }
+
+          // dispatch(
+          //   sendEvent({
+          //     type: screens.length ? 'INIT_SPLASHCREEN_RESOLVE' : 'INIT_SPLASHCREEN_REJECT',
+          //     payload: { screens },
+          //   })
+          // );
         },
       };
 

@@ -43,6 +43,7 @@ export type ActionPayload = DefaultPayload<Event> & EventsWithPayload;
 export type FSMState = {
   step: State;
 
+  unmuted: boolean;
   muted: boolean;
   volume: number;
 };

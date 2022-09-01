@@ -1,11 +1,13 @@
+import { IPostMessageService } from 'interfaces';
+
 import { PostMessageService } from '../PostMessageService';
 import { LocationState } from './types';
 
-const EmbeddedCheckService = () => {
+const EmbeddedCheckService = (postMessageService: IPostMessageService) => {
   const TIMEOUT = 200;
   const state: LocationState = { location: null, hostname: null, isEmbedded: true };
 
-  PostMessageService.on('setPageLocation', ({ location }) => {
+  postMessageService.on('setPageLocation', ({ location }) => {
     if (location) state.location = location;
   });
 
@@ -29,8 +31,8 @@ const EmbeddedCheckService = () => {
         resolve({ ...state });
       };
 
-      PostMessageService.one('setPageLocation', callback);
-      PostMessageService.emit('getPageLocation');
+      postMessageService.one('setPageLocation', callback);
+      postMessageService.emit('getPageLocation');
 
       setTimeout(() => {
         callback({ location: document.referrer });
@@ -42,5 +44,5 @@ const EmbeddedCheckService = () => {
   return { getState, getIframeLocation, getEmbededStatus };
 };
 
-const instance = EmbeddedCheckService();
+const instance = EmbeddedCheckService(PostMessageService);
 export { instance as EmbeddedCheckService };

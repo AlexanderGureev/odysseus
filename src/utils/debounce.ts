@@ -15,3 +15,17 @@ export const debounce = <T extends (...args: any[]) => any>(fn: T, timeout = 500
     }, timeout);
   };
 };
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export const throttle = <T extends (...args: any[]) => any>(fn: T, timeout = 500) => {
+  let timer: Nullable<NodeJS.Timeout> = null;
+
+  return (...args: Parameters<T>) => {
+    if (timer) return;
+    fn(...args);
+
+    timer = setTimeout(() => {
+      timer = null;
+    }, timeout);
+  };
+};

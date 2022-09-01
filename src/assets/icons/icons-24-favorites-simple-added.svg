@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>7BAFAB6C-E9C6-49A1-833E-E5BF6CDB9429</title>
+    <defs>
+        <path d="M15,5.32907052e-15 C15.5128358,5.32907052e-15 15.9355072,0.38604019 15.9932723,0.883378875 L16,1 L16,18.3855119 C16,18.540757 15.9638549,18.6938701 15.8944272,18.8327255 C15.66508,19.2914198 15.1307708,19.4968261 14.6601042,19.3260762 L14.5527864,19.2799391 L8.41408666,16.2105892 C8.19065215,16.098872 7.93330966,16.0829124 7.70018715,16.1627104 L7.58591334,16.2105892 L1.4472136,19.2799391 C1.30835816,19.3493668 1.1552451,19.3855119 1,19.3855119 C0.487164161,19.3855119 0.0644928393,18.9994717 0.00672773133,18.502133 L0,18.3855119 L0,1 C0,0.487164161 0.38604019,0.0644928393 0.883378875,0.00672773133 L1,5.32907052e-15 L15,5.32907052e-15 Z" id="path-1"></path>
+    </defs>
+    <g id="web-player-(актуализация-2021.08:-новая-страница-проекта-и-стиль-кнопок)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="web-player-player-skin.-icon-pack" transform="translate(-291.000000, -835.000000)">
+            <g id="icons/24/favorites-simple-added" transform="translate(291.000000, 835.000000)">
+                <g id="icon-favorites-simple-added" transform="translate(4.000000, 2.037105)">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <use id="Vector-Mask" fill="#FFFFFF" xlink:href="#path-1"></use>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

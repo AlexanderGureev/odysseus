@@ -38,6 +38,7 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
 
   let hooks: PlayerHooks = {
     beforeSetSource: [],
+    beforeLaunch: [],
   };
 
   const addHook = <T extends HookType, C extends Hooks[T]>(type: T, hook: C) => {
@@ -90,6 +91,8 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
   const intitializePlayer = (playerId: string, options: VideoJsPlayerOptions) => {
     return videojs(playerId, {
       preload: 'metadata',
+      controls: false,
+      children: ['mediaLoader'],
       html5: {
         vhs: {
           overrideNative: isAndroid,
@@ -112,16 +115,14 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
     new Promise<void>((resolve) => {
       logger.log('[PlayerService]', 'init');
 
-      hooks = {
-        beforeSetSource: [],
-      };
-
       if (player) return resolve();
 
       player = intitializePlayer(playerId, options);
       player.eme();
 
       window._player = player;
+
+      player.on('dblclick', () => {});
 
       const events: { [key in keyof Events]?: () => void } = {
         seeking: () => mediator.emit('seeking'),
@@ -294,6 +295,12 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
     player.currentTime(value);
   };
 
+  const initLaunchHook = async () => {
+    for (const hook of hooks.beforeLaunch) {
+      await hook();
+    }
+  };
+
   return {
     init,
     setSource,
@@ -320,6 +327,7 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
     enterFullcreen,
     exitFullcreen,
     isEnded,
+    initLaunchHook,
   };
 };
 

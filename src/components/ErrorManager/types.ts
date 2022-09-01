@@ -1,3 +1,8 @@
+import { Nullable } from '@moretv/types';
+import { AppDispatch } from 'store';
+import { SkinClass } from 'types';
+import { ERROR_TYPE } from 'types/errors';
+
 export enum PLAYER_ERROR_TYPE {
   ERROR_ENCRYPTED_IOS = 'ERROR_ENCRYPTED_IOS',
   ERROR_CUSTOM = 'ERROR_CUSTOM',
@@ -29,4 +34,31 @@ export const PLAYER_ERROR_CODES: Record<PLAYER_ERROR_TYPE, string> = {
   [PLAYER_ERROR_TYPE.ERROR_ABORTED]: '205',
   [PLAYER_ERROR_TYPE.ERROR_SRC_NOT_SUPPORTED]: '300',
   [PLAYER_ERROR_TYPE.ERROR_INVALID_STREAMS]: '301',
+};
+
+export type ErrorConfigByType = {
+  [key in ERROR_TYPE]: (opts: { theme: SkinClass; isEmbedded: boolean; mailOpts: MailOpts; sharingUrl?: string }) => {
+    icon: string;
+    text: (isMobile: boolean) => React.ReactNode;
+    btn_text?: Nullable<() => React.ReactNode | null>;
+    footer_icons?: () => {
+      src: string;
+      href: string;
+    }[];
+    onClick?: (dispatch: AppDispatch) => void;
+  };
+};
+
+export type MailData = { subject: string; code: number };
+export type MailOpts = {
+  partnerId: number | null;
+  projectId: number;
+  trackId: number | null;
+  ssid: string;
+  userId: number | null;
+  sid: string | null;
+  webVersion: string | undefined;
+  projectName: string;
+  seasonName: string;
+  episodeName: string;
 };

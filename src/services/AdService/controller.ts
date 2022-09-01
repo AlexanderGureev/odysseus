@@ -32,13 +32,12 @@ const AdService = (localStorageService: ILocalStorageService) => {
 
   let videoSlot: HTMLVideoElement;
   let controlsSlot: HTMLDivElement;
-  let isInitialized = false;
   let preloaded: Record<string, TAdBlock> = {};
 
   let hooks: AdControllerHooks = {
     adBlockCreated: [],
     canPlayAd: [],
-    beforeAdBreakStart: [],
+    initAdBreak: [],
   };
 
   const addHook = <T extends AdHookType, C extends AdServiceHooks[T]>(type: T, hook: C) => {
@@ -62,11 +61,10 @@ const AdService = (localStorageService: ILocalStorageService) => {
     ADV_INTERSECTION_TIMEOUT = features.ADV_INTERSECTION_TIMEOUT || 180000;
     ADV_PAUSE_ROLL_ACTIVATE_TIMEOUT = features.ADV_PAUSE_ROLL_ACTIVATE_TIMEOUT || 5000;
 
-    const sdk = await loadYaSdk();
-    isInitialized = Boolean(sdk);
+    await loadYaSdk();
 
     // TODO DELETE
-    throw new Error('test');
+    // throw new Error('test');
   };
 
   const isPreloadable = () => ADV_CACHE_LOOKAHEAD > 0;
@@ -215,17 +213,14 @@ const AdService = (localStorageService: ILocalStorageService) => {
     });
   };
 
-  const startAdBreakHook = async (category: AdCategory) => {
-    for (const hook of hooks.beforeAdBreakStart) {
-      try {
-        await hook(category);
-      } catch (err) {}
+  const initAdBreakHook = async (point: TAdPointConfig) => {
+    for (const hook of hooks.initAdBreak) {
+      await hook(point);
     }
   };
 
   return {
     init,
-    isInitialized,
     isCachedPoint,
     getPreCachePoint,
     updatePreloadedBlocks,
@@ -241,7 +236,7 @@ const AdService = (localStorageService: ILocalStorageService) => {
     updateTimeout,
     isPreloadable,
     addHook,
-    startAdBreakHook,
+    initAdBreakHook,
   };
 };
 

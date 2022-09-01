@@ -1,0 +1,26 @@
+.favourites {
+  composes: btn-hover from global;
+  position: relative;
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.54;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+.favourites::before {
+  padding: 8px 10px;
+}
+
+.icon {
+  composes: icon from global;
+}
+
+.favourites span {
+  margin-left: 6px;
+}

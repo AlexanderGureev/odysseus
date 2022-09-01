@@ -48,9 +48,9 @@ const getPaywallDescription = (state: AppState, type: SubType) => {
 
 const initialState: FSMState = {
   step: 'IDLE',
-  title: '',
+  title: null,
   description: null,
-  paywallButtonText: '',
+  paywallButtonText: null,
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -145,11 +145,13 @@ const addMiddleware = () => {
           const item = getPlaylistItem(getState());
 
           if (item.sharing_url && isEmbedded) {
-            const queryParams = services.utmService.buildUTMQueryParams({
-              term: previews ? 'preview' : 'paywall',
-              trackId,
-              skinId: config.config.skin_id,
-            });
+            const queryParams = services.utmService
+              .buildUTMQueryParams({
+                term: previews ? 'preview' : 'paywall',
+                trackId,
+                skinId: config.config.skin_id,
+              })
+              .toString();
 
             window.open(`${item.sharing_url}?${queryParams}`, '_blank');
           }

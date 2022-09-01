@@ -8,11 +8,11 @@ const PARAMS_SELECTOR: Record<UTMParam, (p: Params) => any> = {
 };
 
 export class UTMService {
-  static buildUTMQueryParams = ({ term, skinId, trackId }: Params): string => {
+  static buildUTMQueryParams = ({ term, skinId, trackId }: Params) => {
     const params = Object.keys(PARAMS_SELECTOR).reduce((acc: Record<string, any>, param) => {
       return { ...acc, [param]: PARAMS_SELECTOR[param as UTMParam]({ skinId, trackId, term }) };
     }, {});
 
-    return new URLSearchParams(params).toString();
+    return new URLSearchParams(params);
   };
 }

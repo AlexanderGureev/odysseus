@@ -3,6 +3,7 @@ import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { TAdPointConfig } from 'types/ad';
+import { PlayerDisposeError } from 'utils/errors';
 import { logger } from 'utils/logger';
 
 import { checkPauseRoll, checkPostRoll, checkTimePoint, init, initAdBreak, preloadAdBlock } from './effects';
@@ -67,6 +68,7 @@ const config: FSMConfig<State, AppEvent> = {
   INITIALIZING_AD_BREAK: {
     AD_BREAK_STARTED: 'AD_BREAK',
     AD_BREAK_END: 'END',
+    DISPOSE_PLAYER: 'IDLE',
   },
   AD_BREAK: {
     AD_BREAK_END: 'END',
@@ -171,12 +173,27 @@ const addMiddleware = () =>
 
           preloadAdBlock(point, opts);
         },
-        INITIALIZING_AD_BREAK: () => {
+        INITIALIZING_AD_BREAK: async () => {
           const {
             payload: { payload },
           } = action as PayloadAction<{
             payload: Opts;
           }>;
+
+          try {
+            await services.adService.initAdBreakHook(payload.point);
+          } catch (err) {
+            if (err instanceof PlayerDisposeError) {
+              logger.error(
+                '[INITIALIZING_AD_BREAK]',
+                'initAdBreakHook rejected, player dispose, message:',
+                err?.message
+              );
+
+              dispatch(sendEvent({ type: 'DISPOSE_PLAYER' }));
+              return;
+            }
+          }
 
           initAdBreak(payload, opts);
         },

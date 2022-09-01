@@ -4,7 +4,7 @@ import { EffectOpts } from 'interfaces';
 import { PLAYER_ID } from 'services/PlayerService/types';
 import { StreamProtocol } from 'services/StreamService/types';
 import { getPlaylistItem, getUserSubscriptionType } from 'store/selectors';
-import { APP_CLASSNAME, DOMAINS, MAP_HOST_TO_SKIN } from 'types';
+import { AppNameBySkin, DOMAINS, MAP_HOST_TO_SKIN } from 'types';
 
 import { STREAM_LOWER_CASE, VIDEO_BUSSINESS_MODEL_TYPES } from './parameters';
 import { ParamsSelector } from './types';
@@ -125,7 +125,7 @@ export const createParamsSelector = ({
       return MAP_HOST_TO_SKIN[`${host}`] ?? 'DEFAULT';
     }
 
-    return APP_CLASSNAME[skin] ?? 'DEFAULT';
+    return AppNameBySkin[skin] ?? 'DEFAULT';
   },
   player_embedded: () => getState().root.meta.isEmbedded,
   player_id: () => getState().root.meta.skin,
