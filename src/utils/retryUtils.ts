@@ -20,6 +20,12 @@ type RetryOptions<T> = {
   timeoutFn?: (attempt: number) => number;
 };
 
+export class AbortError extends Error {
+  constructor(message?: string) {
+    super(message);
+  }
+}
+
 // ~ 100, 400, 1000, 2800
 const getTimeoutForNextAttempt = (attempt: number) => Math.exp(attempt) * DEFAULT_RETRY_TIMEOUT;
 

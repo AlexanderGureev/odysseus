@@ -26,4 +26,6 @@ export enum STORAGE_SETTINGS {
 
   AUTOSWITCH_AVOD_POPUP = '@autoswitch/avod_popup',
   AD_DISABLE_SUGGESTION_BEFORE_PREROLL = '@notice/ad_disable_suggestion_before_preroll',
+
+  COMPLAIN_TIMESTAMP = '@error_reports/timestamp',
 }

@@ -1,8 +1,9 @@
-import controlBackwardIcon from 'assets/icons/icons-web-player-control-backward-m.svg';
-import controlForwardIcon from 'assets/icons/icons-web-player-control-forward-m.svg';
+import controlBackwardIcon from 'assets/sprite/icons-web-player-control-backward-m.svg';
+import controlForwardIcon from 'assets/sprite/icons-web-player-control-forward-m.svg';
 import { useAppDispatch, useAppSelector } from 'hooks';
 import React from 'react';
 import { sendEvent } from 'store';
+import { BACKWARD_REWIND_STEP, FORWARD_REWIND_STEP } from 'store/slices/hotkeys/constants';
 
 import Styles from './index.module.css';
 
@@ -11,7 +12,7 @@ export const RewindBackwardButton = () => {
   const { dec } = useAppSelector((state) => state.rewindAcc);
 
   const onClick = () => {
-    dispatch(sendEvent({ type: 'DEC_SEEK', payload: { value: -15 } }));
+    dispatch(sendEvent({ type: 'DEC_SEEK', payload: { value: -BACKWARD_REWIND_STEP } }));
   };
 
   return (
@@ -27,7 +28,7 @@ export const RewindForwardButton = () => {
   const { inc } = useAppSelector((state) => state.rewindAcc);
 
   const onClick = () => {
-    dispatch(sendEvent({ type: 'INC_SEEK', payload: { value: 30 } }));
+    dispatch(sendEvent({ type: 'INC_SEEK', payload: { value: FORWARD_REWIND_STEP } }));
   };
 
   return (

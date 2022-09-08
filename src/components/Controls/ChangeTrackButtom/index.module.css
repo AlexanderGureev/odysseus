@@ -27,6 +27,11 @@
   background-color: var(--secondary-color);
 }
 
+.btn {
+  width: var(--s-icon-size);
+  height: var(--s-icon-size);
+}
+
 .wrapper:hover .thumb {
   opacity: 1;
 }

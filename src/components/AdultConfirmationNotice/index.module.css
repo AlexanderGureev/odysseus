@@ -1,0 +1,32 @@
+.adult {
+  composes: fade-in from global;
+}
+
+:global(.wrapper:not(.embedded).theme-more-tv) .adult {
+  display: none;
+}
+
+.title {
+  margin: 10px 0 17px;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.wrapper img {
+  width: var(--xl-icon-size);
+  height: var(--xl-icon-size);
+}
+
+.hidden {
+  display: none;
+}
+
+.group {
+  position: absolute;
+  top: 100%;
+}

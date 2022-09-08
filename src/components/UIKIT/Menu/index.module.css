@@ -1,0 +1,132 @@
+.container {
+  position: relative;
+  user-select: none;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  right: 50%;
+  transform: translateX(50%);
+  top: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 0 8px;
+}
+
+.menu {
+  position: absolute;
+  max-height: calc(100vh - 100px);
+  overflow-y: scroll;
+  background: var(--secondary-color);
+  right: -8px;
+  top: calc(100% + 12px);
+  border-radius: 4px;
+  padding: 3px 0;
+  opacity: 0;
+  pointer-events: none;
+}
+/* 
+.menu::-webkit-scrollbar-track {
+  margin: 5px 0;
+}
+
+.menu::-webkit-scrollbar {
+  visibility: hidden;
+  width: 5px;
+}
+
+.menu::-webkit-scrollbar-thumb {
+  border-radius: 2.5px;
+  background-color: rgba(255, 255, 255, 0.3);
+} */
+
+.enter {
+  composes: fade-in from global;
+  pointer-events: auto;
+}
+
+.leave {
+  composes: fade-out from global;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.15px;
+  text-align: right;
+  color: #fff;
+  padding: 11px 12px 11px 12px;
+  white-space: nowrap;
+  transition: var(--default-transition);
+  cursor: pointer;
+}
+
+.item.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.item::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  background: url('assets/icons/icons-24-check-light.svg') no-repeat center center;
+  background-size: cover;
+  width: 16px;
+  height: 16px;
+  opacity: 0;
+  transition: var(--default-transition);
+}
+
+.item.active::before {
+  opacity: 1;
+}
+
+.selectable .item {
+  padding: 11px 29px 11px 40px;
+}
+
+.title {
+  width: 100%;
+  display: block;
+  padding-right: 12px;
+  text-align: left;
+}
+
+.selected-title {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.15px;
+  width: 100%;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.item:hover {
+  background-color: var(--primary-color);
+  color: var(--primary-text-color);
+}
+
+.item:hover .selected-title {
+  color: #000;
+}
+
+:global(.theme-more-tv) .item:hover .selected-title {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.item img {
+  width: 16px;
+  height: 16px;
+  margin-right: 12px;
+}
+
+:global(.wrapper:not(.theme-more-tv)) .item:hover::before,
+:global(.wrapper:not(.theme-more-tv)) .item:hover img {
+  filter: invert(100%);
+}

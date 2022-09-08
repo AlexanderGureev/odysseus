@@ -29,6 +29,7 @@ export type TParams = {
   pf?: string;
   pt?: string;
   p2p?: string;
+  isNcanto?: string;
 };
 
 export const createParams = (params: Record<string, any>) =>

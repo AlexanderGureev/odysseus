@@ -1,4 +1,21 @@
 .playback {
   cursor: pointer;
   margin: 0 105px;
+  user-select: none;
+}
+
+.playback img {
+  width: var(--xl-icon-size);
+  height: var(--xl-icon-size);
+}
+
+@media (max-width: 599px) {
+  .playback {
+    margin: 0 76px;
+  }
+
+  .playback img {
+    width: var(--m-icon-size);
+    height: var(--m-icon-size);
+  }
 }

@@ -5,11 +5,18 @@
   color: #fff;
   opacity: var(--icon-opacity);
   transition: var(--default-transition);
+  user-select: none;
 }
 
 .backward:hover,
 .forward:hover {
   opacity: 1;
+}
+
+.backward img,
+.forward img {
+  width: var(--xl-icon-size);
+  height: var(--xl-icon-size);
 }
 
 .acc {
@@ -21,4 +28,12 @@
   line-height: 1.23;
   top: -25px;
   white-space: nowrap;
+}
+
+@media (max-width: 599px) {
+  .backward img,
+  .forward img {
+    width: var(--l-icon-size);
+    height: var(--l-icon-size);
+  }
 }

@@ -114,19 +114,12 @@ const addMiddleware = () =>
             root: {
               previews,
               params: { startAt },
-              currentStream,
+              isFirstStartPlayback,
             },
-            quality: { currentURL, currentQualityMark, qualityRecord },
+            quality: { currentQualityMark, qualityRecord },
           } = getState();
 
           const savedTime = getSavedProgressTime(getState(), services.localStorageService);
-
-          console.log('[TEST] launch setup', {
-            time: isResetStartTime || previews ? 0 : startAt ?? savedTime ?? currentTime ?? 0,
-            savedTime,
-            startAt,
-            currentTime,
-          });
 
           services.playerService.setMute(muted);
           services.playerService.setVolume(volume);
@@ -135,7 +128,9 @@ const addMiddleware = () =>
           const qualityCfg = qualityRecord[currentQualityMark];
           if (qualityCfg) await services.qualityService.setInitialQuality(qualityCfg);
 
-          const value = isResetStartTime || previews ? 0 : startAt ?? savedTime ?? currentTime ?? 0;
+          const value =
+            (isResetStartTime || previews ? 0 : isFirstStartPlayback ? startAt ?? savedTime : currentTime) ?? 0;
+
           const startPosition = value < (duration || 0) ? value : 0;
 
           if (isOldSafari(getState())) {
@@ -145,6 +140,14 @@ const addMiddleware = () =>
           } else {
             services.playerService.setCurrentTime(startPosition);
           }
+
+          console.log('[TEST] launch setup', {
+            isFirstStartPlayback,
+            time: value,
+            savedTime,
+            startAt,
+            currentTime,
+          });
 
           dispatch(
             sendEvent({

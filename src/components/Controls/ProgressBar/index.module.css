@@ -3,6 +3,12 @@
   display: flex;
   align-items: center;
   margin-left: 48px;
+  user-select: none;
+  z-index: 1;
+}
+
+:global(.mobile) .progress {
+  margin-left: 0;
 }
 
 .duration {

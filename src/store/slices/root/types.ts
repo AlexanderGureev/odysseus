@@ -77,6 +77,8 @@ export type EventsWithPayload =
       | 'PAYWALL_SHOWN'
       | 'RESIZE'
       | 'DISPOSE_PLAYER'
+      | 'MENU_SHOWN'
+      | 'QUALITY_MENU_SHOWN'
     >
   | ErrorPayload<
       | 'CHECK_ERROR_REJECT'
@@ -151,6 +153,14 @@ export type EventsWithPayload =
   | {
       type: 'CHANGE_TRACK';
       meta: { config: NextTrackConfig; context: Partial<TParams> | null; params?: TrackParams };
+    }
+  | {
+      type: 'CLICK_MENU_ITEM';
+      meta: { title: string; block?: string };
+    }
+  | {
+      type: 'TRACK_DESCRIPTION_CLICK';
+      meta: { type: 'project' | 'season' | 'track' };
     };
 
 export type Event = EventsWithPayload['type'];

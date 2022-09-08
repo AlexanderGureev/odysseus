@@ -1,0 +1,41 @@
+.paywall {
+  composes: fade-in from global;
+}
+
+.wrapper {
+  padding: 0 20px;
+}
+
+.title {
+  margin-bottom: 8px;
+}
+
+.description {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+  text-align: center;
+  color: #c6c6c6;
+}
+
+.btn {
+  margin-top: 24px;
+}
+
+@media (max-width: 599px) {
+  .title {
+    margin-bottom: 10px;
+  }
+
+  .description {
+    font-size: 13px;
+  }
+
+  .btn {
+    margin-top: 20px;
+  }
+
+  :global(.wrapper:not(.embedded)) .btn {
+    display: none;
+  }
+}

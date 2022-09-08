@@ -1,5 +1,5 @@
-import nextTrackIcon from 'assets/icons/icons-24-next-track.svg';
-import prevTrackIcon from 'assets/icons/icons-24-previous-track.svg';
+import nextTrackIcon from 'assets/sprite/icons-24-next-track.svg';
+import prevTrackIcon from 'assets/sprite/icons-24-previous-track.svg';
 import { useAppDispatch } from 'hooks';
 import React from 'react';
 import { sendEvent } from 'store';

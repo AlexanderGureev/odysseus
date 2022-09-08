@@ -9,7 +9,7 @@ import { logger } from 'utils/logger';
 
 import { FSMState, State, SubType } from './types';
 
-const DEFAULT_TITLE = 'Оформи подписку для продолжения просмотра';
+const DEFAULT_TITLE = 'Оформи подписку<br/>для продолжения просмотра';
 
 export const getButtonTextBySkin = (state: AppState, type: SubType): string => {
   const { skin } = state.root.meta;

@@ -1,5 +1,7 @@
 @import './variables.css';
 @import './fonts.css';
+@import './button.css';
+@import './notice.css';
 
 html,
 body {
@@ -12,10 +14,6 @@ body {
   overflow: hidden;
 }
 
-#root {
-  background: #000;
-}
-
 .wrapper,
 #root,
 #video-player,
@@ -23,23 +21,30 @@ body {
   width: 100%;
   height: 100%;
   outline: none;
+  background: #000;
+}
+
+.wrapper {
+  font-family: var(--font-default);
+  overflow: hidden;
 }
 
 .icon {
-  width: var(--icon-size);
-  height: var(--icon-size);
+  width: var(--s-icon-size);
+  height: var(--s-icon-size);
   cursor: pointer;
 }
 
 .btn-hover {
   opacity: var(--icon-opacity);
+  user-select: none;
 }
 
 .btn-hover::before {
   content: '';
   position: absolute;
   border-radius: var(--hover-btn-border-radius);
-  background-color: var(--hover-control-color);
+  background-color: var(--text-color-12);
   transition: var(--default-transition);
   opacity: 0;
   left: 50%;
@@ -53,6 +58,63 @@ body {
 .btn-hover:hover,
 .btn-hover:hover::before {
   opacity: 1;
+}
+
+.big-btn {
+  position: relative;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.big-btn::before {
+  padding: 8px 10px;
+}
+
+.big-btn span {
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+@media (max-width: 599px) {
+  .big-btn::before {
+    padding: 8px;
+  }
+
+  .big-btn span {
+    display: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.2s ease forwards;
+}
+
+.fade-out {
+  animation: fade-out 0.2s ease forwards;
 }
 
 /* 

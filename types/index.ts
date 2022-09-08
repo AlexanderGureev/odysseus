@@ -104,7 +104,7 @@ export type TFeatureConfig = {
   TRIAL_SUGGESTION?: TrialSuggestionCfg;
   FEATURE_OFF_ADS_DISPLAY_TIME?: number;
   FEATURE_COMPLAIN?: boolean;
-  EMAIL_FOR_COMPLAINTS?: string;
+  COMPLAINT_LIMIT_TIME?: number;
 
   AUTH_URL?: string; // используется для открытия страницы авторизации в эмбедах
 
@@ -274,7 +274,14 @@ export type TLinkedTracks = {
   previous: Nullable<TLinkedTrackConfig>;
 };
 
+export type Badge = {
+  text: string | null;
+  badgeColor: string | null;
+  textColor: string | null;
+};
+
 export type TAutoSwitchConfig = {
+  badge: Nullable<Badge>;
   caption: string;
   caption_v2: string;
   countdown: number;

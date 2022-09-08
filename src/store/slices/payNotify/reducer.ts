@@ -144,7 +144,7 @@ const addMiddleware = () => {
           if (item.sharing_url && isEmbedded) {
             const queryParams = services.utmService
               .buildUTMQueryParams({
-                term: previews ? 'preview' : 'paywall',
+                term: previews ? 'preview' : 'subscribe_cta',
                 trackId,
                 skinId: config.config.skin_id,
               })

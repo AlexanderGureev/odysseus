@@ -1,5 +1,5 @@
-import controlPauseIcon from 'assets/icons/icons-web-player-control-pause-m.svg';
-import controlPlayIcon from 'assets/icons/icons-web-player-control-play-m.svg';
+import controlPauseIcon from 'assets/sprite/icons-web-player-control-pause-m.svg';
+import controlPlayIcon from 'assets/sprite/icons-web-player-control-play-m.svg';
 import { useAppDispatch, useAppSelector } from 'hooks';
 import React from 'react';
 import { sendEvent } from 'store';
@@ -16,7 +16,7 @@ export const PlaybackButton = () => {
 
   return (
     <div className={Styles.playback} onClick={onClick}>
-      <img src={step === 'PAUSED' ? controlPlayIcon : controlPauseIcon} />
+      <img key={step} src={step === 'PAUSED' ? controlPlayIcon : controlPauseIcon} />
     </div>
   );
 };

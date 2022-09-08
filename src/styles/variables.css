@@ -6,19 +6,37 @@
   --border-radius-h40: 14px;
   --border-radius-h54: 18px;
 
-  --default-transition: opacity 0.15s ease;
+  --default-transition: 0.15s ease;
   --icon-opacity: 0.87;
   --text-color-87: rgba(255, 255, 255, 0.87);
-  --hover-control-color: rgba(255, 255, 255, 0.12);
+  --text-color-38: rgba(255, 255, 255, 0.38);
+  --text-color-12: rgba(255, 255, 255, 0.12);
   --hover-btn-border-radius: 12px;
 
-  --icon-size: 24px;
+  --white-10: rgba(255, 255, 255, 0.1);
+
+  --s-icon-size: 24px;
+  --m-icon-size: 32px;
+  --l-icon-size: 36px;
+  --xl-icon-size: 40px;
+  --xxl-icon-size: 48px;
+
+  --z-index-overlay: 10;
+  --overlay-background: rgba(14, 14, 14, 0.9);
+  --modal-background: #141414;
 }
 
 .theme-more-tv {
   --font-default: 'Montserrat';
   --primary-color: #21a4f7;
   --secondary-color: #1b1b1b;
+  --primary-text-color: #fff;
+}
+
+.theme-ctc {
+  --primary-color: #fed444;
+  --secondary-color: #1b1b1b;
+  --primary-text-color: #000;
 }
 
 .theme-ctc,

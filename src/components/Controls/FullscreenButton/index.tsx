@@ -1,5 +1,5 @@
-import exitFullscreenIcon from 'assets/icons/icons-app-player-fullscreen-off.svg';
-import enterFullcreenIcon from 'assets/icons/icons-app-player-fullscreen-on.svg';
+import exitFullscreenIcon from 'assets/sprite/icons-app-player-fullscreen-off.svg';
+import enterFullcreenIcon from 'assets/sprite/icons-app-player-fullscreen-on.svg';
 import { useAppDispatch, useAppSelector } from 'hooks';
 import React from 'react';
 import { sendEvent } from 'store';
@@ -16,7 +16,7 @@ export const FullscreenButton = () => {
 
   return (
     <div className={Styles.wrapper} onClick={onClick}>
-      <img src={step === 'FULLSCREEN' ? exitFullscreenIcon : enterFullcreenIcon} />
+      <img key={step} src={step === 'FULLSCREEN' ? exitFullscreenIcon : enterFullcreenIcon} />
     </div>
   );
 };

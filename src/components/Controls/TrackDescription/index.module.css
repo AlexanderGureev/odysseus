@@ -1,4 +1,18 @@
 .wrapper {
+  overflow: hidden;
+  margin-right: 3px;
+  user-select: none;
+  display: none;
+}
+
+:global(.fullscreen) .wrapper,
+:global(.embedded) .wrapper {
+  display: block;
+}
+
+.title {
+  display: flex;
+  margin-bottom: 2px;
 }
 
 .title,
@@ -15,7 +29,19 @@
   font-weight: 500;
   line-height: 1.6;
   color: #e6e6e6;
-  margin-top: 2px;
+}
+
+.subtitle,
+.title span,
+.title a {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.min-age {
+  margin-left: 6px;
 }
 
 .title a,
@@ -32,4 +58,16 @@
 .subtitle a:first-child,
 .subtitle span:first-child {
   margin-right: 8px;
+}
+
+@media (max-width: 599px) {
+  .title,
+  .title a {
+    font-size: 15px;
+  }
+
+  .subtitle,
+  .subtitle a {
+    font-size: 13px;
+  }
 }

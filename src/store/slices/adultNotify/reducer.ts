@@ -15,6 +15,7 @@ const initialState: FSMState = {
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
     DO_INIT: 'ADULT_NOTIFY_INIT',
+    PARSE_CONFIG_RESOLVE: null,
     CHECK_ADULT: 'CHECK_ADULT_CONTENT',
   },
   ADULT_NOTIFY_INIT: {
@@ -47,6 +48,8 @@ const adultNotify = createSlice({
       const step = next || state.step;
 
       switch (type) {
+        case 'PARSE_CONFIG_RESOLVE':
+          return { ...state, confirmed: payload.params.adult === false };
         case 'ADULT_NOTIFY_RESOLVE':
           return { ...state, step, confirmed: true };
         default:
@@ -80,36 +83,25 @@ const addMiddleware = () =>
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         ADULT_NOTIFY_INIT: () => {
-          const {
-            root: { params },
-          } = getState();
+          services.postMessageService.on('userReachedCorrectAge', () => {
+            dispatch(
+              sendEvent({
+                type: 'ADULT_NOTIFY_RESOLVE',
+              })
+            );
+          });
 
-          const confirmed = params.adult === false;
-
-          if (!confirmed) {
-            services.postMessageService.on('userReachedCorrectAge', () => {
-              dispatch(
-                sendEvent({
-                  type: 'ADULT_NOTIFY_RESOLVE',
-                })
-              );
-            });
-
-            services.postMessageService.on('userNotReachedCorrectAge', () => {
-              dispatch(
-                sendEvent({
-                  type: 'ADULT_NOTIFY_REJECT',
-                })
-              );
-            });
-          }
+          services.postMessageService.on('userNotReachedCorrectAge', () => {
+            dispatch(
+              sendEvent({
+                type: 'ADULT_NOTIFY_REJECT',
+              })
+            );
+          });
 
           dispatch(
             sendEvent({
               type: 'ADULT_NOTIFY_INIT_RESOLVE',
-              payload: {
-                confirmed,
-              },
             })
           );
         },

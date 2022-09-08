@@ -28,6 +28,23 @@ export const ymStats = async (
       if (previews) ymService.reachGoal('pay_and_watch'); // TODO возможно нужно отправлять всегда
       ymService.sendEvent('click_subscribe');
       break;
+    case 'MENU_SHOWN':
+      ymService.reachGoal('menu');
+      break;
+    case 'TRACK_DESCRIPTION_CLICK':
+      const { type } = payload.meta;
+      if (type === 'project') ymService.reachGoal('project');
+      if (type === 'season') ymService.reachGoal('season');
+      break;
+    case 'CHANGE_CURRENT_QUALITY':
+      ymService.reachGoal('quality');
+      break;
+    case 'CLICK_MENU_ITEM':
+      const { title } = payload.meta;
+      if (title === 'Код вставки') ymService.reachGoal('insert');
+      if (title === 'Поделиться') ymService.reachGoal('shering_button');
+      if (title === 'Горячие клавиши') ymService.reachGoal('hotkeys');
+      break;
     case 'ENTER_FULLCREEN':
       if (!isFullscreenGoalSent && !deviceInfo.isMobile) {
         isFullscreenGoalSent = true;

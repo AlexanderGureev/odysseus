@@ -111,6 +111,7 @@ export type OutputEvents = {
       project_id?: number;
       track_id?: number | null;
       videosession_id?: string;
+      time_cursor?: number;
     }>
   ) => void;
   play_btn_click: (data: Payload<{ btn_type: 'play' | 'pause' }>) => void;

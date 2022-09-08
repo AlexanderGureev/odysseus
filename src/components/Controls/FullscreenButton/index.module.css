@@ -6,3 +6,8 @@
   cursor: pointer;
   margin-left: 24px;
 }
+
+.wrapper img {
+  width: var(--s-icon-size);
+  height: var(--s-icon-size);
+}

@@ -9,6 +9,7 @@ import { dbclick } from 'utils/dbclick';
 import { isKeyPressed, SUPPORTED_KEY_CODES } from 'utils/keyboard';
 import { logger } from 'utils/logger';
 
+import { BACKWARD_REWIND_STEP, FORWARD_REWIND_STEP, VOLUME_STEP } from './constants';
 import { FSMState, State } from './types';
 
 const initialState: FSMState = {
@@ -16,12 +17,10 @@ const initialState: FSMState = {
   isInitialized: false,
 };
 
-const VOLUME_STEP = 0.1;
-const REWIND_STEP = 30;
-
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
     START_PLAYBACK: null,
+    CLOSE_OVERLAY: 'READY',
   },
   HOTKEYS_INIT: {
     HOTKEYS_INIT_RESOLVE: 'READY',
@@ -32,7 +31,9 @@ const config: FSMConfig<State, AppEvent> = {
     KEYBOARD_EVENT: 'PROCESSING_KEYBOARD_EVENT',
     NETWORK_ERROR: 'IDLE',
     DISABLE_HOTKEYS: 'IDLE',
+    SET_OVERLAY: 'IDLE',
     CHANGE_TRACK: 'IDLE',
+    SETUP_PAYWALL_RESOLVE: 'IDLE',
   },
   PROCESSING_KEYBOARD_EVENT: {
     PROCESSING_KEYBOARD_EVENT_RESOLVE: 'READY',
@@ -139,7 +140,7 @@ const addMiddleware = () =>
                 const { currentTime, duration } = getState().playback;
                 if (!duration) return;
 
-                const to = Math.max(0, (currentTime || 0) - REWIND_STEP);
+                const to = Math.max(0, (currentTime || 0) - BACKWARD_REWIND_STEP);
                 const event: EventPayload = {
                   type: 'SEEK',
                   meta: { to },
@@ -152,7 +153,7 @@ const addMiddleware = () =>
                 const { currentTime, duration } = getState().playback;
                 if (!duration) return;
 
-                const to = Math.min(duration, (currentTime || 0) + REWIND_STEP);
+                const to = Math.min(duration, (currentTime || 0) + FORWARD_REWIND_STEP);
                 const event: EventPayload = {
                   type: 'SEEK',
                   meta: { to },

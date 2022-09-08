@@ -10,6 +10,11 @@
   justify-content: center;
   padding: 16px 8px 8px;
   pointer-events: none;
+  user-select: none;
+}
+
+:global(.mobile) .volume {
+  display: none;
 }
 
 .volume::before {
@@ -47,14 +52,64 @@
 }
 
 .unmute-button {
+  display: flex;
+  align-items: center;
+  user-select: none;
   cursor: pointer;
   opacity: var(--icon-opacity);
   transition: var(--default-transition);
   position: absolute;
-  left: 12px;
+  left: 16px;
   bottom: 18px;
-  width: 36px;
-  height: 36px;
+  z-index: 1;
+}
+
+.label {
+  position: absolute;
+  left: calc(100% + 14px);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--text-color-87);
+  text-transform: uppercase;
+  line-height: 1.6;
+  letter-spacing: 0.71px;
+  opacity: 0;
+  transition: var(--default-transition);
+  pointer-events: none;
+}
+
+:global(.mobile) .label {
+  opacity: 1;
+}
+
+:global(.controls-hidden) .label {
+  opacity: 1;
+}
+
+:global(.mobile) .unmute-button {
+  bottom: 64px;
+}
+
+.unmute-button {
+  width: var(--l-icon-size);
+  height: var(--l-icon-size);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-color);
+  border-radius: 100%;
+}
+
+.unmute-button img {
+  width: var(--s-icon-size);
+  height: var(--s-icon-size);
+  transform: translateX(2px);
+}
+
+:global(.wrapper:not(.theme-more-tv)) .unmute-button img {
+  filter: invert(1);
 }
 
 .unmute-button:hover {
@@ -67,4 +122,20 @@
 
 .volume :global .range-input-track {
   background-color: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 599px) {
+  .unmute-button,
+  .unmute-button img {
+    width: var(--m-icon-size);
+    height: var(--m-icon-size);
+  }
+
+  .unmute-button {
+    bottom: 14px;
+  }
+
+  :global(.mobile) .unmute-button {
+    bottom: 46px;
+  }
 }

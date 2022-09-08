@@ -9,7 +9,7 @@ import { AppliedTariffModifiers, SubscriptionStatus, SubscriptionType, UserSubsc
 import { pad } from 'utils';
 import { declOfNum } from 'utils/declOfNum';
 
-export const getPlaylistItem = (state: AppState) => state.root.config.playlist.items[0];
+export const getPlaylistItem = (state: AppState) => state.root.config.playlist?.items?.[0];
 
 export const getSources = (state: AppState) => getPlaylistItem(state).streams;
 
@@ -25,10 +25,10 @@ export const getTrackInfo = (state: AppState) => {
   const { project_name, min_age, season_name, episode_name, thumbnail_url } = getPlaylistItem(state);
 
   return {
-    project_name,
     min_age,
-    season_name,
-    episode_name,
+    project_name: project_name || '',
+    season_name: season_name || '',
+    episode_name: episode_name || '',
     thumbnail_url,
   };
 };

@@ -4,6 +4,7 @@ import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { condition } from 'store/condition';
 import { isStepChange, startListening } from 'store/middleware';
+import { getPlaylistItem } from 'store/selectors';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { AdCategory } from 'types/ad';
 import { PlayerDisposeError } from 'utils/errors';
@@ -148,8 +149,10 @@ const addMiddleware = () =>
             experiments: { experiments },
           } = getState();
 
+          const { num_in_project } = getPlaylistItem(getState());
+
           const isDisabled = Boolean(
-            experiments.EXP_AB_MONEY689 !== 'test' || !adConfig?.pre_roll || subscription.ACTIVE
+            experiments.EXP_AB_MONEY689 !== 'test' || num_in_project !== 2 || !adConfig?.pre_roll || subscription.ACTIVE
           );
 
           const isShown = services.localStorageService.getItemByDomain<boolean>(

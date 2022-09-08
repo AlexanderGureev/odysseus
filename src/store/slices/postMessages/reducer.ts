@@ -9,7 +9,10 @@ import { adEvents } from './effects/adEvents';
 import { adultNotify } from './effects/adultNotify';
 import { autoswitchPopup } from './effects/autoswitchPopup';
 import { baseEvents } from './effects/baseEvents';
+import { errorReports } from './effects/errorReports';
 import { errors } from './effects/errors';
+import { playback } from './effects/playback';
+import { quality } from './effects/quality';
 import { resumeNotify } from './effects/resumeNotify';
 import { trialSuggestion } from './effects/trialSuggestion';
 import { FSMState, State } from './types';
@@ -171,6 +174,9 @@ const addMiddleware = () => {
       adultNotify(event, opts);
       trialSuggestion(event, opts);
       errors(event, opts);
+      errorReports(event, opts);
+      quality(event, opts);
+      playback(event, opts);
     },
   });
 };

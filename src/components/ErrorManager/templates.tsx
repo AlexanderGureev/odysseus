@@ -1,3 +1,13 @@
+import che_logo_icon from 'assets/logo/che_logo_icon.svg';
+import ctc_kids_icon from 'assets/logo/ctc_kids_logo_icon.svg';
+import ctc_logo_icon from 'assets/logo/ctc_logo_icon.svg';
+import ctc_love_icon from 'assets/logo/ctc_love_logo_icon.svg';
+import dom_logo_icon from 'assets/logo/dom_logo_icon.svg';
+import more_logo_icon from 'assets/logo/more_logo_icon.svg';
+import error_icon from 'assets/sprite/error_icon.svg';
+import error_invalid_streams_icon from 'assets/sprite/error_invalid_streams_icon.svg';
+import error_network_icon from 'assets/sprite/error_network_icon.svg';
+import error_restriction_icon from 'assets/sprite/error_restriction_icon.svg';
 import React from 'react';
 import { isAndroid, isIOS } from 'react-device-detect';
 import { sendEvent } from 'store';
@@ -6,17 +16,7 @@ import { ERROR_CODES, ERROR_TYPE } from 'types/errors';
 
 import app_store_black_icon from './icons/app_store_black_icon.svg';
 import app_store_white_icon from './icons/app_store_white_icon.svg';
-import che_logo_icon from './icons/che_logo_icon.svg';
-import ctc_kids_icon from './icons/ctc_kids_logo_icon.svg';
-import ctc_logo_icon from './icons/ctc_logo_icon.svg';
-import ctc_love_icon from './icons/ctc_love_logo_icon.svg';
-import dom_logo_icon from './icons/dom_logo_icon.svg';
-import error_icon from './icons/error_icon.svg';
-import error_invalid_streams_icon from './icons/error_invalid_streams_icon.svg';
-import error_network_icon from './icons/error_network_icon.svg';
-import error_restriction_icon from './icons/error_restriction_icon.svg';
 import google_play_icon from './icons/google_play_icon.svg';
-import more_logo_icon from './icons/more_logo_icon.svg';
 import Styles from './index.module.css';
 import { ErrorConfigByType, MailData, MailOpts } from './types';
 

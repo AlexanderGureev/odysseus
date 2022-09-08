@@ -6,7 +6,7 @@ import { isNil } from '.';
 import { PlayerError } from './errors';
 import { logger } from './logger';
 
-export const NETWORK_CHECK_PATH = '/check_connection'; // 'https://odysseus.more.tv/check_connection'
+export const NETWORK_CHECK_PATH = 'https://odysseus.more.tv/check_connection'; //'/check_connection'; //
 
 export class HTTPResponseError extends BaseError {
   response: Response;

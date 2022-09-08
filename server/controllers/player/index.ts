@@ -41,14 +41,15 @@ export const PlayerController = () => {
             if (!isNumber(params.partner_id)) throw new RequestError(ERROR.INVALID_PARTNER_ID, 400);
             if (!isNumber(params.track_id)) throw new RequestError(ERROR.INVALID_TRACK_ID, 400);
 
+            const { isNcanto, ...reqParams } = params;
             const options = { headers: createHeaders(req) };
             const features = await hydraRequest(params.partner_id, options);
 
             const [config, serviceTariffs, trackInfo, subscription, mediascopeCounter] = await Promise.all([
-              configRequest(req, features.config_source, params, options),
-              serviceTariffsRequest(params.user_token, features.skin_theme_class, options),
-              trackInfoRequest(params.track_id, features.skin_theme_class, options),
-              userSubscriptionRequest(params.user_token, features.skin_theme_class, options),
+              configRequest(req, features.config_source, reqParams, { headers: { ...options.headers, isNcanto } }),
+              serviceTariffsRequest(reqParams.user_token, features.skin_theme_class, options),
+              trackInfoRequest(reqParams.track_id, features.skin_theme_class, options),
+              userSubscriptionRequest(reqParams.user_token, features.skin_theme_class, options),
               mediascopeCounterRequest(SERVICE_GROUP_ID[features.skin_theme_class], options),
             ]);
 
@@ -65,7 +66,7 @@ export const PlayerController = () => {
                 mediascopeCounter,
               },
               context: {
-                ...params,
+                ...reqParams,
               },
             });
           } catch (err) {

@@ -1,5 +1,5 @@
-import addFavIcon from 'assets/icons/icons-24-favorites-simple-add.svg';
-import removeFavIcon from 'assets/icons/icons-24-favorites-simple-added.svg';
+import addFavIcon from 'assets/sprite/icons-24-favorites-simple-add.svg';
+import removeFavIcon from 'assets/sprite/icons-24-favorites-simple-added.svg';
 import { useAppDispatch, useAppSelector } from 'hooks';
 import React from 'react';
 import { sendEvent } from 'store';

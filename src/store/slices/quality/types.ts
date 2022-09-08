@@ -25,7 +25,12 @@ export type EventsWithPayload =
       };
     }
   | {
-      type: 'CHANGE_CURRENT_QUALITY' | 'AUTO_CHANGE_CURRENT_QUALITY';
+      type: 'CHANGE_CURRENT_QUALITY';
+      payload: { value: QUALITY_MARKS };
+      meta: { block: string };
+    }
+  | {
+      type: 'AUTO_CHANGE_CURRENT_QUALITY';
       payload: { value: QUALITY_MARKS };
     }
   | {

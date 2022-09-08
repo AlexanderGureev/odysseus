@@ -1,0 +1,64 @@
+.wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: var(--default-transition);
+  z-index: var(--z-index-overlay);
+  user-select: none;
+
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  border-radius: 4px;
+  background-color: var(--modal-background);
+  box-sizing: border-box;
+  max-height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.close {
+  position: absolute;
+  z-index: 1;
+  right: 12px;
+  top: 12px;
+  width: var(--s-icon-size);
+  height: var(--s-icon-size);
+  cursor: pointer;
+  padding: 10px;
+  opacity: 0.6;
+  transition: var(--default-transition);
+}
+
+.close:hover {
+  opacity: 1;
+}
+
+:global(.mobile) .modal {
+  background: #000;
+  width: 100%;
+  height: 100%;
+}
+
+:global(.mobile) .close {
+  width: max-content;
+  height: max-content;
+  padding: 0;
+  opacity: 1;
+  right: 1px;
+  top: 5px;
+  position: fixed;
+}

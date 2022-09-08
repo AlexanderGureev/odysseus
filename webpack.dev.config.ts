@@ -5,6 +5,7 @@ import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import HappyPack from 'happypack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from 'path';
+import SpriteLoaderPlugin from 'svg-sprite-loader/plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
 
@@ -37,6 +38,7 @@ const config: webpack.Configuration = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)$/i,
+        exclude: path.resolve('src', 'assets', 'sprite'),
         type: 'asset/resource',
         generator: {
           filename: 'static/img/[hash][ext]',
@@ -47,6 +49,16 @@ const config: webpack.Configuration = {
         type: 'asset/resource',
         generator: {
           filename: 'static/fonts/[hash][ext]',
+        },
+      },
+      {
+        test: /\.svg$/,
+        include: path.resolve('src', 'assets', 'sprite'),
+        loader: 'svg-sprite-loader',
+        options: {
+          extract: true,
+          esModule: false,
+          spriteFilename: 'static/icons/sprite-[contenthash:8].svg',
         },
       },
       {
@@ -116,6 +128,8 @@ const config: webpack.Configuration = {
     new CopyPlugin({
       patterns: [{ from: path.resolve('src', 'static'), to: path.resolve('build', 'client') }],
     }),
+    // @ts-ignore
+    new SpriteLoaderPlugin(),
     new ModifySrcPlugin(),
   ],
 };

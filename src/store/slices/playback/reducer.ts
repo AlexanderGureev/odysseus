@@ -99,7 +99,7 @@ const playback = createSlice({
       const step = next || state.step;
 
       if (['CHANGE_TRACK'].includes(type)) return { ...initialState, step: 'READY' };
-      // if (['RESUME_VIDEO'].includes(type)) return { ...state, step: 'READY' };
+      if (['RESUME_VIDEO'].includes(type)) return { ...state, step: 'READY' };
       if (['NETWORK_ERROR', 'GO_TO_NEXT_TRACK', 'GO_TO_PREV_TRACK'].includes(type)) {
         return { ...state, step: 'PAUSE_PENDING' };
       }

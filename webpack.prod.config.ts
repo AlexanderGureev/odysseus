@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import CopyPlugin from 'copy-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
+import SpriteLoaderPlugin from 'svg-sprite-loader/plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
@@ -60,6 +62,7 @@ const config: webpack.Configuration = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)$/i,
+        exclude: path.resolve('src', 'assets', 'sprite'),
         type: 'asset/resource',
         generator: {
           filename: 'static/img/[hash][ext]',
@@ -73,12 +76,22 @@ const config: webpack.Configuration = {
         },
       },
       {
-        test: /fonts.css/,
-        use: ['style-loader', 'css-loader', 'postcss-loader'],
+        test: /\.svg$/,
+        include: path.resolve('src', 'assets', 'sprite'),
+        loader: 'svg-sprite-loader',
+        options: {
+          extract: true,
+          esModule: false,
+          spriteFilename: 'static/icons/sprite-[contenthash:8].svg',
+        },
       },
+      // {
+      //   test: /fonts.css/,
+      //   use: ['style-loader', 'css-loader', 'postcss-loader'],
+      // },
       {
         test: /\.css$/i,
-        exclude: [/\.module\.css$/i, /fonts.css/],
+        exclude: [/\.module\.css$/i], ///fonts.css/
         use: [
           {
             loader: MiniCssExtractPlugin.loader,
@@ -148,6 +161,8 @@ const config: webpack.Configuration = {
       process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
     }),
+    // @ts-ignore
+    new SpriteLoaderPlugin(),
     new ModifySrcPlugin(),
   ],
 };

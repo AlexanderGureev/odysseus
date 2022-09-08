@@ -1,4 +1,5 @@
 import { DefaultPayload, WithoutPayload } from 'store/types';
+import { Badge, Nullable } from 'types';
 
 export type State =
   | 'IDLE'
@@ -52,6 +53,7 @@ export type FSMState = {
   thumbnail: string | null;
   buttonText: string | null;
   cancelButtonText: string | null;
+  badge: Nullable<{ text: string | null; badgeColor: string; textColor: string }>;
 
   previousTime: number | null;
   auto: boolean;

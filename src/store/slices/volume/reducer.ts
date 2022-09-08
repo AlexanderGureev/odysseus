@@ -80,6 +80,7 @@ const volume = createSlice({
           state.step = step;
           state.volume = payload.value;
           state.muted = payload.value === 0;
+          if (payload.value > 0) state.unmuted = true;
           break;
         default:
           return { ...state, step, ...payload };

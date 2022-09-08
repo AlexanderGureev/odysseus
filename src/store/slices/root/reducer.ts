@@ -415,9 +415,6 @@ const addMiddleware = () =>
             })
           );
         },
-        BIG_PLAY_BUTTON: () => {
-          return;
-        },
         READY: () => {
           const { config } = getState().root;
 

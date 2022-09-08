@@ -1,4 +1,5 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { Problem } from 'services/MailService/types';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
@@ -20,8 +21,16 @@ const config: FSMConfig<State, AppEvent> = {
     SEND_ERROR_REPORT: 'SEND_ERROR_REPORT_PENDING',
   },
   SEND_ERROR_REPORT_PENDING: {
-    SEND_ERROR_REPORT_RESOLVE: 'READY',
-    SEND_ERROR_REPORT_REJECT: 'READY',
+    SEND_ERROR_REPORT_RESOLVE: 'REPORT_SEND_SUCCESS',
+    SEND_ERROR_REPORT_REJECT: 'REPORT_SEND_ERROR',
+  },
+  REPORT_SEND_SUCCESS: {
+    SEND_ERROR_REPORT: 'SEND_ERROR_REPORT_PENDING',
+    CLOSE_OVERLAY: 'READY',
+  },
+  REPORT_SEND_ERROR: {
+    SEND_ERROR_REPORT: 'SEND_ERROR_REPORT_PENDING',
+    CLOSE_OVERLAY: 'READY',
   },
   DISABLED: {},
 };
@@ -82,17 +91,18 @@ const addMiddleware = () =>
         SEND_ERROR_REPORT_PENDING: async () => {
           try {
             const {
-              root: { meta, session, config, features },
+              root: { meta, session, config },
             } = getState();
 
             const {
               payload: {
-                meta: { problems, description },
+                meta: { problems, description, email },
               },
             } = action as PayloadAction<{
               meta: {
                 problems: Problem[];
-                description: string;
+                description?: string;
+                email?: string;
               };
             }>;
 
@@ -100,8 +110,7 @@ const addMiddleware = () =>
             const { location } = await services.embeddedCheckService.getIframeLocation();
 
             await services.mailService.send({
-              clientIp: window.ENV.IP,
-              email: features.EMAIL_FOR_COMPLAINTS || 'player@more.tv',
+              email,
               app_version: window.ENV.APP_VERSION || 'unknown',
               web_version: 'unknown',
               list_problem: problems,
@@ -115,6 +124,7 @@ const addMiddleware = () =>
               videosession_id: session.videosession_id,
             });
 
+            services.localStorageService.setItemByDomain(STORAGE_SETTINGS.COMPLAIN_TIMESTAMP, Date.now());
             dispatch(sendEvent({ type: 'SEND_ERROR_REPORT_RESOLVE' }));
           } catch (err) {
             logger.error('[mailService]', 'error send report', err?.message);

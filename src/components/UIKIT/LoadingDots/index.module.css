@@ -1,0 +1,42 @@
+.loading {
+  display: flex;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.left,
+.center,
+.right {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 5px;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+.left {
+  animation: animDot 1s infinite ease-in-out;
+}
+
+.center {
+  animation: animDot 1s 0.2s infinite ease-in-out;
+}
+
+.right {
+  animation: animDot 1s 0.4s infinite ease-in-out;
+}
+
+@keyframes animDot {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}

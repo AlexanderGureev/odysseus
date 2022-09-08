@@ -17,6 +17,7 @@ import buffering from './slices/buffering/reducer';
 import changeTrack from './slices/changeTrack/reducer';
 import error from './slices/error/reducer';
 import errorReports from './slices/errorReports/reducer';
+import errorReportsForm from './slices/errorReportsForm/reducer';
 import experiments from './slices/experiments/reducer';
 import favourites from './slices/favourites/reducer';
 import favouritesController from './slices/favouritesController/reducer';
@@ -27,6 +28,7 @@ import mediaSession from './slices/mediaSession/reducer';
 import network from './slices/network/reducer';
 import networkRecovery from './slices/networkRecovery/reducer';
 import offlineMode from './slices/offlineMode/reducer';
+import overlay from './slices/overlay/reducer';
 import p2p from './slices/p2p/reducer';
 import payButton from './slices/payButton/reducer';
 import payNotify from './slices/payNotify/reducer';
@@ -74,7 +76,8 @@ const rootReducer = combineReducers({
   adBanner: adBanner.reducer,
   trialSuggestion: trialSuggestion.reducer,
   adDisableSuggestion: adDisableSuggestion.reducer,
-
+  // экрана 18+
+  adultNotify: adultNotify.reducer,
   /* 
   корневой автомат, точка входа в приложение:
   1) парсинг конфига
@@ -123,8 +126,6 @@ const rootReducer = combineReducers({
   visibility: visibility.reducer,
   // управление полноэкранным режимом
   fullscreen: fullscreen.reducer,
-  // экрана 18+
-  adultNotify: adultNotify.reducer,
   // экран "продолжить просмотр"
   resumeVideoNotify: resumeVideoNotify.reducer,
   // обработка горячих клавиш
@@ -149,6 +150,8 @@ const rootReducer = combineReducers({
   payNotify: payNotify.reducer,
   audioTracks: audioTracks.reducer,
   errorReports: errorReports.reducer,
+  errorReportsForm: errorReportsForm.reducer,
+  overlay: overlay.reducer,
   // модуль сбора ошибок
   error: error.reducer,
 });
@@ -159,6 +162,7 @@ postMessages.addMiddleware();
 adBanner.addMiddleware();
 trialSuggestion.addMiddleware();
 adDisableSuggestion.addMiddleware();
+adultNotify.addMiddleware();
 
 root.addMiddleware();
 resumeVideo.addMiddleware();
@@ -182,7 +186,6 @@ playbackSpeed.addMiddleware();
 volume.addMiddleware();
 visibility.addMiddleware();
 fullscreen.addMiddleware();
-adultNotify.addMiddleware();
 resumeVideoNotify.addMiddleware();
 hotkeys.addMiddleware();
 splashscreen.addMiddleware();
@@ -196,6 +199,8 @@ paywall.addMiddleware();
 payNotify.addMiddleware();
 audioTracks.addMiddleware();
 errorReports.addMiddleware();
+errorReportsForm.addMiddleware();
+overlay.addMiddleware();
 error.addMiddleware();
 
 // console.log(

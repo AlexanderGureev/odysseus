@@ -1,0 +1,8 @@
+.subtitles {
+  composes: btn-hover big-btn from global;
+  margin-left: 20px;
+}
+
+.icon {
+  composes: icon from global;
+}

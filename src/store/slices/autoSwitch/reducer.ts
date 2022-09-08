@@ -24,6 +24,7 @@ const initialState: FSMState = {
   buttonText: null,
   cancelButtonText: null,
   previousTime: null,
+  badge: null,
 
   auto: true,
   autoswitchNotifyType: 'default',
@@ -105,8 +106,17 @@ const autoSwitch = createSlice({
             return { ...state, step: 'DISABLED' };
           }
 
+          const badge = data.badge?.text
+            ? {
+                ...data.badge,
+                badgeColor: data.badge.badgeColor || '#CF2226',
+                textColor: data.badge.textColor || '#FFFFFF',
+              }
+            : null;
+
           return {
             ...state,
+            badge,
             controlType: data.project_poster ? 'project' : 'episode',
             autoswitchType,
             autoswitchPoint: data.point,
@@ -135,7 +145,8 @@ const autoSwitch = createSlice({
             };
           }
 
-          if (currentTime >= state.autoswitchPoint) {
+          if (currentTime >= 3) {
+            //state.autoswitchPoint
             const diff = currentTime - previousTime;
             const countdownValue = state.countdownValue - diff;
 

@@ -16,6 +16,7 @@ import { sendEvent, store } from 'store';
 import { getTrackInfo } from 'store/selectors';
 import { AD_BANNER_CONTAINER_ID } from 'store/slices/adBanner';
 import { Lang, LinkedAudioTrackItem } from 'store/slices/audioTracks';
+import { BACKWARD_REWIND_STEP, FORWARD_REWIND_STEP } from 'store/slices/hotkeys/constants';
 import { Screens } from 'store/slices/splashscreen';
 import { NoticeContent, TS_TRIGGER } from 'store/slices/trialSuggestion/utils';
 import { AppThemeBySkin, SkinClass } from 'types';
@@ -141,7 +142,11 @@ const Player = () => {
                 value={quality.currentQualityMark}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                   dispatch(
-                    sendEvent({ type: 'CHANGE_CURRENT_QUALITY', payload: { value: e.target.value as QUALITY_MARKS } })
+                    sendEvent({
+                      type: 'CHANGE_CURRENT_QUALITY',
+                      payload: { value: e.target.value as QUALITY_MARKS },
+                      meta: { block: '' },
+                    })
                   );
                 }}>
                 {quality.qualityList.map((mark) => (
@@ -256,12 +261,12 @@ const Player = () => {
                   sendEvent({
                     type: 'INC_SEEK',
                     payload: {
-                      value: 30,
+                      value: FORWARD_REWIND_STEP,
                     },
                   })
                 );
               }}>
-              seek +30 ({rewindAcc.inc})
+              seek +{FORWARD_REWIND_STEP} ({rewindAcc.inc})
             </button>
             <button
               onClick={() => {
@@ -269,12 +274,12 @@ const Player = () => {
                   sendEvent({
                     type: 'DEC_SEEK',
                     payload: {
-                      value: -30,
+                      value: -BACKWARD_REWIND_STEP,
                     },
                   })
                 );
               }}>
-              seek -30 ({rewindAcc.dec})
+              seek -{BACKWARD_REWIND_STEP} ({rewindAcc.dec})
             </button>
             <button
               onClick={() => {
@@ -335,7 +340,6 @@ const Player = () => {
                       description: 'test',
                       problems: [
                         {
-                          checked: true,
                           labelText: 'test',
                           name: 'not_play',
                         },

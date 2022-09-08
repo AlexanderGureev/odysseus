@@ -66,11 +66,8 @@ export const fetchConfig = async (sirenURL: string, outerHost: string | null) =>
   }
 };
 
-export const sendEmail = async ({ clientIp, ...data }: MailData): Promise<void> => {
+export const sendEmail = async (data: MailData): Promise<void> => {
   await request.post(`${window.ENV.PUBLIC_BE_ENDPOINT}/mercury/v1/send/web/error-reports`, {
     json: data,
-    headers: {
-      'X-Real-IP': clientIp,
-    },
   });
 };

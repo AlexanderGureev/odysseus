@@ -1,14 +1,22 @@
 import { Problem } from 'services/MailService/types';
 import { DefaultPayload, WithoutPayload } from 'store/types';
 
-export type State = 'IDLE' | 'READY' | 'SEND_ERROR_REPORT_PENDING' | 'DISABLED';
+export type State =
+  | 'IDLE'
+  | 'READY'
+  | 'REPORT_SEND_SUCCESS'
+  | 'REPORT_SEND_ERROR'
+  | 'TEMPORARY_BLOCK'
+  | 'SEND_ERROR_REPORT_PENDING'
+  | 'DISABLED';
 
 export type EventsWithPayload =
   | {
       type: 'SEND_ERROR_REPORT';
       meta: {
         problems: Problem[];
-        description: string;
+        description?: string;
+        email?: string;
       };
     }
   | {

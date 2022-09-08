@@ -1,0 +1,16 @@
+.resume {
+  composes: fade-in from global;
+}
+
+.agree,
+.disagree {
+  width: 187px;
+  padding: 9px 0;
+}
+
+@media (max-width: 599px) {
+  .agree,
+  .disagree {
+    width: 200px;
+  }
+}

@@ -148,5 +148,21 @@ export const horusStat = (
       const { beforeAutoswitch } = payload.meta || {};
       if (!beforeAutoswitch) horusService.routeEvent('HORUS_SESSION_FINISHED');
       break;
+
+    case 'SET_OVERLAY':
+      const { overlayType } = payload.payload;
+      if (overlayType === 'complain') {
+        horusService.routeEvent('HORUS_ERROR_RESPONSE');
+      }
+      break;
+    case 'CLICK_REPORT_BUTTON':
+      horusService.routeEvent('HORUS_ERROR_RESPONSE_SEND');
+      break;
+    case 'CLICK_SEND_REPORT_BUTTON':
+      horusService.routeEvent('HORUS_ERROR_RESPONSE_OK');
+      break;
+    case 'CLOSING_REPORT_FORM_RESOLVE':
+      horusService.routeEvent('HORUS_ERROR_CLOSE');
+      break;
   }
 };

@@ -1,26 +1,14 @@
 .quality {
-  composes: btn-hover from global;
-  position: relative;
-
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.54;
-  color: #fff;
-
-  display: flex;
-  align-items: center;
-  cursor: pointer;
+  composes: btn-hover big-btn from global;
   margin-left: 20px;
-}
-
-.quality::before {
-  padding: 8px 10px;
 }
 
 .icon {
   composes: icon from global;
 }
 
-.quality span {
-  margin-left: 6px;
+@media (max-width: 428px) {
+  .wrapper {
+    display: none;
+  }
 }

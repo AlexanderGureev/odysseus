@@ -38,7 +38,7 @@ const getBodyComplainLetter = (data: Omit<EmailBody, 'clientIp'>): string => {
     track_id: 'Идентификатор трека в ПАК: ',
     user_id: 'Идентификатор пользователя: ',
     videosession_id: 'Идентификатор сессии воспроизведения: ',
-    player_location: 'Адрес плеереа: ',
+    player_location: 'Адрес плеера: ',
     web_version: 'Версия Web: ',
   };
 
@@ -47,7 +47,7 @@ const getBodyComplainLetter = (data: Omit<EmailBody, 'clientIp'>): string => {
 
     if (allowedKey === 'list_problem' && Array.isArray(data[allowedKey])) {
       const listProblemTemplate = data[allowedKey].reduce((nestedAcc, problem) => {
-        return problem.checked ? `${nestedAcc}${problem.labelText}: + \n` : nestedAcc;
+        return `${nestedAcc}${problem.labelText}: + \n`;
       }, '');
 
       return `${template}${listProblemTemplate}\n`;
@@ -58,10 +58,10 @@ const getBodyComplainLetter = (data: Omit<EmailBody, 'clientIp'>): string => {
 };
 
 const getSubjectComplaintLetter = (data: Omit<EmailBody, 'clientIp'>): string => {
-  const LIST = [...data[ALLOWED_BODY_KEYS.LIST_PROBLEM]].filter((i) => i.checked);
+  const LIST = [...data[ALLOWED_BODY_KEYS.LIST_PROBLEM]];
 
   if (!LIST.length && data.problem_description) {
-    LIST.push({ name: 'other', labelText: '', checked: true });
+    LIST.push({ name: 'other', labelText: '' });
   }
 
   const template = LIST.reduce((acc, { name }, idx, { length }) => {
@@ -86,13 +86,12 @@ const getSubjectComplaintLetter = (data: Omit<EmailBody, 'clientIp'>): string =>
 };
 
 const MailService = () => {
-  const send = async ({ clientIp, ...data }: EmailBody) => {
+  const send = async (data: EmailBody) => {
     const body = getBodyComplainLetter(data);
     const subject = getSubjectComplaintLetter(data);
 
     await sendEmail({
-      clientIp,
-      from: data.email,
+      from: data.email || '',
       subject,
       contents: body,
     });

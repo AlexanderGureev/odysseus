@@ -36,7 +36,10 @@ const config: FSMConfig<State, AppEvent> = {
   },
   REJECTED: {
     GO_ONLINE: 'IDLE',
-    RELOAD: null,
+    RELOAD: 'RELOADING',
+  },
+  RELOADING: {
+    RELOADING_RESOLVE: 'IDLE',
   },
   DISABLED: {},
 };
@@ -133,6 +136,10 @@ const addMiddleware = () =>
               dispatch(sendEvent({ type: 'UPDATE_TIMER', payload: { timerValue: timerValue - 1 } }));
             }
           }
+        },
+        RELOADING: () => {
+          window.location.reload();
+          dispatch(sendEvent({ type: 'RELOADING_RESOLVE' }));
         },
       };
 

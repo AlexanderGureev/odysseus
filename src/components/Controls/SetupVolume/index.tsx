@@ -1,7 +1,7 @@
-import volumeOff from 'assets/icons/icons-app-player-volume-off.svg';
-import unmuteIcon from 'assets/icons/icons-web-player-sound-off-in-circle.svg';
-import volumeHigh from 'assets/icons/icons-web-player-sound-on-high.svg';
-import volumeLow from 'assets/icons/icons-web-player-sound-on-low.svg';
+import volumeOff from 'assets/sprite/icons-app-player-volume-off.svg';
+import unmuteIcon from 'assets/sprite/icons-web-player-sound-off-in-circle.svg';
+import volumeHigh from 'assets/sprite/icons-web-player-sound-on-high.svg';
+import volumeLow from 'assets/sprite/icons-web-player-sound-on-low.svg';
 import cn from 'classnames';
 import { Range } from 'components/UIKIT/Range';
 import { useAppDispatch, useAppSelector } from 'hooks';
@@ -19,7 +19,8 @@ export const UnmuteButton = () => {
 
   return (
     <div className={Styles['unmute-button']} onClick={onUnmute}>
-      <img src={unmuteIcon} />
+      <img src={volumeOff} />
+      <span className={Styles.label}>без звука</span>
     </div>
   );
 };
@@ -53,6 +54,7 @@ export const SetupVolume = () => {
       />
 
       <img
+        key={`${muted}`}
         className={Styles['mute-button']}
         onClick={onMuteChange}
         src={muted ? volumeOff : volume > 0.5 ? volumeHigh : volumeLow}
