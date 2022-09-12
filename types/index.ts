@@ -144,14 +144,14 @@ export type TFeatureConfig = {
   NEXT_EPISODE_AUTOPLAY_SUGGEST: boolean;
   // RESTORE_SUBSCRIPTION: boolean; // TODO legacy
   SHARING: boolean;
-  SHOW_LOGO_CONTROL: boolean;
+  // SHOW_LOGO_CONTROL: boolean; // TODO legacy
   SUBSCRIPTION: boolean;
-  THUMBNAIL_LOGO: boolean;
+  // THUMBNAIL_LOGO: boolean; // TODO legacy
   ANDROID_APP_LINK: string;
   IOS_APP_LINK: string;
   ALLOW_FULLSCREEN: boolean;
   PAK_FALLBACK_SRC: boolean;
-  FORCE_PUID_4: boolean;
+  // FORCE_PUID_4: boolean;
   SHOW_AD_NUMBER: boolean;
   SENTRY_ENABLED: boolean;
 

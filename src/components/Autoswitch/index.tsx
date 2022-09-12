@@ -10,9 +10,9 @@ export const Autoswitch = () => {
   const autoSwitch = useAppSelector((state) => state.autoSwitch);
 
   return (
-    <>
+    <div className={Styles[`${autoSwitch.controlType}`]}>
       <div className={Styles.overlay} />
-      <div className={cn(Styles.wrapper, Styles[`${autoSwitch.controlType}`])}>
+      <div className={cn(Styles.wrapper)}>
         <button
           className={cn(Styles['cancel-btn'], 'button')}
           onClick={() => {
@@ -24,8 +24,13 @@ export const Autoswitch = () => {
           }}>
           {autoSwitch.cancelButtonText}
         </button>
-        <div className={Styles['btn-wrapper']}>
-          {autoSwitch.thumbnail && <img className={Styles.poster} src={autoSwitch.thumbnail} />}
+        <div className={Styles.container}>
+          {autoSwitch.thumbnail && (
+            <div className={Styles['poster-wrapper']}>
+              <img className={Styles.poster} src={autoSwitch.thumbnail} />
+              {autoSwitch.thumbnailText && <div className={Styles['poster-text']}>{autoSwitch.thumbnailText}</div>}
+            </div>
+          )}
           {autoSwitch.badge && (
             <div
               className={Styles.badge}
@@ -47,6 +52,6 @@ export const Autoswitch = () => {
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };

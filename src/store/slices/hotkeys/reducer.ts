@@ -1,11 +1,9 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { isMobile } from 'react-device-detect';
-import { PLAYER_ID } from 'services/PlayerService/types';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { on } from 'utils';
-import { dbclick } from 'utils/dbclick';
 import { isKeyPressed, SUPPORTED_KEY_CODES } from 'utils/keyboard';
 import { logger } from 'utils/logger';
 
@@ -93,22 +91,13 @@ const addMiddleware = () =>
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         HOTKEYS_INIT: () => {
-          if (isMobile) {
+          const {
+            features: { CONTROLS = true },
+          } = getState().root;
+
+          if (isMobile || !CONTROLS) {
             dispatch(sendEvent({ type: 'HOTKEYS_INIT_REJECT' }));
             return;
-          }
-
-          const node = document.getElementById(PLAYER_ID);
-          if (node) {
-            dbclick(node, () => {
-              const { step } = getState().fullscreen;
-
-              const event: EventPayload = {
-                type: step === 'FULLSCREEN' ? 'EXIT_FULLCREEN' : 'ENTER_FULLCREEN',
-              };
-
-              dispatch(sendEvent({ type: 'KEYBOARD_EVENT', meta: { event } }));
-            });
           }
 
           on(window, 'keydown', (event: KeyboardEvent) => {
@@ -143,7 +132,7 @@ const addMiddleware = () =>
                 const to = Math.max(0, (currentTime || 0) - BACKWARD_REWIND_STEP);
                 const event: EventPayload = {
                   type: 'SEEK',
-                  meta: { to },
+                  meta: { to, type: 'backward' },
                 };
 
                 dispatch(sendEvent({ type: 'KEYBOARD_EVENT', meta: { event } }));
@@ -156,7 +145,7 @@ const addMiddleware = () =>
                 const to = Math.min(duration, (currentTime || 0) + FORWARD_REWIND_STEP);
                 const event: EventPayload = {
                   type: 'SEEK',
-                  meta: { to },
+                  meta: { to, type: 'forward' },
                 };
 
                 dispatch(sendEvent({ type: 'KEYBOARD_EVENT', meta: { event } }));

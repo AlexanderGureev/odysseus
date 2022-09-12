@@ -65,7 +65,6 @@ const adTimeNotify = createSlice({
             ...state,
             time: null,
             points: state.points.filter((p) => p.point !== point),
-            isVisible: false,
           };
         }
         default:

@@ -1,5 +1,6 @@
 import cn from 'classnames';
-import { AdSkin } from 'components/AdSkin';
+import { AdControls } from 'components/AdControls';
+import { AdDisableSuggestionNotice } from 'components/AdDisableSuggestionNotice';
 import { AdultConfirmationNotice } from 'components/AdultConfirmationNotice';
 import { Autoswitch } from 'components/Autoswitch';
 import { AutoswitchAvodPopup } from 'components/AutoswitchAvodPopup';
@@ -10,13 +11,15 @@ import { Embedding } from 'components/Controls/Menu/Embedding';
 import { Hotkeys } from 'components/Controls/Menu/Hotkeys';
 import { Sharing } from 'components/Controls/Menu/Sharing';
 import { ErrorManager } from 'components/ErrorManager';
+import { HotkeysNotice } from 'components/HotkeysNotice';
+import { Loader } from 'components/Loader';
 import { NetworkNotice } from 'components/NetworkNotice';
 import { Paywall } from 'components/Paywall';
 import { ResumeVideoNotice } from 'components/ResumeVideoNotice';
 import { SpashScreen } from 'components/SpashScreen';
 import { Modal } from 'components/UIKIT/Modal';
 import { Overlay } from 'components/UIKIT/Overlay';
-import { useAppDispatch, useAppSelector } from 'hooks';
+import { useAppDispatch, useAppSelector, useFeatures } from 'hooks';
 import { MenuProvider } from 'providers/MenuProvider';
 import React, { useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -53,7 +56,7 @@ const ModalContentByType: { [key in OverlayType]?: () => React.ReactElement | nu
 };
 
 const PlayerManager = () => {
-  const { step, isShowPlayerUI } = useAppSelector((state) => state.root);
+  const { step, isShowPlayerUI, theme: playerControlsTheme } = useAppSelector((state) => state.root);
   const isRenderControls = useAppSelector((state) =>
     Boolean(state.root.step === 'READY' && state.adController.step !== 'AD_BREAK' && state.playback.duration)
   );
@@ -67,12 +70,13 @@ const PlayerManager = () => {
   const networkRecovery = useAppSelector((state) => state.networkRecovery);
   const autoSwitch = useAppSelector((state) => state.autoSwitch);
   const isOverlay = useAppSelector((state) => state.overlay.step === 'READY');
+  const isAutoswitch = ['AUTOSWITCH_NOTIFY'].includes(autoSwitch.step);
+  const adDisableSuggestion = useAppSelector((state) => state.adDisableSuggestion);
+  const trialSuggestion = useAppSelector((state) => state.trialSuggestion);
+  const payNotify = useAppSelector((state) => state.payNotify);
+  const isUnmuteButton = useAppSelector((state) => state.volume.muted && !state.volume.unmuted);
 
-  const isTrialSuggestion = useAppSelector(
-    (state) =>
-      state.trialSuggestion.step === 'SHOWING_TRIAL_NOTICE' &&
-      state.trialSuggestion.notifyType === 'triggerBeforePauserolls'
-  );
+  const { CONTROLS = true } = useFeatures();
 
   const overlayType = useAppSelector((state) => state.overlay.overlayType);
   const OverlayContent = OverlayContentByType[overlayType];
@@ -83,11 +87,16 @@ const PlayerManager = () => {
       className={cn(
         'wrapper',
         theme,
+        `controls-theme-${playerControlsTheme}`,
         isFullscreen && 'fullscreen',
         isEmbedded && 'embedded',
         paywall.step === 'READY' && 'paywall',
-        autoSwitch.step === 'AUTOSWITCH_NOTIFY' && 'autoswitch',
-        isTrialSuggestion && 'trial-suggestion',
+        isAutoswitch && 'autoswitch',
+        payNotify.step === 'READY' && 'pay-notice',
+        isAutoswitch && autoSwitch.autoswitchNotifyType && `autoswitch-${autoSwitch.autoswitchNotifyType}`,
+        trialSuggestion.step === 'SHOWING_TRIAL_NOTICE' && 'trial-suggestion',
+        trialSuggestion.notifyType === 'triggerBeforePauserolls' && 'trial-suggestion-before-pauseroll',
+        isUnmuteButton && 'unmute-button',
         isOverlay && 'overlay',
         isMobile && 'mobile'
       )}>
@@ -95,7 +104,7 @@ const PlayerManager = () => {
         {isShowPlayerUI && (
           <>
             <Player>
-              <MenuProvider>{isRenderControls && <Controls />}</MenuProvider>
+              <MenuProvider>{isRenderControls && CONTROLS ? <Controls /> : null}</MenuProvider>
 
               {step === 'BIG_PLAY_BUTTON' && <BigPlayButton />}
 
@@ -109,9 +118,9 @@ const PlayerManager = () => {
 
               {splashscreen.step === 'SHOWING_SPLASHCREEN' && <SpashScreen data={splashscreen.screens} />}
 
-              {networkRecovery.step !== 'DISABLED' && <NetworkNotice />}
+              {networkRecovery.step !== 'DISABLED' && CONTROLS && <NetworkNotice />}
 
-              {autoSwitch.step === 'AUTOSWITCH_NOTIFY' ? (
+              {isAutoswitch ? (
                 autoSwitch.autoswitchNotifyType === 'avod_popup' ? (
                   <AutoswitchAvodPopup />
                 ) : (
@@ -119,10 +128,18 @@ const PlayerManager = () => {
                 )
               ) : null}
 
+              {adDisableSuggestion.step === 'SHOWING_AD_DISABLE_SUGGESTION' && (
+                <AdDisableSuggestionNotice content={adDisableSuggestion} />
+              )}
+
               <Overlay>{OverlayContent ? <OverlayContent /> : null}</Overlay>
               <Modal>{ModalContent ? <ModalContent /> : null}</Modal>
+              <HotkeysNotice />
+
+              <AdControls />
+
+              {CONTROLS && <Loader />}
             </Player>
-            <AdSkin />
           </>
         )}
       </ErrorManager>

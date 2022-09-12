@@ -28,6 +28,7 @@ export type Events = {
   play: () => void;
   pause: () => void;
   loadedmetadata: (payload: { duration: number }) => void;
+  volumechange: (payload: { volume: number; muted: boolean }) => void;
 };
 
 export type TPlayerService = {

@@ -55,7 +55,7 @@ export type ParsedConfigData = {
   params: TrackParams;
 };
 
-export type PlayerTheme = 'DEFAULT' | 'TRAILER';
+export type PlayerTheme = 'default' | 'trailer';
 
 export type EventsWithPayload =
   | WithoutPayload<

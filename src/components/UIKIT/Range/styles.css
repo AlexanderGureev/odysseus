@@ -10,7 +10,7 @@
 
   touch-action: none;
 
-  --hover-color: rgba(255, 255, 255, 0.6);
+  --hover-color: rgba(255, 255, 255, 0.4);
   --progress-color: #fe1717;
   --buffer-color: rgba(255, 255, 255, 0.5);
 

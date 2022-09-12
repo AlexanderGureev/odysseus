@@ -33,11 +33,23 @@ export const baseEvents = (
       postMessageService.emit('inited-player');
       break;
     case 'AD_INIT':
-      postMessageService.emit('launch-player');
+      const { theme } = getState().root;
+      postMessageService.emit('launch-player', {
+        payload: {
+          is_sub_button: theme === 'trailer',
+        },
+      });
       break;
 
-    case 'AUTO_PAUSE_RESOLVE':
     case 'DO_PAUSE':
+      if (!payload.isKeyboardEvent) {
+        postMessageService.emit('play_btn_click', {
+          payload: {
+            btn_type: 'pause',
+          },
+        });
+      }
+    case 'AUTO_PAUSE_RESOLVE':
     case 'SET_PAUSED':
       postMessageService.emit('paused', {
         time: playback.currentTime || 0,
@@ -76,12 +88,13 @@ export const baseEvents = (
       break;
 
     case 'DO_PLAY':
-    case 'DO_PAUSE':
-      postMessageService.emit('play_btn_click', {
-        payload: {
-          btn_type: payload.type === 'DO_PLAY' ? 'play' : 'pause',
-        },
-      });
+      if (!payload.isKeyboardEvent) {
+        postMessageService.emit('play_btn_click', {
+          payload: {
+            btn_type: 'play',
+          },
+        });
+      }
       break;
     case 'SET_VOLUME':
       const { value } = payload.payload;
@@ -108,15 +121,20 @@ export const baseEvents = (
       break;
     case 'CLICK_PAY_BUTTON':
       postMessageService.emit('button_disable_ad');
+      postMessageService.emit('pay_and_watch_button', {
+        payload: {
+          time_cursor: playback.currentTime || 0,
+        },
+      });
+      break;
     case 'CLICK_SUB_BUTTON':
       postMessageService.emit('pay_and_watch_button', {
         payload: {
           time_cursor: playback.currentTime || 0,
-          btn_type: undefined,
+          btn_type: payload.meta?.btn_type,
         },
       });
       break;
-
     case 'GO_TO_NEXT_TRACK':
     case 'GO_TO_PREV_TRACK': {
       const type = payload.type === 'GO_TO_PREV_TRACK' ? 'previous' : 'next';

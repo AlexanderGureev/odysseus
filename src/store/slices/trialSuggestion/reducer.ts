@@ -218,13 +218,14 @@ const addMiddleware = () =>
 
           const timeout = toNumber(getSettingByKey(getState(), 'suggestionDisplayDuration'));
 
-          if (timeout && timeout > 0) {
-            setTimeout(() => {
-              if (timerId !== getState().trialSuggestion.timerId) return;
+          // TODO FIX
+          // if (timeout && timeout > 0) {
+          //   setTimeout(() => {
+          //     if (timerId !== getState().trialSuggestion.timerId) return;
 
-              dispatch(sendEvent({ type: 'AUTO_CLOSE_TRIAL_NOTICE' }));
-            }, timeout * 1000);
-          }
+          //     dispatch(sendEvent({ type: 'AUTO_CLOSE_TRIAL_NOTICE' }));
+          //   }, timeout * 1000);
+          // }
         },
         CLICK_PAY_BUTTON_TRIAL_NOTICE_PROCESSING: () => {
           clickSubscribeButton(opts);

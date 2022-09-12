@@ -107,7 +107,7 @@ const addMiddleware = () =>
           const type = navigator?.connection?.type ?? null;
 
           if (type) {
-            navigator.connection.addEventListener('change', () => {
+            navigator.connection?.addEventListener('change', () => {
               dispatch(
                 sendEvent({
                   type: 'CHANGE_CONNECTION_TYPE',

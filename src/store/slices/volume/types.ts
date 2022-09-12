@@ -5,6 +5,7 @@ export type State =
   | 'SETUP_INITIAL_VOLUME'
   | 'CHANGE_MUTE_PENDING'
   | 'CHANGE_VOLUME_PENDING'
+  | 'INIT_VOLUME_SUBSCRIBERS'
   // ad
   | 'SYNC_VOLUME_PENDING'
   | 'CHANGE_VOLUME_AD_BLOCK_PENDING'
@@ -13,7 +14,7 @@ export type State =
 
 export type EventsWithPayload =
   | {
-      type: 'SET_INITIAL_VOLUME';
+      type: 'SET_INITIAL_VOLUME' | 'INIT_VOLUME_SUBSCRIBERS_RESOLVE';
     }
   | {
       type: 'SETUP_INITIAL_VOLUME_RESOLVE';
@@ -23,7 +24,7 @@ export type EventsWithPayload =
       };
     }
   | {
-      type: 'SET_MUTE';
+      type: 'SET_MUTE' | 'UPDATE_MUTE';
       payload: {
         value: boolean;
       };
@@ -34,7 +35,7 @@ export type EventsWithPayload =
         value: number;
       };
     }
-  | WithoutPayload<'CHANGE_MUTE_RESOLVE' | 'CHANGE_VOLUME_RESOLVE'>;
+  | WithoutPayload<'CHANGE_MUTE_RESOLVE' | 'CHANGE_VOLUME_RESOLVE' | 'CHECK_VOLUME_RESOLVE'>;
 
 export type Event = EventsWithPayload['type'];
 

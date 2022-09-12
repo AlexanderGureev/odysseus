@@ -8,6 +8,7 @@ export type State =
   | 'AUTOSWITCH_NOTIFY'
   | 'AUTOSWITCH_WAITING'
   | 'AUTOSWITCH_PENDING'
+  | 'AUTOSWITCH_NOTIFY_PAUSED'
   | 'SELECT_AUTOSWITCH_NOTIFY_TYPE'
   | 'DISABLED';
 
@@ -42,15 +43,18 @@ export type ActionPayload = DefaultPayload<Event> & EventsWithPayload;
 
 export type AutoswitchNotifyType = 'default' | 'avod_popup';
 
+export type AutoswitchType = 'notify' | 'auto' | null;
+
 export type FSMState = {
   step: State;
 
   controlType: 'project' | 'episode' | null;
-  autoswitchType: 'notify' | 'auto' | null;
+  autoswitchType: AutoswitchType;
   autoswitchPoint: number;
   countdown: number;
   countdownValue: number;
   thumbnail: string | null;
+  thumbnailText: string | null;
   buttonText: string | null;
   cancelButtonText: string | null;
   badge: Nullable<{ text: string | null; badgeColor: string; textColor: string }>;

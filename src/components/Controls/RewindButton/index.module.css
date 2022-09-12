@@ -30,6 +30,12 @@
   white-space: nowrap;
 }
 
+:global(.wrapper:not(.fullscreen).controls-theme-trailer) .backward,
+:global(.wrapper:not(.fullscreen).controls-theme-trailer) .forward {
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media (max-width: 599px) {
   .backward img,
   .forward img {

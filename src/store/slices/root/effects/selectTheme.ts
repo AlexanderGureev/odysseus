@@ -36,7 +36,7 @@ export const selectTheme = ({ getState, dispatch }: EffectOpts) => {
     sendEvent({
       type: 'SELECTING_PLAYER_THEME_RESOLVE',
       payload: {
-        theme: isTrailerTheme(getState()) ? 'TRAILER' : 'DEFAULT',
+        theme: isTrailerTheme(getState()) ? 'trailer' : 'default',
       },
     })
   );

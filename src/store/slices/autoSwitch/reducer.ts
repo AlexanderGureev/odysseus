@@ -9,7 +9,7 @@ import { AdCategory } from 'types/ad';
 import { isNil } from 'utils';
 import { logger } from 'utils/logger';
 
-import { FSMState, State } from './types';
+import { AutoswitchType, FSMState, State } from './types';
 import { getAutoswitchNotifyContent, selectAutoswitchNotifyType } from './utils';
 
 const initialState: FSMState = {
@@ -21,6 +21,7 @@ const initialState: FSMState = {
   countdown: -1,
   countdownValue: -1,
   thumbnail: null,
+  thumbnailText: null,
   buttonText: null,
   cancelButtonText: null,
   previousTime: null,
@@ -96,13 +97,18 @@ const autoSwitch = createSlice({
 
           if (isNil(data?.point) || isNil(data?.countdown) || !next) return { ...state, step: 'DISABLED' };
 
-          const autoswitchType = data.countdown === 0 ? 'auto' : 'notify';
+          let autoswitchType: AutoswitchType = data.countdown === 0 ? 'auto' : 'notify';
 
           if (autoswitchType === 'notify' && !NEXT_EPISODE_AUTOPLAY_SUGGEST) {
-            return { ...state, step: 'DISABLED' };
+            autoswitchType = 'auto';
           }
 
           if (autoswitchType === 'auto' && !NEXT_EPISODE_AUTOPLAY) {
+            return { ...state, step: 'DISABLED' };
+          }
+
+          const buttonText = data.project_poster ? data.caption_v2 : data.caption;
+          if (!buttonText) {
             return { ...state, step: 'DISABLED' };
           }
 
@@ -123,7 +129,8 @@ const autoSwitch = createSlice({
             countdown: data.countdown,
             countdownValue: data.countdown,
             thumbnail: data.project_poster || next.thumbnail || null,
-            buttonText: data.project_poster ? data.caption_v2 : data.caption,
+            thumbnailText: (!data.project_poster && next.caption) || null,
+            buttonText,
             cancelButtonText: skin === SkinClass.MORE_TV ? 'Смотреть титры' : 'Досмотреть',
             step: autoswitchType === 'auto' ? 'AUTOSWITCH_WAITING' : 'READY',
           };
@@ -145,8 +152,7 @@ const autoSwitch = createSlice({
             };
           }
 
-          if (currentTime >= 3) {
-            //state.autoswitchPoint
+          if (currentTime >= state.autoswitchPoint) {
             const diff = currentTime - previousTime;
             const countdownValue = state.countdownValue - diff;
 

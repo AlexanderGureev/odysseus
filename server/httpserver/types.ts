@@ -45,7 +45,7 @@ export type ValidatorOpts = {
 };
 
 export type ControllerOpts = ValidatorOpts & {
-  builder: <P, Q = qs.ParsedQs, ReqB = unknown, ResB = unknown>(
+  builder: <P extends Record<string, any>, Q extends Record<string, any> = qs.ParsedQs, ReqB = unknown, ResB = unknown>(
     opts: HandlerOpts<P, Q, ReqB, ResB>
   ) => EHandler<P, Q, ReqB, ResB>;
 };

@@ -53,3 +53,8 @@
   color: var(--text-color-87);
   bottom: 17px;
 }
+
+:global(.wrapper:not(.fullscreen).controls-theme-trailer) .progress {
+  opacity: 0;
+  pointer-events: none;
+}

@@ -7,6 +7,7 @@ export type EventsWithPayload =
       type: 'SEEK';
       meta: {
         to: number;
+        type?: 'backward' | 'forward';
       };
     }
   | {

@@ -24,6 +24,8 @@ import favouritesController from './slices/favouritesController/reducer';
 import fullscreen from './slices/fullscreen/reducer';
 import heartbeat from './slices/heartbeat/reducer';
 import hotkeys from './slices/hotkeys/reducer';
+import hotkeysNotice from './slices/hotkeysNotice/reducer';
+import loader from './slices/loader/reducer';
 import mediaSession from './slices/mediaSession/reducer';
 import network from './slices/network/reducer';
 import networkRecovery from './slices/networkRecovery/reducer';
@@ -43,6 +45,7 @@ import rewind from './slices/rewind/reducer';
 import rewindAcc from './slices/rewindAcc/reducer';
 import root from './slices/root/reducer';
 import splashscreen from './slices/splashscreen/reducer';
+import trailerSubNotice from './slices/trailerSubNotice/reducer';
 import trialSuggestion from './slices/trialSuggestion/reducer';
 import visibility from './slices/visibility/reducer';
 import volume from './slices/volume/reducer';
@@ -66,6 +69,7 @@ sendEvent(type: "DO_INIT", payload: {}, meta: {})
 */
 
 const rootReducer = combineReducers({
+  loader: loader.reducer,
   //  обработка экспериментов от веба
   experiments: experiments.reducer,
   // прослушивание событий приложения и отправка событий в различные системы аналитики
@@ -78,6 +82,10 @@ const rootReducer = combineReducers({
   adDisableSuggestion: adDisableSuggestion.reducer,
   // экрана 18+
   adultNotify: adultNotify.reducer,
+  trailerSubNotice: trailerSubNotice.reducer,
+  hotkeysNotice: hotkeysNotice.reducer,
+  // управление звуком на рекламе и основном видео
+  volume: volume.reducer,
   /* 
   корневой автомат, точка входа в приложение:
   1) парсинг конфига
@@ -120,8 +128,6 @@ const rootReducer = combineReducers({
   autoSwitch: autoSwitch.reducer,
   // управление скоростью воспроизведения
   playbackSpeed: playbackSpeed.reducer,
-  // управление звуком на рекламе и основном видео
-  volume: volume.reducer,
   // детекция видимости страницы
   visibility: visibility.reducer,
   // управление полноэкранным режимом
@@ -163,6 +169,8 @@ adBanner.addMiddleware();
 trialSuggestion.addMiddleware();
 adDisableSuggestion.addMiddleware();
 adultNotify.addMiddleware();
+trailerSubNotice.addMiddleware();
+volume.addMiddleware();
 
 root.addMiddleware();
 resumeVideo.addMiddleware();
@@ -183,7 +191,6 @@ offlineMode.addMiddleware();
 changeTrack.addMiddleware();
 autoSwitch.addMiddleware();
 playbackSpeed.addMiddleware();
-volume.addMiddleware();
 visibility.addMiddleware();
 fullscreen.addMiddleware();
 resumeVideoNotify.addMiddleware();

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { isMobile } from 'react-device-detect';
 import { off, on } from 'utils';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,7 +10,7 @@ export const useMenuState = (ref: React.RefObject<Element>, leaveDelay = 200) =>
   const { state, setState } = useMenu();
 
   const close = useCallback(() => {
-    setState((s) => ({ ...s, [id.current]: 'leave' }));
+    setState((s) => ({ ...s, [id.current]: s[id.current] ? 'leave' : null }));
   }, [setState]);
 
   useEffect(() => {
@@ -38,12 +39,20 @@ export const useMenuState = (ref: React.RefObject<Element>, leaveDelay = 200) =>
       }, leaveDelay);
     };
 
+    const onTouchStart = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        close();
+      }
+    };
+
     on(ref.current, 'mouseenter', onEnter);
     on(ref.current, 'mouseleave', onLeave);
+    if (isMobile) on(document, 'touchstart', onTouchStart);
 
     return () => {
       off(ref.current, 'mouseenter', onEnter);
       off(ref.current, 'mouseleave', onLeave);
+      if (isMobile) off(document, 'touchstart', onTouchStart);
     };
   }, [leaveDelay, ref, setState, close]);
 

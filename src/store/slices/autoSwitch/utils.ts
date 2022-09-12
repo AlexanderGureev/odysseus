@@ -49,6 +49,6 @@ export const getAutoswitchNotifyContent = (state: AppState, type: AutoswitchNoti
   return {
     autoswitchNotifyText,
     buttonText: 'Продолжить с рекламой',
-    cancelButtonText: 'Отключить бесплатно',
+    cancelButtonText: 'Отключить рекламу',
   };
 };

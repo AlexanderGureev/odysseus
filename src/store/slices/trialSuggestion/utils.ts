@@ -57,7 +57,7 @@ export const getContentByTrigger = (state: AppState, trigger: TS_TRIGGER) => {
     notify: {
       title: null,
       description: `Хочешь смотреть без рекламы?<br>Оформи ${text} подписки бесплатно`,
-      payButtonText: `Отключить рекламу ${state.fullscreen.step === 'FULLSCREEN' ? 'бесплатно' : ''}`,
+      payButtonText: `Отключить рекламу`,
       closeButtonText: null,
     },
     modal: {

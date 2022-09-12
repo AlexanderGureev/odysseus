@@ -43,6 +43,10 @@
   border-radius: 4px;
 }
 
+.wrapper:not(.theme-more-tv) .button::before {
+  border-radius: 4px;
+}
+
 .copy-btn {
   position: relative;
   padding: 10px 25px 12px;

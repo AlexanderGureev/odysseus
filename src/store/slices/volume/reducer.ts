@@ -17,14 +17,21 @@ const initialState: FSMState = {
 
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
+    DO_INIT: 'INIT_VOLUME_SUBSCRIBERS',
+
     SET_INITIAL_VOLUME: 'SETUP_INITIAL_VOLUME',
     SET_MUTE: 'CHANGE_MUTE_PENDING',
     SET_VOLUME: 'CHANGE_VOLUME_PENDING',
+    UPDATE_MUTE: 'CHANGE_MUTE_PENDING',
 
     SYNC_VOLUME: 'SYNC_VOLUME_PENDING', // синхронизация звука на рекламе с видеотегом
     SET_MUTE_AD_BLOCK: 'CHANGE_MUTE_AD_BLOCK_PENDING', // изменение мюта на рекламе через наш скин
     SET_VOLUME_AD_BLOCK: 'CHANGE_VOLUME_AD_BLOCK_PENDING', // изменение звука на рекламе через наш скин
     UPDATE_VOLUME_AD_BLOCK: 'UPDATE_VOLUME_AD_BLOCK_PENDING', // изменение звука через рекламный скин
+  },
+
+  INIT_VOLUME_SUBSCRIBERS: {
+    INIT_VOLUME_SUBSCRIBERS_RESOLVE: 'IDLE',
   },
 
   // video
@@ -71,16 +78,19 @@ const volume = createSlice({
       switch (type) {
         case 'SET_MUTE_AD_BLOCK':
         case 'SET_MUTE':
+        case 'UPDATE_MUTE':
           state.step = step;
           state.muted = payload.value;
           if (!payload.value) state.unmuted = true;
           break;
+
         case 'SET_VOLUME_AD_BLOCK':
         case 'SET_VOLUME':
+          const volume = Number(payload.value.toFixed(2));
           state.step = step;
-          state.volume = payload.value;
-          state.muted = payload.value === 0;
-          if (payload.value > 0) state.unmuted = true;
+          state.volume = volume;
+          state.muted = volume === 0;
+          if (volume > 0) state.unmuted = true;
           break;
         default:
           return { ...state, step, ...payload };
@@ -106,6 +116,21 @@ const addMiddleware = () =>
       const { step } = getState().volume;
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
+        INIT_VOLUME_SUBSCRIBERS: () => {
+          // Для ios в фулскрине
+          services.playerService.on('volumechange', ({ muted }) => {
+            const {
+              volume: { muted: current },
+            } = getState();
+
+            if (current !== muted) {
+              dispatch(sendEvent({ type: 'UPDATE_MUTE', payload: { value: muted } }));
+            }
+          });
+
+          dispatch(sendEvent({ type: 'INIT_VOLUME_SUBSCRIBERS_RESOLVE' }));
+        },
+
         SETUP_INITIAL_VOLUME: () => {
           const {
             permissions: { mute },

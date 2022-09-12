@@ -1,5 +1,6 @@
 import { Experiments } from '@moretv/types';
 import { OnceSubscribe, Subscribe, Unsubscribe } from 'services/MediatorService/types';
+import { SubButtonType } from 'store/slices/paywall';
 import { TS_TRIGGER } from 'store/slices/trialSuggestion/utils';
 import { TLinkedTrackConfig, TLinkedTracks } from 'types';
 import { AdCategory } from 'types/ad';
@@ -64,7 +65,7 @@ export type OutputEvents = {
 
   rewound: (data: { time: number; previousTime: number }) => void;
   adShown: (data: { time: number }) => void;
-  pay_and_watch_button: (data: Payload<{ time_cursor: number; btn_type?: 'about' }>) => void;
+  pay_and_watch_button: (data: Payload<{ time_cursor: number; btn_type?: SubButtonType }>) => void;
 
   // subscription_restore: () => void;
 
@@ -72,7 +73,7 @@ export type OutputEvents = {
   'enter-full-screen': () => void;
   show_payment_popup: () => void;
   button_disable_ad: () => void;
-  'launch-player': (data: Payload<{ volume: number; is_sub_button: boolean }>) => void;
+  'launch-player': (data: Payload<{ volume?: number; is_sub_button?: boolean }>) => void;
   play: (data: Payload<{ videosession_id: string; track_id: number | null }>) => void;
   view: (data: Payload<{ videosession_id: string; track_id: number | null }>) => void;
   watchpoint: (

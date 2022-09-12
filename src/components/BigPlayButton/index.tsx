@@ -1,4 +1,4 @@
-import controlPlayIcon from 'assets/sprite/icons-web-player-control-play-m.svg';
+import controlPlayIcon from 'assets/icons/icons-web-player-control-play-m.svg';
 import { useAppDispatch, useAppSelector } from 'hooks';
 import React from 'react';
 import { sendEvent } from 'store';

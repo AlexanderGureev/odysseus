@@ -1,0 +1,36 @@
+.countdown {
+  composes: fade-in from global;
+
+  position: absolute;
+  right: 20px;
+  bottom: 64px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.54;
+  text-align: right;
+  color: #e6e6e6;
+  width: 160px;
+  user-select: none;
+  transition: var(--default-transition);
+}
+
+:global(.volume-range-active) .countdown,
+:global(.trial-suggestion) .countdown {
+  opacity: 0 !important;
+}
+
+@media (max-width: 599px) {
+  .countdown {
+    font-size: 12px;
+    left: 16px;
+    text-align: left;
+    width: 40%;
+    height: 32px;
+    display: flex;
+    align-items: center;
+  }
+
+  :global(.unmute-button.mobile) .countdown {
+    bottom: 114px;
+  }
+}

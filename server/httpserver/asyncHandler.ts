@@ -17,7 +17,9 @@ export const asyncHandler =
 
 export const createBuilder =
   (validateOpts: ValidatorOpts) =>
-  <P, Q = qs.ParsedQs, ReqB = unknown, ResB = unknown>(opts: HandlerOpts<P, Q, ReqB, ResB>) =>
+  <P extends Record<string, any>, Q extends Record<string, any> = qs.ParsedQs, ReqB = unknown, ResB = unknown>(
+    opts: HandlerOpts<P, Q, ReqB, ResB>
+  ) =>
   (req: Request<P, ResB, ReqB, Q>, res: Response, next: NextFunction) => {
     const isValidate = opts.isValidate ?? true;
 

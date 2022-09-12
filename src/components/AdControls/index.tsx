@@ -4,7 +4,7 @@ import React from 'react';
 
 import Styles from './index.module.css';
 
-const AdSkin = () => {
+const AdControls = () => {
   const { step } = useAppSelector((state) => state.adController);
 
   return (
@@ -17,4 +17,4 @@ const AdSkin = () => {
   );
 };
 
-export { AdSkin };
+export { AdControls };

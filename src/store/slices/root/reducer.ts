@@ -61,12 +61,10 @@ const config: FSMConfig<State, AppEvent> = {
   },
   // парсинг raw конфига от сервера
   PARSE_CONFIG_PENDING: {
-    PARSE_CONFIG_RESOLVE: 'SELECTING_PLAYER_THEME',
+    PARSE_CONFIG_RESOLVE: 'RENDER',
     PARSE_CONFIG_REJECT: 'ERROR',
   },
-  SELECTING_PLAYER_THEME: {
-    SELECTING_PLAYER_THEME_RESOLVE: 'RENDER',
-  },
+
   // первый render приложения
   RENDER: {
     SET_STATE: null,
@@ -74,8 +72,12 @@ const config: FSMConfig<State, AppEvent> = {
   },
   // инициализация playService (videojs)
   PLAYER_INIT_PENDING: {
-    PLAYER_INIT_RESOLVE: 'INIT_ANALYTICS_PENDING',
+    PLAYER_INIT_RESOLVE: 'CHECK_PERMISSIONS_PENDING',
     PLAYER_INIT_REJECT: 'ERROR',
+  },
+  // проверка прав на запуск (autoplay, mute)
+  CHECK_PERMISSIONS_PENDING: {
+    CHECK_PERMISSIONS_RESOLVE: 'INIT_ANALYTICS_PENDING',
   },
   // инициализация аналитических сервисов (ym, google, amberdata...)
   INIT_ANALYTICS_PENDING: {
@@ -107,13 +109,9 @@ const config: FSMConfig<State, AppEvent> = {
   },
   // проверка на необходимость показа экрана "продолжить просмотр"
   CHECK_RESUME_VIDEO: {
-    RESUME_VIDEO_NOTIFY_RESOLVE: 'CHECK_PERMISSIONS_PENDING',
-    RESUME_VIDEO_NOTIFY_REJECT: 'CHECK_PERMISSIONS_PENDING',
-    SKIP_RESUME_VIDEO_NOTIFY: 'CHECK_PERMISSIONS_PENDING',
-  },
-  // проверка прав на запуск (autoplay, mute)
-  CHECK_PERMISSIONS_PENDING: {
-    CHECK_PERMISSIONS_RESOLVE: 'INITIAL_SELECT_SOURCE_PENDING',
+    RESUME_VIDEO_NOTIFY_RESOLVE: 'INITIAL_SELECT_SOURCE_PENDING',
+    RESUME_VIDEO_NOTIFY_REJECT: 'INITIAL_SELECT_SOURCE_PENDING',
+    SKIP_RESUME_VIDEO_NOTIFY: 'INITIAL_SELECT_SOURCE_PENDING',
   },
 
   // первичный выбор потока
@@ -129,17 +127,11 @@ const config: FSMConfig<State, AppEvent> = {
     QUALITY_INITIALIZATION_RESOLVE: 'SETUP_INITIAL_VOLUME',
     QUALITY_INITIALIZATION_REJECT: 'ERROR',
   },
-  // выбор другого доступного потока в случае ошибок
-  SELECT_SOURCE_PENDING: {
-    SELECT_SOURCE_RESOLVE: 'FETCHING_MANIFEST',
-    SELECT_SOURCE_ERROR: 'ERROR',
-  },
-  FETCHING_MANIFEST: {
-    FETCHING_MANIFEST_RESOLVE: 'RESUME_VIDEO_PENDING',
-    FETCHING_MANIFEST_REJECT: 'ERROR',
-  },
   SETUP_INITIAL_VOLUME: {
-    SETUP_INITIAL_VOLUME_RESOLVE: 'CHECK_AUTOPLAY',
+    SETUP_INITIAL_VOLUME_RESOLVE: 'SELECTING_PLAYER_THEME',
+  },
+  SELECTING_PLAYER_THEME: {
+    SELECTING_PLAYER_THEME_RESOLVE: 'CHECK_AUTOPLAY',
   },
   CHECK_AUTOPLAY: {
     CHECK_AUTOPLAY_RESOLVE: 'AD_INIT_PENDING',
@@ -148,10 +140,19 @@ const config: FSMConfig<State, AppEvent> = {
   BIG_PLAY_BUTTON: {
     CLICK_BIG_PLAY_BUTTON: 'AD_INIT_PENDING',
   },
-
   // передаем управление рекламному fsm и играем pre_roll если он есть
   AD_INIT_PENDING: {
     RESUME_VIDEO: 'RESUME_VIDEO_PENDING',
+  },
+
+  // выбор другого доступного потока в случае ошибок
+  SELECT_SOURCE_PENDING: {
+    SELECT_SOURCE_RESOLVE: 'FETCHING_MANIFEST',
+    SELECT_SOURCE_ERROR: 'ERROR',
+  },
+  FETCHING_MANIFEST: {
+    FETCHING_MANIFEST_RESOLVE: 'RESUME_VIDEO_PENDING',
+    FETCHING_MANIFEST_REJECT: 'ERROR',
   },
 
   // начать воспроизведение основного контента
@@ -179,7 +180,7 @@ const config: FSMConfig<State, AppEvent> = {
 
 const initialState: FSMState = {
   step: 'IDLE',
-  theme: 'DEFAULT',
+  theme: 'default',
 
   config: {} as TExtendedConfig,
   adConfig: null,

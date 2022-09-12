@@ -1,0 +1,33 @@
+.wrapper {
+  composes: fade-in from global;
+
+  position: absolute;
+  top: 78px;
+  width: 100%;
+  display: none;
+}
+
+.active {
+  display: block;
+}
+
+.banner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:global(.fullscreen) .wrapper {
+  top: initial;
+  bottom: 140px;
+}
+
+:global(.controls-theme-trailer) .wrapper,
+:global(.trial-suggestion-before-pauseroll) .wrapper {
+  display: none;
+}
+
+:global(.fullscreen.trial-suggestion) .wrapper {
+  bottom: 160px;
+}

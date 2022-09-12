@@ -16,6 +16,7 @@ import { Events, Hooks, HookType, PLAYER_TYPE, PlayerHooks, SetSourceOpts, TStat
 
 const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
   let player: VideoJsPlayer;
+  let videoNode: HTMLVideoElement;
   let state: TState = {
     src: null,
     currentTime: 0,
@@ -89,6 +90,8 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
   const getPlayer = () => player;
 
   const intitializePlayer = (playerId: string, options: VideoJsPlayerOptions) => {
+    videoNode = document.getElementById(playerId) as HTMLVideoElement;
+
     return videojs(playerId, {
       preload: 'metadata',
       controls: false,
@@ -131,7 +134,9 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
         waiting: () => mediator.emit('waiting'),
         canplay: () => mediator.emit('canplay'),
         ratechange: () => mediator.emit('ratechange', getPlaybackRate()),
-        fullscreenchange: () => mediator.emit('fullscreenchange', isFullscreen()),
+        fullscreenchange: () => {
+          mediator.emit('fullscreenchange', isFullscreen());
+        },
         play: () => mediator.emit('play'),
         pause: () => mediator.emit('pause'),
         progress: () =>
@@ -152,6 +157,9 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
         },
         loadedmetadata: () => {
           mediator.emit('loadedmetadata', { duration: player.duration() });
+        },
+        volumechange: () => {
+          mediator.emit('volumechange', { volume: videoNode.volume, muted: videoNode.muted });
         },
       };
 

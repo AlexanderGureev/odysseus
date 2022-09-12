@@ -1,11 +1,10 @@
 import volumeOff from 'assets/sprite/icons-app-player-volume-off.svg';
-import unmuteIcon from 'assets/sprite/icons-web-player-sound-off-in-circle.svg';
 import volumeHigh from 'assets/sprite/icons-web-player-sound-on-high.svg';
 import volumeLow from 'assets/sprite/icons-web-player-sound-on-low.svg';
 import cn from 'classnames';
 import { Range } from 'components/UIKIT/Range';
 import { useAppDispatch, useAppSelector } from 'hooks';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { sendEvent } from 'store';
 
 import Styles from './index.module.css';
@@ -25,7 +24,9 @@ export const UnmuteButton = () => {
   );
 };
 
-export const SetupVolume = () => {
+export const SetupVolume: React.FC<{ onVisibleVolumeChange?: (status: boolean) => void }> = ({
+  onVisibleVolumeChange,
+}) => {
   const dispatch = useAppDispatch();
   const { muted, volume } = useAppSelector((state) => state.volume);
   const [isDrag, setIsDrag] = useState(false);
@@ -38,8 +39,20 @@ export const SetupVolume = () => {
     dispatch(sendEvent({ type: 'SET_MUTE', payload: { value: !muted } }));
   };
 
+  useEffect(() => {
+    onVisibleVolumeChange?.(isDrag);
+  }, [onVisibleVolumeChange, isDrag]);
+
   return (
-    <div className={cn(Styles.volume, isDrag && Styles.dragging)}>
+    <div
+      className={cn(Styles.volume, isDrag && Styles.dragging)}
+      onMouseEnter={() => {
+        onVisibleVolumeChange?.(true);
+      }}
+      onMouseLeave={() => {
+        if (isDrag) return;
+        onVisibleVolumeChange?.(false);
+      }}>
       <Range
         direction="vertical"
         ariaLabel="volume slider"

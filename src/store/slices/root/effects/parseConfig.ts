@@ -82,7 +82,7 @@ const createAdConfig = (ad: TRawAdConfig, playlist: TRawPlaylist) => {
 const createFeaturesConfig = (isEmbedded: boolean, { base, embedded }: THydraResponse) => {
   const features = isEmbedded ? { ...base, ...embedded } : base;
   features.SUBSCRIPTION_TITLE =
-    features.SUBSCRIPTION_TITLE || isEmbedded ? EMBEDED_SUBSCRIPTION_TITLE : BASE_SUBSCRIPTION_TITLE;
+    features.SUBSCRIPTION_TITLE || (isEmbedded ? EMBEDED_SUBSCRIPTION_TITLE : BASE_SUBSCRIPTION_TITLE);
 
   return Object.entries(features).reduce(
     (acc: TParsedFeatures, [key, value]) => ({

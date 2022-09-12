@@ -22,6 +22,8 @@ import * as favouritesController from './slices/favouritesController';
 import * as fullscreen from './slices/fullscreen';
 import * as heartbeat from './slices/heartbeat';
 import * as hotkeys from './slices/hotkeys';
+import * as hotkeysNotice from './slices/hotkeysNotice';
+import * as loader from './slices/loader';
 import * as mediaSession from './slices/mediaSession';
 import * as network from './slices/network';
 import * as networkRecovery from './slices/networkRecovery';
@@ -41,6 +43,7 @@ import * as rewind from './slices/rewind';
 import * as rewindAcc from './slices/rewindAcc';
 import * as root from './slices/root';
 import * as splashscreen from './slices/splashscreen';
+import * as trailerSubNotice from './slices/trailerSubNotice';
 import * as trialSuggestion from './slices/trialSuggestion';
 import * as updater from './slices/updater';
 import * as visibility from './slices/visibility';
@@ -118,7 +121,10 @@ export type EventPayload =
   | errorReports.ActionPayload
   | adDisableSuggestion.ActionPayload
   | overlay.ActionPayload
-  | errorReportsForm.ActionPayload;
+  | errorReportsForm.ActionPayload
+  | loader.ActionPayload
+  | trailerSubNotice.ActionPayload
+  | hotkeysNotice.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -166,4 +172,7 @@ export type AppEvent =
   | errorReports.Event
   | adDisableSuggestion.Event
   | overlay.Event
-  | errorReportsForm.Event;
+  | errorReportsForm.Event
+  | loader.Event
+  | trailerSubNotice.Event
+  | hotkeysNotice.Event;

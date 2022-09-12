@@ -118,15 +118,7 @@ export const initialize = async (opts: EffectOpts) => {
   const {
     getState,
     dispatch,
-    services: {
-      embeddedCheckService,
-      sauronService,
-      postMessageService,
-      horusService,
-      localStorageService,
-      favouritesService,
-      dbService,
-    },
+    services: { embeddedCheckService, sauronService, horusService, localStorageService, favouritesService, dbService },
   } = opts;
 
   try {

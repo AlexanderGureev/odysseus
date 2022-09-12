@@ -5,7 +5,9 @@ const DEFAULT_DELAY = 300;
 
 export const dbclick = (node: Element, callback: () => void): (() => void) => {
   let timer: Nullable<NodeJS.Timeout> = null;
-  const subscriber = () => {
+  const subscriber = (e: MouseEvent) => {
+    if (e.target !== e.currentTarget) return;
+
     if (timer) {
       clearTimeout(timer);
       timer = null;

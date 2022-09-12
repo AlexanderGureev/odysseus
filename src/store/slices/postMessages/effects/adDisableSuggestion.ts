@@ -12,7 +12,7 @@ export const adDisableSuggestion = (
     adDisableSuggestion,
   } = getState();
 
-  if (adDisableSuggestion.step === 'DISABLED') return;
+  if (!['SHOWING_AD_DISABLE_SUGGESTION', 'READY'].includes(adDisableSuggestion.step)) return;
 
   switch (payload.type) {
     case 'CLICK_CLOSE_AD_DISABLE_SUGGESTION':

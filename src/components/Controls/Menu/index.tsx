@@ -25,7 +25,7 @@ export const Menu = () => {
   const errorReports = useAppSelector((state) => state.errorReports);
   const isMobile = useMediaQuery('(max-width: 428px)');
 
-  const { COMPLAINT_LIMIT_TIME } = useFeatures();
+  const { COMPLAINT_LIMIT_TIME, SHARING } = useFeatures();
   const { getItemByDomain } = useLocalStorage();
 
   const isComplainDisabled = useCallback(() => {
@@ -89,11 +89,13 @@ export const Menu = () => {
       title: 'Поделиться',
       value: 'sharing',
     },
-    {
-      icon: embedIcon,
-      title: 'Код вставки',
-      value: 'embedding',
-    },
+    SHARING
+      ? {
+          icon: embedIcon,
+          title: 'Код вставки',
+          value: 'embedding',
+        }
+      : null,
     !isMobile
       ? {
           icon: hotkeysIcon,

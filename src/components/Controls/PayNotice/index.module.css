@@ -1,4 +1,6 @@
 .notice {
+  composes: fade-in from global;
+
   position: absolute;
   left: 0;
   bottom: 64px;
@@ -32,6 +34,10 @@
   padding: 12px 24px;
   font-weight: 600;
   border-radius: 14px;
+}
+
+:global(.trial-suggestion) .notice {
+  display: none;
 }
 
 @media (max-width: 667px) {

@@ -1,0 +1,123 @@
+.wrapper {
+  composes: fade-in from global;
+
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 64px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 24px;
+  user-select: none;
+}
+
+.container {
+  position: relative;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.close-wrapper {
+  padding: 4px;
+  opacity: 1;
+  position: absolute;
+  right: -14px;
+  top: -14px;
+  cursor: pointer;
+  display: flex;
+}
+
+.close {
+  width: 28px;
+  height: 28px;
+  padding: 6px;
+  box-sizing: border-box;
+  background-color: #2b2b2b;
+  border-radius: 100%;
+}
+
+.close:hover {
+  opacity: 1;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.description {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.87);
+  white-space: nowrap;
+  width: 360px;
+  margin-right: 24px;
+}
+
+.cancel-btn {
+  padding: 11px 14px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.71px;
+  border-radius: 12px;
+}
+
+:global(.fullscreen) .close {
+  background-color: #404040;
+}
+
+@media (max-width: 1025px) {
+  .description {
+    width: 320px;
+  }
+
+  :global(.fullscreen) .description {
+    width: 260px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 599px) {
+  :global(.embedded) .wrapper,
+  :global(.fullscreen) .wrapper {
+    border-radius: 5px;
+    box-shadow: 0 6px 25px 0 rgba(0, 0, 0, 0.75);
+    background-color: #2b2b2b;
+    width: calc(100% - 16px);
+    bottom: 8px;
+    box-sizing: border-box;
+    z-index: 1;
+
+    flex-direction: column;
+    align-items: start;
+    padding: 16px 20px;
+  }
+
+  :global(.embedded) .description,
+  :global(.fullscreen) .description {
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+
+  :global(.embedded) .close-wrapper,
+  :global(.fullscreen) .close-wrapper {
+    right: -10px;
+    top: -12px;
+  }
+
+  :global(.wrapper:not(.embedded):not(.fullscreen)) .wrapper {
+    display: none;
+  }
+}

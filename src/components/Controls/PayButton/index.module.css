@@ -1,0 +1,52 @@
+.wrapper {
+  composes: fade-in from global;
+
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 64px;
+  user-select: none;
+}
+
+.button {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 12px 19px;
+  border-radius: 14px;
+  opacity: 0;
+  transition: var(--default-transition);
+}
+
+:global(.pay-notice) .wrapper,
+:global(.trial-suggestion) .wrapper {
+  display: none;
+}
+
+:global(.controls-visible) .button {
+  opacity: 1;
+}
+
+@media (max-width: 599px) {
+  .wrapper {
+    left: initial;
+    transform: none;
+    right: 16px;
+  }
+
+  .button {
+    font-size: 10px;
+    padding: 9px 14px;
+    border-radius: 12px;
+  }
+
+  :global(.wrapper:not(.embedded)) .wrapper {
+    display: none;
+  }
+}
+
+@media (max-width: 375px) {
+  .button {
+    font-size: 8px;
+    padding: 9px 10px;
+  }
+}

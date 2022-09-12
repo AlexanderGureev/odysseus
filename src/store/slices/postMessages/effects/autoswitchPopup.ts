@@ -12,7 +12,7 @@ export const autoswitchPopup = (
     autoSwitch,
   } = getState();
 
-  if (autoSwitch.autoswitchNotifyType !== 'avod_popup') return;
+  if (autoSwitch.step !== 'AUTOSWITCH_NOTIFY') return;
 
   switch (payload.type) {
     case 'HIDE_AUTOSWITCH_NOTIFY':
@@ -32,19 +32,21 @@ export const autoswitchPopup = (
       }
       break;
     case 'CLICK_SUB_BUTTON':
-      const isTrial = getStatusTrialSelector(getState());
-      postMessageService.emit('on_close_off_ads_experiment');
-      postMessageService.emit('BI', {
-        payload: {
-          page: 'player',
-          block: 'nv_avod_popup',
-          event_type: 'click',
-          event_name: 'button',
-          event_value: isTrial ? 'buy_trial' : 'buy_subscription',
-          project_id: config.config.project_id,
-          track_id: meta.trackId,
-        },
-      });
+      if (autoSwitch.autoswitchNotifyType === 'avod_popup') {
+        const isTrial = getStatusTrialSelector(getState());
+        postMessageService.emit('on_close_off_ads_experiment');
+        postMessageService.emit('BI', {
+          payload: {
+            page: 'player',
+            block: 'nv_avod_popup',
+            event_type: 'click',
+            event_name: 'button',
+            event_value: isTrial ? 'buy_trial' : 'buy_subscription',
+            project_id: config.config.project_id,
+            track_id: meta.trackId,
+          },
+        });
+      }
       break;
     case 'START_AUTOSWITCH':
       postMessageService.emit('on_close_off_ads_experiment');
