@@ -11,11 +11,11 @@ const DEFAULT_SYNC_TIMEOUT = 2000;
 
 export const startNextBlock = async ({ getState, dispatch, services: { adService, playerService } }: EffectOpts) => {
   const {
-    adBlock: { point, index },
+    adBlock: { adPoint, index },
     adController: { isStarted },
   } = getState();
 
-  const currentBlock = adService.getBlock(point, index);
+  const currentBlock = adService.getBlock(adPoint, index);
   let error = null;
   let isSyncPhase = true;
   let isSynced = false;
@@ -37,6 +37,7 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
         type: 'SET_ADFOX_PARAMS',
         payload: {
           adFoxParams: currentBlock.getAdFoxParams(),
+          isYandexCreative: currentBlock.isYandexCreative(),
         },
       })
     );

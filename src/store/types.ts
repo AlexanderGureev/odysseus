@@ -13,6 +13,7 @@ import * as autoSwitch from './slices/autoSwitch';
 import * as beholder from './slices/beholder';
 import * as buffering from './slices/buffering';
 import * as changeTrack from './slices/changeTrack';
+import * as debug from './slices/debug';
 import * as error from './slices/error';
 import * as errorReports from './slices/errorReports';
 import * as errorReportsForm from './slices/errorReportsForm';
@@ -124,7 +125,8 @@ export type EventPayload =
   | errorReportsForm.ActionPayload
   | loader.ActionPayload
   | trailerSubNotice.ActionPayload
-  | hotkeysNotice.ActionPayload;
+  | hotkeysNotice.ActionPayload
+  | debug.ActionPayload;
 
 export type AppEvent =
   | root.Event
@@ -175,4 +177,5 @@ export type AppEvent =
   | errorReportsForm.Event
   | loader.Event
   | trailerSubNotice.Event
-  | hotkeysNotice.Event;
+  | hotkeysNotice.Event
+  | debug.Event;

@@ -9,13 +9,17 @@ import { MenuProps } from './types';
 export const Menu = <T extends object, V>(props: React.PropsWithChildren<MenuProps<T, V>>) => {
   const ref = useRef<HTMLDivElement>(null);
   const { state, close } = useMenuState(ref, isMobile ? 0 : 500);
-  const [indexes, setSubIndex] = useState<number[]>([]);
+  const [ids, setSubMenu] = useState<string[]>([]);
 
-  const sub = indexes.reduce((acc: MenuProps<T, V> | undefined, idx) => acc?.items?.[idx]?.subMenu, props);
+  const sub = ids.reduce(
+    (acc: MenuProps<T, V> | undefined, id) => acc?.items?.find((i) => i.id === id)?.subMenu,
+    props
+  );
+
   const { items, onSelect, selected = null, closeOnSelect = false, onOpen, onClick } = sub || props;
 
   const onAnimationEnd = useCallback(() => {
-    if (state === 'leave') setSubIndex([]);
+    if (state === 'leave') setSubMenu([]);
   }, [state]);
 
   useEffect(() => {
@@ -28,7 +32,7 @@ export const Menu = <T extends object, V>(props: React.PropsWithChildren<MenuPro
       className={cn(Styles.container, { [Styles.selectable]: selected !== null })}
       onAnimationEnd={onAnimationEnd}>
       <div className={cn(Styles.menu, Styles[`${state}`])}>
-        {items.map(({ title, icon, value, selectedTitle, subMenu, disabled = false }, index) => {
+        {items.map(({ id, title, icon, value, selectedTitle, subMenu, disabled = false }, index) => {
           return (
             <div
               key={title}
@@ -41,7 +45,7 @@ export const Menu = <T extends object, V>(props: React.PropsWithChildren<MenuPro
 
                 if (selected === value) return;
 
-                if (subMenu) setSubIndex((p) => [...p, index]);
+                if (subMenu) setSubMenu((p) => [...p, id]);
                 else {
                   onSelect?.(items[index] as T);
                   if (closeOnSelect) close();

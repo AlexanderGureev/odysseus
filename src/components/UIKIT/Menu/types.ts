@@ -13,6 +13,7 @@ export type SubMenu<T, V> = {
 };
 
 export type MenuItem<T, V> = {
+  id: string;
   icon?: string;
   title: string;
   value?: V;

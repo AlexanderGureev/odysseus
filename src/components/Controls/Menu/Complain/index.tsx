@@ -136,7 +136,7 @@ export const Complain = () => {
 
     setState(data);
     dispatch(
-      sendEvent({ type: step === 'IDLE' ? 'CLICK_REPORT_BUTTON' : 'CLICK_SEND_REPORT_BUTTON', meta: formState })
+      sendEvent({ type: step === 'INITIAL_STEP' ? 'CLICK_REPORT_BUTTON' : 'CLICK_SEND_REPORT_BUTTON', meta: formState })
     );
 
     if (!isInvalid) dispatch(sendEvent({ type: 'NEXT_STEP' }));
@@ -147,7 +147,7 @@ export const Complain = () => {
   return (
     <div className={cn(Styles.wrapper, Styles[step.toLowerCase()])}>
       <div className={Styles.content}>
-        {step === 'IDLE' && (
+        {step === 'INITIAL_STEP' && (
           <>
             <h6 className={Styles.title}>В чём проблема с этим видео?</h6>
             <div className={Styles.form}>
@@ -178,7 +178,7 @@ export const Complain = () => {
           </>
         )}
 
-        {step !== 'IDLE' && (
+        {step !== 'INITIAL_STEP' && (
           <>
             <h6 className={Styles.title}>Спасибо, мы все проверим.</h6>
             <div className={Styles.form}>

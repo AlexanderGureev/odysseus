@@ -83,8 +83,11 @@ const Wrapper = React.memo(({ children, className }: React.PropsWithChildren<{ c
   }, [hide, show]);
 
   return (
-    <div className={cn(Styles.controls, isUnmuteButton && 'unmute-btn', status, className)} onMouseMove={onMouseMove}>
-      {children}
+    <div
+      className={cn(Styles.controls, isUnmuteButton && 'unmute-btn', status, className)}
+      onMouseMove={onMouseMove}
+      onClick={show}>
+      <div className={Styles.wrapper}>{children}</div>
     </div>
   );
 });
@@ -117,7 +120,7 @@ export const Controls = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    if (!middleNodeRef.current) return;
+    if (!middleNodeRef.current || isMobile) return;
 
     return dbclick(middleNodeRef.current, () => {
       dispatch(sendEvent({ type: fullscreen.step === 'FULLSCREEN' ? 'EXIT_FULLCREEN' : 'ENTER_FULLCREEN' }));
@@ -126,7 +129,7 @@ export const Controls = React.memo(() => {
 
   const onClick = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
-      if (e.currentTarget === e.target) {
+      if (!isMobile && e.currentTarget === e.target) {
         dispatch(sendEvent({ type: playback.step === 'PAUSED' ? 'DO_PLAY' : 'DO_PAUSE' }));
       }
     },

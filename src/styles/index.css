@@ -64,7 +64,8 @@ body {
   position: relative;
 
   font-size: 13px;
-  font-weight: 600;
+  font-weight: var(--text-weight);
+  text-transform: var(--text-transform);
   color: #fff;
 
   display: flex;

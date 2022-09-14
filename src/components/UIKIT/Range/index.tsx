@@ -2,7 +2,7 @@ import './styles.css';
 
 import cn from 'classnames';
 import { useMouse, useUpdateEffect } from 'hooks';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { off, on } from 'utils';
 
 type Props = {
@@ -20,12 +20,20 @@ type Props = {
   onDragEnd?: (value: number) => void;
   onDrag?: (status: boolean) => void;
   bufferValue?: number;
+  transitionStep?: number | null;
 };
 
 const GRADIENT_DEG: Record<'horisontal' | 'vertical', string> = {
   horisontal: '90deg',
   vertical: '0deg',
 };
+
+const TRANSFORM_THUMB: Record<'horisontal' | 'vertical', (pos: number) => string> = {
+  horisontal: (pos) => `translateX(${pos}px)`,
+  vertical: (pos) => `translate(-50%, -${pos}px)`,
+};
+
+const MIN_DIFF = 5;
 
 export const Range = ({
   direction = 'horisontal',
@@ -42,12 +50,15 @@ export const Range = ({
   onDragEnd,
   bufferValue,
   onDrag,
+  transitionStep = MIN_DIFF,
 }: React.PropsWithChildren<Props>) => {
   const [currentValue, setValue] = useState(initialValue);
   const inputRef = useRef<HTMLDivElement>(null);
   const thumbLabelRef = useRef<HTMLDivElement>(null);
   const isKeyboardEvent = useRef<boolean>(false);
   const prevIsDrag = useRef<boolean>(false);
+  const isDisableTransition = useRef<boolean>(true);
+
   const [isOverlap, setOverlap] = useState(false);
 
   const { isMouseDown: isDrag, elW, elH, elX, elY, isEnter } = useMouse(inputRef);
@@ -58,7 +69,12 @@ export const Range = ({
   const gradientPercent = (x / w) * 100;
   const value = Number(((pos / w) * max).toFixed(3));
   const progressValue = w * (currentValue / max);
-  const bufferPx = bufferValue ? w * (bufferValue / max) : null;
+  const bufferPercent = bufferValue ? bufferValue / max : null;
+
+  useLayoutEffect(() => {
+    if (!transitionStep) return;
+    isDisableTransition.current = Math.abs(initialValue - currentValue) > transitionStep;
+  }, [currentValue, initialValue, transitionStep]);
 
   useUpdateEffect(() => {
     if (!isDrag) setValue(initialValue);
@@ -140,7 +156,7 @@ export const Range = ({
 
   return (
     <div
-      className={cn('range-input', direction)}
+      className={cn('range-input', direction, (isDrag || isDisableTransition.current) && 'transition-disable')}
       ref={inputRef}
       role="slider"
       tabIndex={0}
@@ -149,14 +165,13 @@ export const Range = ({
       aria-valuemax={max}
       aria-label={ariaLabel}>
       <div className="range-input-track" style={{ borderRadius: radius }}>
-        {bufferPx && (
+        {bufferPercent && (
           <div
             className="range-input-buffer"
             style={{
               borderRadius: radius,
-              background: `linear-gradient(${
-                GRADIENT_DEG[direction]
-              },  ${`var(${bufferColor})`} ${bufferPx}px,  transparent ${bufferPx}px)`,
+              backgroundColor: `var(${bufferColor})`,
+              transform: `${direction === 'horisontal' ? 'scaleX' : 'scaleY'}(${bufferPercent})`,
             }}
           />
         )}
@@ -164,9 +179,8 @@ export const Range = ({
           className="range-input-progress"
           style={{
             borderRadius: radius,
-            background: `linear-gradient(${
-              GRADIENT_DEG[direction]
-            },  ${`var(${progressColor})`} ${progressValue}px,  transparent ${progressValue}px)`,
+            backgroundColor: `var(${progressColor})`,
+            transform: `${direction === 'horisontal' ? 'scaleX' : 'scaleY'}(${currentValue / max})`,
           }}
         />
         <div
@@ -181,25 +195,30 @@ export const Range = ({
       </div>
 
       <div
-        className="range-input-thumb"
+        className="range-input-thumb-position"
         style={{
-          [direction === 'horisontal' ? 'left' : 'bottom']: progressValue,
-        }}
-      />
+          transform: TRANSFORM_THUMB[direction](progressValue),
+        }}>
+        <div className="range-input-thumb" />
+      </div>
 
       {thumbLabel && (
         <div
-          ref={thumbLabelRef}
-          aria-hidden="true"
-          className={cn('range-input-thumb-label', {
-            active: isDrag || (isEnter && !isOverlap),
-          })}
+          className="range-input-thumb-label-position"
           style={{
-            [direction === 'horisontal' ? 'left' : 'bottom']: progressValue,
+            transform: TRANSFORM_THUMB[direction](progressValue),
           }}>
-          {thumbLabel}
+          <div
+            ref={thumbLabelRef}
+            aria-hidden="true"
+            className={cn('range-input-thumb-label', {
+              active: isDrag || (isEnter && !isOverlap),
+            })}>
+            {thumbLabel}
+          </div>
         </div>
       )}
+
       {label && (
         <div
           aria-hidden="true"

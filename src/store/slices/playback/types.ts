@@ -32,6 +32,8 @@ export type EventsWithPayload =
       | 'AUTOSWITCH_DISABLED'
       | 'AUTO_PAUSE'
       | 'AUTO_PAUSE_RESOLVE'
+      | 'AUTO_PLAY'
+      | 'AUTO_PLAY_RESOLVE'
     >
   | {
       type: 'TIME_UPDATE';

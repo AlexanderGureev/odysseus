@@ -1,0 +1,109 @@
+.volume {
+  composes: btn-hover from global;
+
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 8px 8px;
+  pointer-events: none;
+  user-select: none;
+}
+
+:global(.mobile) .volume {
+  display: none;
+}
+
+.volume::before {
+  padding: 0;
+}
+
+.volume :global .range-input {
+  height: 88px;
+  width: 6px;
+  opacity: 0;
+  transition: var(--default-transition);
+}
+
+.volume:hover {
+  pointer-events: all;
+}
+
+.volume.dragging::before,
+.volume:hover::before,
+.volume.dragging .mute-button {
+  opacity: 1;
+}
+
+.volume.dragging :global .range-input,
+.volume:hover :global .range-input {
+  opacity: 1;
+}
+
+.mute-button {
+  composes: icon from global;
+  z-index: 1;
+  margin-top: 12px;
+  pointer-events: all;
+  transform: translate(2px, 0);
+  opacity: var(--icon-opacity);
+}
+
+.unmute-button {
+  display: flex;
+  align-items: center;
+  user-select: none;
+  cursor: pointer;
+  opacity: var(--icon-opacity);
+  transition: var(--default-transition);
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 1;
+}
+
+.label {
+  position: absolute;
+  left: calc(100% + 14px);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--text-color-87);
+  text-transform: uppercase;
+  line-height: 1.6;
+  letter-spacing: 0.71px;
+  transition: var(--default-transition);
+  pointer-events: none;
+}
+
+.unmute-button {
+  width: var(--m-icon-size);
+  height: var(--m-icon-size);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(20, 20, 20, 0.75);
+  border-radius: 100%;
+}
+
+.unmute-button img {
+  width: var(--xs-icon-size);
+  height: var(--xs-icon-size);
+  transform: translateX(2px);
+}
+
+.unmute-button:hover {
+  opacity: 1;
+}
+
+.volume :global .range-input-thumb {
+  background: var(--ad-primary-color);
+}
+
+.volume :global .range-input-track {
+  background-color: rgba(255, 255, 255, 0.4);
+}

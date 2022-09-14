@@ -16,7 +16,7 @@ export const PlaybackButton = () => {
 
   return (
     <div className={Styles.playback} onClick={onClick}>
-      <img key={step} src={step === 'PAUSED' ? controlPlayIcon : controlPauseIcon} />
+      <img className={Styles.icon} key={step} src={step === 'PAUSED' ? controlPlayIcon : controlPauseIcon} />
     </div>
   );
 };

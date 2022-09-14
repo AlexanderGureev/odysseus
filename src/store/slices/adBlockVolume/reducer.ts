@@ -104,12 +104,12 @@ const addMiddleware = () =>
         },
         SYNC_VOLUME_PENDING: () => {
           const {
-            adBlock: { index, point },
+            adBlock: { index, adPoint },
             adBlockVolume: { volume: currentVolume, muted: currentMute },
           } = getState();
 
           const value = currentMute ? 0 : currentVolume;
-          const currentBlock = services.adService.getBlock(point, index);
+          const currentBlock = services.adService.getBlock(adPoint, index);
           currentBlock.setVolume(value); // специально повторно выставляем блоку звук так как не всегда интерфейс синхронизирован со стейтом
 
           dispatch(
@@ -124,11 +124,11 @@ const addMiddleware = () =>
         },
         CHANGE_MUTE_AD_BLOCK_PENDING: () => {
           const {
-            adBlock: { index, point },
+            adBlock: { index, adPoint },
             adBlockVolume: { volume, muted },
           } = getState();
 
-          const currentBlock = services.adService.getBlock(point, index);
+          const currentBlock = services.adService.getBlock(adPoint, index);
           currentBlock.setVolume(muted ? 0 : volume);
 
           dispatch(
@@ -139,11 +139,11 @@ const addMiddleware = () =>
         },
         CHANGE_VOLUME_AD_BLOCK_PENDING: () => {
           const {
-            adBlock: { index, point },
+            adBlock: { index, adPoint },
             adBlockVolume: { volume },
           } = getState();
 
-          const currentBlock = services.adService.getBlock(point, index);
+          const currentBlock = services.adService.getBlock(adPoint, index);
           currentBlock.setVolume(volume);
 
           dispatch(

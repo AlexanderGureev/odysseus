@@ -14,7 +14,6 @@ import { PlayerError } from 'utils/errors';
 import { logger } from 'utils/logger';
 import { request } from 'utils/request';
 
-import { testManifest } from './manifest';
 import { RawManifest, TManifestData, TParsedManifest, TParserMap } from './types';
 
 export const getAudioFormat = (manifest: RawManifest) => {
@@ -129,9 +128,12 @@ const ManifestParser = () => {
 
   const requestManifest = async (url: string) => {
     try {
-      const response = await request.get(url);
+      const response = await request.get(url, { useCustomCheckStatus: false });
       return response;
     } catch (err) {
+      // network error
+      if (err instanceof PlayerError) throw err;
+      // cors anubis (ошибку cors к медиасерверу мы определить не можем)
       throw new PlayerError(ERROR_CODES.BALANCER_UNAVAILABLE, err?.message);
     }
   };
@@ -164,6 +166,8 @@ const ManifestParser = () => {
       return manifestData;
     } catch (err) {
       logger.error('[ManifestParser]', 'fetchManifest error:', err?.message);
+
+      if (err instanceof PlayerError) throw err;
       throw new PlayerError(ERROR_CODES.CDN_INVALID_DATA, err?.message);
     }
   };

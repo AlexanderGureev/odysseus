@@ -40,6 +40,7 @@ export type ReqInit = Omit<RequestInit, 'headers'> & {
   headers?: Record<string, string | undefined>;
   timeout?: number;
   networkCheck?: boolean;
+  useCustomCheckStatus?: boolean;
 };
 
 export type Hooks = {
@@ -100,7 +101,14 @@ const request = () => {
     (method: HTTPMethod) =>
     async (
       url: string,
-      { json, params = {}, headers = {}, networkCheck = requestOpts.networkCheck, ...opts }: ReqInit = {}
+      {
+        json,
+        params = {},
+        headers = {},
+        networkCheck = requestOpts.networkCheck,
+        useCustomCheckStatus = true,
+        ...opts
+      }: ReqInit = {}
     ) => {
       try {
         const s = new URLSearchParams();
@@ -127,7 +135,7 @@ const request = () => {
         });
 
         for (const h of hooks.beforeResponse) await h(response);
-        checkStatus(response);
+        if (useCustomCheckStatus) checkStatus(response);
 
         logger.log('[http request]', 'before response', { method, url, status: response.status });
         return response;

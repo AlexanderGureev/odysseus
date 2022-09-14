@@ -15,6 +15,7 @@ import autoSwitch from './slices/autoSwitch/reducer';
 import beholder from './slices/beholder/reducer';
 import buffering from './slices/buffering/reducer';
 import changeTrack from './slices/changeTrack/reducer';
+import debug from './slices/debug/reducer';
 import error from './slices/error/reducer';
 import errorReports from './slices/errorReports/reducer';
 import errorReportsForm from './slices/errorReportsForm/reducer';
@@ -69,6 +70,7 @@ sendEvent(type: "DO_INIT", payload: {}, meta: {})
 */
 
 const rootReducer = combineReducers({
+  debug: debug.reducer,
   loader: loader.reducer,
   //  обработка экспериментов от веба
   experiments: experiments.reducer,
@@ -162,6 +164,7 @@ const rootReducer = combineReducers({
   error: error.reducer,
 });
 
+debug.addMiddleware();
 experiments.addMiddleware();
 analytics.addMiddleware();
 postMessages.addMiddleware();

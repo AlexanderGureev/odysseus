@@ -12,6 +12,9 @@ const initialState: FSMState = {
 
 const config: FSMConfig<State, AppEvent> = {
   IDLE: {
+    SET_OVERLAY: null,
+  },
+  INITIAL_STEP: {
     NEXT_STEP: 'EMAIL_STEP',
     CLOSE_OVERLAY: 'CLOSING_REPORT_FORM',
   },
@@ -51,6 +54,8 @@ const errorReportsForm = createSlice({
       logger.log('[FSM]', 'errorReportsForm', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
+        case 'SET_OVERLAY':
+          return { ...state, step: payload.overlayType === 'complain' ? 'INITIAL_STEP' : step };
         default:
           return { ...state, step, ...payload };
       }

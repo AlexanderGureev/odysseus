@@ -4,7 +4,7 @@ import { sendEvent } from 'store';
 import { AdCategory } from 'types/ad';
 import { logger } from 'utils/logger';
 
-const DEFAULT_ADV_CONTROLS_ID = 'adv-controls';
+export const DEFAULT_ADV_CONTROLS_ID = 'adv-controls';
 
 export const init = async ({ getState, dispatch, services: { adService } }: EffectOpts) => {
   try {

@@ -39,7 +39,7 @@
     border-radius: 12px;
   }
 
-  :global(.wrapper:not(.embedded)) .wrapper {
+  :global(.theme-more-tv:not(.embedded)) .wrapper {
     display: none;
   }
 }

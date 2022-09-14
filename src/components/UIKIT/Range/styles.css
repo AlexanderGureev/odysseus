@@ -15,6 +15,9 @@
   --buffer-color: rgba(255, 255, 255, 0.5);
 
   padding: 8px 0;
+
+  display: flex;
+  align-items: center;
 }
 
 .range-input-track {
@@ -22,6 +25,7 @@
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
   position: relative;
+  overflow: hidden;
 }
 
 .range-input-hover {
@@ -47,18 +51,40 @@
   opacity: 1;
 }
 
+.range-input-thumb-label-position {
+  position: absolute;
+  bottom: 0;
+  transition: transform 0.35s linear;
+}
+
 .range-input-label,
 .range-input-thumb-label {
   position: absolute;
+  left: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
   padding: 5px 12px;
   font-size: 14px;
-  transform: translate(-50%, -50%);
-  bottom: 50%;
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
+  transform: translate(-50%, -50%);
+  bottom: 50%;
+}
+
+.range-input.vertical .range-input-label,
+.range-input.vertical .range-input-thumb-label {
+  transform: translate(50%, 50%);
+}
+
+.range-input.vertical .range-input-thumb-label-position {
+  left: 0;
+}
+
+.range-input-thumb-label {
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease;
 }
 
 .range-input-label {
@@ -75,35 +101,33 @@
   padding: 0px 4px;
 }
 
-.range-input.vertical .range-input-label,
-.range-input.vertical .range-input-thumb-label {
-  transform: translate(50%, 50%);
-}
-
 .range-input-label.active,
 .range-input-thumb-label.active {
   opacity: 1;
 }
 
-.range-input-thumb {
+.range-input-thumb-position {
+  position: absolute;
   width: 20px;
   height: 20px;
+  transition: 0.3s linear;
+  pointer-events: none;
+}
+
+.range-input-thumb {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
   border-radius: 50%;
   background: rgba(0, 0, 0, 1);
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  cursor: grab;
-  transition: transform 0.2s ease;
+  transition: 0.15s ease;
+  pointer-events: all;
+  transform: translateX(-50%);
 }
 
 .range-input:focus-visible .range-input-thumb {
   outline: 2px solid white;
-}
-
-.range-input-thumb:hover {
-  transform: translate(-50%, -50%) scale(1.2);
 }
 
 .range-input-buffer,
@@ -114,20 +138,42 @@
   position: absolute;
   left: 0;
   top: 0;
+  transition: 0.3s linear;
+  transform-origin: left;
 }
 
-.range-input.vertical .range-input-buffer,
-.range-input.vertical .range-input-progress {
-  top: initial;
-  bottom: 0;
+.range-input-buffer {
+  transition: 0.15s linear;
+}
+
+.vertical .range-input-buffer,
+.vertical .range-input-progress {
+  transform-origin: bottom;
+}
+
+.transition-disable .range-input-buffer,
+.transition-disable .range-input-progress,
+.transition-disable .range-input-thumb-position,
+.transition-disable .range-input-thumb-label-position {
+  transition: none;
+}
+
+.range-input.vertical {
+  display: block;
+}
+
+.range-input.vertical .range-input-thumb-position {
+  left: 50%;
 }
 
 .range-input.vertical .range-input-thumb {
-  top: initial;
-  left: 50%;
-  transform: translate(-50%, 50%);
+  transform: translateY(-50%);
+}
+
+.range-input-thumb:hover {
+  transform: translateX(-50%) scale(1.2);
 }
 
 .range-input.vertical .range-input-thumb:hover {
-  transform: translate(-50%, 50%) scale(1.2);
+  transform: translateY(-50%) scale(1.2);
 }

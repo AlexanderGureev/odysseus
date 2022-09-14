@@ -42,7 +42,7 @@ export const changeQuality = async ({
         });
       });
 
-      dispatch(sendEvent({ type: 'DO_PLAY' }));
+      dispatch(sendEvent({ type: 'AUTO_PLAY' }));
       await seekPromise;
 
       if (step === 'PAUSED') {

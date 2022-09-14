@@ -9,6 +9,7 @@
   justify-content: center;
   pointer-events: none;
   z-index: 1000;
+  transform: translate(0, -2px);
 }
 
 .wrapper::before {
@@ -43,11 +44,29 @@
   animation: loader-rotate 2s linear infinite;
   width: 80px;
   height: 80px;
-  background: url('assets/icons/loader.png') no-repeat center center;
+  background-image: url('assets/icons/loader.png');
+  background-repeat: no-repeat;
+  background-position: center center;
   background-size: cover;
   transition: var(--default-transition);
 }
 
 .loader.active {
   opacity: 1;
+}
+
+:global(.theme-ctc) .loader {
+  background-image: url('assets/icons/loader_ctc.png');
+}
+:global(.theme-ctc-love) .loader {
+  background-image: url('assets/icons/loader_love.png');
+}
+:global(.theme-home) .loader {
+  background-image: url('assets/icons/loader_dom.png');
+}
+:global(.theme-che) .loader {
+  background-image: url('assets/icons/loader_che.png');
+}
+:global(.theme-ctc-kids) .loader {
+  background-image: url('assets/icons/loader_kids.png');
 }

@@ -126,9 +126,12 @@ const createMailLink = (data: { subject: string; code: number; theme: SkinClass;
   };
 
   return (
-    <a className={Styles.mail_link} href={TEXT.MAIL_OPTIONS}>
-      {TEXT.EMAIL}
-    </a>
+    <>
+      {' '}
+      <a className={Styles.mail_link} href={TEXT.MAIL_OPTIONS}>
+        {TEXT.EMAIL}
+      </a>
+    </>
   );
 };
 

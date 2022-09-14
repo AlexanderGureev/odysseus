@@ -27,6 +27,17 @@
 }
 
 .group {
+  display: flex;
   position: absolute;
   top: 100%;
+}
+
+:global(.wrapper:not(.theme-more-tv)) .agree,
+:global(.wrapper:not(.theme-more-tv)) .disagree {
+  width: 220px;
+  padding: 12px 20px 10px;
+}
+
+:global(.wrapper:not(.theme-more-tv)) .disagree {
+  color: #fff;
 }

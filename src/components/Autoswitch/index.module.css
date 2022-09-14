@@ -275,6 +275,7 @@
     font-size: 15px;
     right: 16px;
   }
+
   .poster-text {
     font-size: 14px;
   }
@@ -325,5 +326,20 @@
   :global(.wrapper:not(.fullscreen)) .poster-text {
     font-size: 12px;
     padding: 0 4px 5px;
+  }
+
+  :global(.wrapper:not(.theme-more-tv).fullscreen) .episode .container,
+  :global(.wrapper:not(.theme-more-tv):not(.theme-ctc)) .episode .container {
+    width: 164px;
+  }
+
+  :global(.wrapper:not(.theme-more-tv).fullscreen) .episode .poster-wrapper,
+  :global(.wrapper:not(.theme-more-tv):not(.theme-ctc)) .episode .poster-wrapper {
+    height: 92px;
+  }
+
+  :global(.wrapper:not(.theme-more-tv):not(.theme-ctc)) .cancel-btn,
+  :global(.wrapper:not(.theme-more-tv):not(.theme-ctc)) .start-btn {
+    font-size: 10px;
   }
 }

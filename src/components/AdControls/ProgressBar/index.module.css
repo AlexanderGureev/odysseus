@@ -1,0 +1,27 @@
+.progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.progress :global .range-input-track {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.progress :global .range-input {
+  width: 100%;
+  height: 3px;
+  padding: 0;
+}
+
+.progress :global .range-input-thumb,
+.progress :global .range-input-label,
+.progress :global .range-input-thumb-label {
+  display: none;
+}

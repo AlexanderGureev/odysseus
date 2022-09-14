@@ -139,11 +139,12 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
         },
         play: () => mediator.emit('play'),
         pause: () => mediator.emit('pause'),
-        progress: () =>
+        progress: () => {
           mediator.emit('progress', {
             loadedPercent: player.bufferedPercent() * 100,
             bufferedEnd: player.bufferedEnd(),
-          }),
+          });
+        },
         timeupdate: () =>
           mediator.emit('timeupdate', {
             currentTime: toFixed(player.currentTime()),

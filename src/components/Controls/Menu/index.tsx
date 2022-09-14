@@ -51,7 +51,7 @@ export const Menu = () => {
   );
 
   const onSelect = useCallback(
-    ({ value }: { value: OverlayType; title: string }) => {
+    ({ value }: { id: string; value: OverlayType; title: string }) => {
       dispatch(sendEvent({ type: 'SET_OVERLAY', payload: { overlayType: value } }));
     },
     [dispatch]
@@ -72,6 +72,7 @@ export const Menu = () => {
   const menu = [
     isMobile
       ? {
+          id: '1',
           icon: qualityMenuIcon,
           title: 'Качество',
           selectedTitle: qualityOptions[quality.currentQualityMark].title,
@@ -79,18 +80,21 @@ export const Menu = () => {
         }
       : null,
     {
+      id: '2',
       icon: playbackSpeedIcon,
       title: 'Скорость',
       selectedTitle: playbackSpeed.currentSpeed === 1 ? 'Обычная' : `${playbackSpeed.currentSpeed}`,
       subMenu: playbackSpeedSubMenu,
     },
     {
+      id: '3',
       icon: shareIcon,
       title: 'Поделиться',
       value: 'sharing',
     },
     SHARING
       ? {
+          id: '4',
           icon: embedIcon,
           title: 'Код вставки',
           value: 'embedding',
@@ -98,6 +102,7 @@ export const Menu = () => {
       : null,
     !isMobile
       ? {
+          id: '5',
           icon: hotkeysIcon,
           title: 'Горячие клавиши',
           value: 'hotkeys',
@@ -105,13 +110,14 @@ export const Menu = () => {
       : null,
     errorReports.step !== 'DISABLED'
       ? {
+          id: '6',
           icon: alertIcon,
           title: 'Сообщить о проблеме с видео',
           value: 'complain',
           disabled: isComplainDisabled,
         }
       : null,
-  ].filter(Boolean) as MenuItem<{ value: string; title: string }, string>[];
+  ].filter(Boolean) as MenuItem<{ id: string; value: string; title: string }, string>[];
 
   const onOpen = useCallback(() => {
     dispatch(sendEvent({ type: 'MENU_SHOWN' }));

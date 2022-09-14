@@ -143,6 +143,8 @@ const config: FSMConfig<State, AppEvent> = {
   // передаем управление рекламному fsm и играем pre_roll если он есть
   AD_INIT_PENDING: {
     RESUME_VIDEO: 'RESUME_VIDEO_PENDING',
+    INIT_AD_REJECT: 'RESUME_VIDEO_PENDING',
+    AD_BREAK_END: 'RESUME_VIDEO_PENDING',
   },
 
   // выбор другого доступного потока в случае ошибок

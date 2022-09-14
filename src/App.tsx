@@ -30,15 +30,22 @@ import { AppThemeBySkin, SkinClass } from 'types';
 
 const Player = ({ children }: React.PropsWithChildren) => {
   const dispatch = useAppDispatch();
+  const isShowPlayerUI = useAppSelector((state) => state.root.isShowPlayerUI);
 
   useEffect(() => {
-    dispatch(sendEvent({ type: 'DO_PLAYER_INIT' }));
-  }, [dispatch]);
+    if (isShowPlayerUI) dispatch(sendEvent({ type: 'DO_PLAYER_INIT' }));
+  }, [isShowPlayerUI, dispatch]);
 
   return (
     <div data-vjs-player>
-      <video id={DEFAULT_PLAYER_ID} preload="metadata" muted playsInline />
-      {children}
+      <ErrorManager>
+        {isShowPlayerUI && (
+          <>
+            <video id={DEFAULT_PLAYER_ID} preload="metadata" muted playsInline />
+            {children}
+          </>
+        )}
+      </ErrorManager>
     </div>
   );
 };
@@ -56,7 +63,8 @@ const ModalContentByType: { [key in OverlayType]?: () => React.ReactElement | nu
 };
 
 const PlayerManager = () => {
-  const { step, isShowPlayerUI, theme: playerControlsTheme } = useAppSelector((state) => state.root);
+  const { step, theme: playerControlsTheme, previews } = useAppSelector((state) => state.root);
+
   const isRenderControls = useAppSelector((state) =>
     Boolean(state.root.step === 'READY' && state.adController.step !== 'AD_BREAK' && state.playback.duration)
   );
@@ -88,6 +96,7 @@ const PlayerManager = () => {
         'wrapper',
         theme,
         `controls-theme-${playerControlsTheme}`,
+        previews?.length && 'preview',
         isFullscreen && 'fullscreen',
         isEmbedded && 'embedded',
         paywall.step === 'READY' && 'paywall',
@@ -100,49 +109,50 @@ const PlayerManager = () => {
         isOverlay && 'overlay',
         isMobile && 'mobile'
       )}>
-      <ErrorManager>
-        {isShowPlayerUI && (
+      <Player>
+        {isRenderControls && CONTROLS && (
           <>
-            <Player>
-              <MenuProvider>{isRenderControls && CONTROLS ? <Controls /> : null}</MenuProvider>
+            <MenuProvider>
+              <Controls />
+            </MenuProvider>
 
-              {step === 'BIG_PLAY_BUTTON' && <BigPlayButton />}
-
-              {paywall.step === 'READY' && <Paywall />}
-
-              {resumeVideoNotify.step === 'RESUME_VIDEO_NOTIFY' && resumeVideoNotify.time && (
-                <ResumeVideoNotice time={resumeVideoNotify.time} />
-              )}
-
-              {['ADULT_NOTIFY_REJECTED', 'ADULT_NOTIFY'].includes(adultNotify.step) && <AdultConfirmationNotice />}
-
-              {splashscreen.step === 'SHOWING_SPLASHCREEN' && <SpashScreen data={splashscreen.screens} />}
-
-              {networkRecovery.step !== 'DISABLED' && CONTROLS && <NetworkNotice />}
-
-              {isAutoswitch ? (
-                autoSwitch.autoswitchNotifyType === 'avod_popup' ? (
-                  <AutoswitchAvodPopup />
-                ) : (
-                  <Autoswitch />
-                )
-              ) : null}
-
-              {adDisableSuggestion.step === 'SHOWING_AD_DISABLE_SUGGESTION' && (
-                <AdDisableSuggestionNotice content={adDisableSuggestion} />
-              )}
-
-              <Overlay>{OverlayContent ? <OverlayContent /> : null}</Overlay>
-              <Modal>{ModalContent ? <ModalContent /> : null}</Modal>
-              <HotkeysNotice />
-
-              <AdControls />
-
-              {CONTROLS && <Loader />}
-            </Player>
+            <Overlay>{OverlayContent ? <OverlayContent /> : null}</Overlay>
+            <Modal>{ModalContent ? <ModalContent /> : null}</Modal>
           </>
         )}
-      </ErrorManager>
+
+        <AdControls />
+
+        <HotkeysNotice />
+
+        {CONTROLS && <Loader />}
+
+        {step === 'BIG_PLAY_BUTTON' && <BigPlayButton />}
+
+        {paywall.step === 'READY' && <Paywall />}
+
+        {resumeVideoNotify.step === 'RESUME_VIDEO_NOTIFY' && resumeVideoNotify.time && (
+          <ResumeVideoNotice time={resumeVideoNotify.time} />
+        )}
+
+        {['ADULT_NOTIFY_REJECTED', 'ADULT_NOTIFY'].includes(adultNotify.step) && <AdultConfirmationNotice />}
+
+        {splashscreen.step === 'SHOWING_SPLASHCREEN' && <SpashScreen data={splashscreen.screens} />}
+
+        {networkRecovery.step !== 'DISABLED' && CONTROLS && <NetworkNotice />}
+
+        {isAutoswitch ? (
+          autoSwitch.autoswitchNotifyType === 'avod_popup' ? (
+            <AutoswitchAvodPopup />
+          ) : (
+            <Autoswitch />
+          )
+        ) : null}
+
+        {adDisableSuggestion.step === 'SHOWING_AD_DISABLE_SUGGESTION' && (
+          <AdDisableSuggestionNotice content={adDisableSuggestion} />
+        )}
+      </Player>
     </div>
   );
 };

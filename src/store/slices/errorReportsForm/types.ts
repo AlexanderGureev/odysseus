@@ -1,7 +1,14 @@
 import { FormState } from 'components/Controls/Menu/Complain';
 import { DefaultPayload } from 'store/types';
 
-export type State = 'IDLE' | 'EMAIL_STEP' | 'SENDING_REPORT_STEP' | 'ERROR_STEP' | 'CLOSING_REPORT_FORM' | 'END';
+export type State =
+  | 'IDLE'
+  | 'INITIAL_STEP'
+  | 'EMAIL_STEP'
+  | 'SENDING_REPORT_STEP'
+  | 'ERROR_STEP'
+  | 'CLOSING_REPORT_FORM'
+  | 'END';
 
 export type EventsWithPayload =
   | {

@@ -16,7 +16,7 @@
 
 .menu {
   position: absolute;
-  max-height: calc(100vh - 100px);
+  max-height: calc(100vh - 160px);
   overflow-y: scroll;
   background: var(--secondary-color);
   right: -8px;
@@ -26,7 +26,7 @@
   opacity: 0;
   pointer-events: none;
 }
-/* 
+
 .menu::-webkit-scrollbar-track {
   margin: 5px 0;
 }
@@ -39,7 +39,7 @@
 .menu::-webkit-scrollbar-thumb {
   border-radius: 2.5px;
   background-color: rgba(255, 255, 255, 0.3);
-} */
+}
 
 .enter {
   composes: fade-in from global;
@@ -128,5 +128,5 @@
 
 :global(.wrapper:not(.theme-more-tv)) .item:hover::before,
 :global(.wrapper:not(.theme-more-tv)) .item:hover img {
-  filter: invert(100%);
+  filter: invert(var(--color-invert));
 }

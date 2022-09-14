@@ -43,7 +43,7 @@ const ErrorTemplate: React.FC<{ error: RawPlayerError }> = ({ error }) => {
         <div className={Styles.footer}>
           {btn_text?.() ? (
             <button
-              className={Styles['footer-btn']}
+              className={cn(Styles['footer-btn'], 'button')}
               onClick={() => {
                 if (onClick) onClick?.(dispatch);
                 else {
@@ -70,26 +70,7 @@ const ErrorTemplate: React.FC<{ error: RawPlayerError }> = ({ error }) => {
 };
 
 const ErrorManager = ({ children }: React.PropsWithChildren) => {
-  // const dispatch = useAppDispatch();
-  // const root = useAppSelector((state) => state.root);
-
   const { step, error } = useAppSelector((state) => state.error);
-
-  // useEffect(() => {
-  //   if (root.step === 'INIT_ANALYTICS_PENDING') {
-  //     dispatch(
-  //       sendEvent({
-  //         type: 'SHOW_ERROR',
-  //         meta: {
-  //           error: {
-  //             code: ERROR_CODES.STORMWALL_GEOBLOCK_ERROR,
-  //             title: ERROR_TYPE.STORMWALL_GEOBLOCK_ERROR,
-  //           },
-  //         },
-  //       })
-  //     );
-  //   }
-  // }, [root.step, dispatch]);
 
   if (error && step === 'ERROR') {
     return <ErrorTemplate error={ERROR_ITEM_MAP[error.code]} />;

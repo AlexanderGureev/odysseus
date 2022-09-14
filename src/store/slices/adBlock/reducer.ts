@@ -1,18 +1,18 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FSM_EVENT } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
-import type { AppEvent, FSMConfig } from 'store/types';
+import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { AdCategory } from 'types/ad';
 import { logger } from 'utils/logger';
 
 import { getNext, pauseBlock, resumeBlock, skipBlock, startNextBlock } from './effects';
-import { ActionPayload, FSMState, State } from './types';
+import { FSMState, State } from './types';
 
 const initialState: FSMState = {
   step: 'IDLE',
 
   links: {},
-  point: {
+  adPoint: {
     category: AdCategory.PRE_ROLL,
     point: 0,
   },
@@ -22,6 +22,7 @@ const initialState: FSMState = {
   isPromo: false,
   skippable: false,
   isVolumeAvailable: false,
+  isYandexCreative: false,
 
   currentTime: null,
   duration: null,
@@ -66,10 +67,7 @@ const config: FSMConfig<State, AppEvent> = {
   },
   NEXT_BLOCK_PENDING: {
     PLAY_NEXT_BLOCK: 'START_BLOCK_PENDING',
-    AD_BREAK_END: 'END',
-  },
-  END: {
-    RESET: 'IDLE',
+    AD_BREAK_END: 'IDLE',
   },
 };
 
@@ -78,10 +76,8 @@ const adBlock = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(createAction<ActionPayload>(FSM_EVENT), (state, action) => {
+    builder.addCase(createAction<EventPayload>(FSM_EVENT), (state, action) => {
       const { type, payload } = action.payload;
-
-      if (type === 'RESET') return initialState;
 
       const next = config[state.step]?.[type];
       if (next === undefined) return state;
@@ -91,6 +87,8 @@ const adBlock = createSlice({
       const step = next || state.step;
 
       switch (type) {
+        case 'AD_BREAK_END':
+          return initialState;
         default:
           return { ...state, step, ...payload };
       }
@@ -130,9 +128,6 @@ const addMiddleware = () =>
         PAUSE_AD_BLOCK_PENDING: () => pauseBlock(opts),
         PLAY_AD_BLOCK_PENDING: () => resumeBlock(opts),
         SKIP_AD_BLOCK_PENDING: () => skipBlock(opts),
-        END: () => {
-          return;
-        },
       };
 
       const effect = handler[step];

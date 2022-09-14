@@ -18,7 +18,8 @@
 .title,
 .title a {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: var(--text-weight);
+  text-transform: var(--text-transform);
   line-height: 1.22;
   color: #fff;
 }

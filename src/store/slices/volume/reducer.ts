@@ -81,7 +81,7 @@ const volume = createSlice({
         case 'UPDATE_MUTE':
           state.step = step;
           state.muted = payload.value;
-          if (!payload.value) state.unmuted = true;
+          if (!state.unmuted) state.unmuted = true;
           break;
 
         case 'SET_VOLUME_AD_BLOCK':
@@ -90,7 +90,7 @@ const volume = createSlice({
           state.step = step;
           state.volume = volume;
           state.muted = volume === 0;
-          if (volume > 0) state.unmuted = true;
+          if (!state.unmuted) state.unmuted = true;
           break;
         default:
           return { ...state, step, ...payload };
@@ -183,12 +183,12 @@ const addMiddleware = () =>
 
         SYNC_VOLUME_PENDING: () => {
           const {
-            adBlock: { index, point },
+            adBlock: { index, adPoint },
             volume: { volume: currentVolume, muted: currentMute },
           } = getState();
 
           const value = currentMute ? 0 : currentVolume;
-          const currentBlock = services.adService.getBlock(point, index);
+          const currentBlock = services.adService.getBlock(adPoint, index);
           currentBlock.setVolume(value); // специально повторно выставляем блоку звук так как не всегда интерфейс синхронизирован со стейтом
 
           dispatch(
@@ -203,11 +203,11 @@ const addMiddleware = () =>
         },
         CHANGE_MUTE_AD_BLOCK_PENDING: () => {
           const {
-            adBlock: { index, point },
+            adBlock: { index, adPoint },
             volume: { volume, muted },
           } = getState();
 
-          const currentBlock = services.adService.getBlock(point, index);
+          const currentBlock = services.adService.getBlock(adPoint, index);
           currentBlock.setVolume(muted ? 0 : volume);
           services.localStorageService.setItemByDomain(STORAGE_SETTINGS.MUTED, muted);
 
@@ -219,11 +219,11 @@ const addMiddleware = () =>
         },
         CHANGE_VOLUME_AD_BLOCK_PENDING: () => {
           const {
-            adBlock: { index, point },
+            adBlock: { index, adPoint },
             volume: { volume, muted },
           } = getState();
 
-          const currentBlock = services.adService.getBlock(point, index);
+          const currentBlock = services.adService.getBlock(adPoint, index);
           currentBlock.setVolume(volume);
           services.localStorageService.setItemByDomain(STORAGE_SETTINGS.MUTED, muted);
           services.localStorageService.setItemByDomain(STORAGE_SETTINGS.VOLUME, volume);

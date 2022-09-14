@@ -16,12 +16,15 @@ const config: FSMConfig<State, AppEvent> = {
     GO_TO_PREV_TRACK: 'SHOWING',
     SEEK: 'SHOWING',
     BUFFERING_START: 'SHOWING',
+    AD_INIT: 'SHOWING',
   },
   SHOWING: {
     ERROR_SHOWN: 'IDLE',
     INIT_ANALYTICS_RESOLVE: 'IDLE',
     SEEK_END: 'IDLE',
     BUFFERING_END: 'IDLE',
+    RESUME_VIDEO_RESOLVE: 'IDLE',
+    AD_BREAK_STARTED: 'IDLE',
   },
 };
 
@@ -44,6 +47,7 @@ const loader = createSlice({
         case 'SEEK':
         case 'BUFFERING_START':
           return { ...state, step, type: 'spinner' };
+        case 'AD_INIT':
         case 'GO_TO_NEXT_TRACK':
         case 'GO_TO_PREV_TRACK':
           return { ...state, step, type: 'overlay' };

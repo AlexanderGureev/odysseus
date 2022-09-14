@@ -9,7 +9,7 @@ export const adEvents = (
   const {
     playback: { currentTime },
     root: { adPoints },
-    adBlock: { point, index, limit },
+    adBlock: { adPoint, index, limit },
   } = getState();
 
   switch (payload.type) {
@@ -27,9 +27,9 @@ export const adEvents = (
     case 'AD_BREAK_STARTED': {
       postMessageService.emit('ad_break_start', {
         payload: {
-          category: point.category,
+          category: adPoint.category,
           limit,
-          point: point.point,
+          point: adPoint.point,
         },
       });
       break;
@@ -41,7 +41,7 @@ export const adEvents = (
 
       postMessageService.emit('ad_start', {
         payload: {
-          category: point.category,
+          category: adPoint.category,
           position: index,
         },
       });
@@ -59,7 +59,7 @@ export const adEvents = (
     case 'AD_BLOCK_CLICK': {
       postMessageService.emit('ad_click_thru', {
         payload: {
-          category: point.category,
+          category: adPoint.category,
           position: index,
         },
       });
@@ -68,7 +68,7 @@ export const adEvents = (
     case 'DO_SKIP_AD_BLOCK': {
       postMessageService.emit('ad_skip', {
         payload: {
-          category: point.category,
+          category: adPoint.category,
           position: index,
         },
       });
@@ -77,7 +77,7 @@ export const adEvents = (
     case 'AD_BLOCK_END': {
       postMessageService.emit('ad_end', {
         payload: {
-          category: point.category,
+          category: adPoint.category,
           position: index,
         },
       });
@@ -86,7 +86,7 @@ export const adEvents = (
     case 'AD_BLOCK_ERROR': {
       postMessageService.emit('ad_error', {
         payload: {
-          category: point.category,
+          category: adPoint.category,
           position: index,
         },
       });

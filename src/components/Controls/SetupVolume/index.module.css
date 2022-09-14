@@ -65,6 +65,10 @@
   z-index: 1;
 }
 
+:global(.mobile) .unmute-button {
+  z-index: 0;
+}
+
 .label {
   position: absolute;
   left: calc(100% + 14px);
@@ -130,7 +134,34 @@
 }
 
 :global(.wrapper:not(.theme-more-tv)) .unmute-button img {
-  filter: invert(1);
+  filter: invert(var(--color-invert));
+}
+
+:global(.wrapper:not(.theme-more-tv):not(.theme-ctc)) .unmute-button {
+  border-radius: 18px;
+  width: 136px;
+  height: 36px;
+}
+
+:global(.wrapper.mobile:not(.theme-more-tv):not(.theme-ctc)) .unmute-button {
+  border-radius: 20px;
+  width: 146px;
+  height: 40px;
+}
+
+:global(.theme-default) .unmute-button,
+:global(.theme-vm) .unmute-button {
+  width: 156px !important;
+}
+
+:global(.wrapper:not(.theme-more-tv):not(.theme-ctc)) .unmute-button .label {
+  opacity: 1;
+  position: relative;
+  left: 0;
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.71px;
 }
 
 @media (max-width: 599px) {
@@ -153,5 +184,19 @@
 
   :global(.mobile) .unmute-button {
     bottom: 64px;
+  }
+
+  :global(.wrapper:not(.theme-more-tv):not(.theme-ctc)) .unmute-button {
+    border-radius: 16px;
+    height: 32px;
+  }
+
+  :global(.wrapper.mobile:not(.theme-more-tv):not(.theme-ctc)) .unmute-button {
+    width: 135px;
+    height: 32px;
+  }
+
+  :global(.wrapper:not(.theme-more-tv):not(.theme-ctc)) .unmute-button img {
+    transform: translate(-2px, -0.5px);
   }
 }

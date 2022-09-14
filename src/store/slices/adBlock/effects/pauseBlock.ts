@@ -4,8 +4,8 @@ import { logger } from 'utils/logger';
 
 export const pauseBlock = ({ getState, dispatch, services: { adService } }: EffectOpts) => {
   try {
-    const { point, index } = getState().adBlock;
-    const currentBlock = adService.getBlock(point, index);
+    const { adPoint, index } = getState().adBlock;
+    const currentBlock = adService.getBlock(adPoint, index);
     currentBlock.pauseAd();
   } catch (err) {
     logger.error('[pauseBlock]', err?.message);

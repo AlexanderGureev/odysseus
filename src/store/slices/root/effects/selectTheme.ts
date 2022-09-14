@@ -17,10 +17,10 @@ export const isTrailerTheme = (state: AppState) => {
   } = state.root.config?.trackInfo?.project || {};
 
   const {
-    root: { subscription, features },
+    root: { subscription, features, previews },
   } = state;
 
-  if (!features.PROMO_OFFER_BUTTON) return false;
+  if (!features.PROMO_OFFER_BUTTON || previews) return false;
 
   try {
     const { enable, SVOD, AVOD, FREE }: PromoOfferCfg = JSON.parse(features.PROMO_OFFER_BUTTON);

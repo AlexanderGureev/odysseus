@@ -22,6 +22,18 @@
   margin-top: 24px;
 }
 
+:global(.wrapper:not(.theme-more-tv)) .title {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+:global(.wrapper:not(.theme-more-tv)) .btn {
+  font-size: 15px;
+  padding: 20px 39px 19px 39px;
+}
+
 @media (max-width: 599px) {
   .title {
     margin-bottom: 10px;
@@ -37,5 +49,24 @@
 
   :global(.wrapper:not(.embedded)) .btn {
     display: none;
+  }
+
+  :global(.wrapper:not(.theme-more-tv)) .title {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  :global(.wrapper:not(.theme-more-tv)) .btn {
+    font-size: 14px;
+    padding: 14px 64px 12px 64px;
+    margin-top: 14px;
+  }
+}
+
+@media (max-width: 375px) {
+  :global(.wrapper:not(.theme-more-tv)) .btn {
+    padding: 14px 32px 12px 32px;
   }
 }

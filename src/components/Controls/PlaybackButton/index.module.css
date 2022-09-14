@@ -4,7 +4,8 @@
   user-select: none;
 }
 
-.playback img {
+.icon {
+  composes: fade-in from global;
   width: var(--xl-icon-size);
   height: var(--xl-icon-size);
 }
@@ -14,7 +15,7 @@
     margin: 0 76px;
   }
 
-  .playback img {
+  .icon {
     width: var(--m-icon-size);
     height: var(--m-icon-size);
   }

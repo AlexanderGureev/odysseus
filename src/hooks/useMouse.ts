@@ -91,18 +91,24 @@ export const useMouse = (ref: React.RefObject<Element>): State => {
       const elX = pageX - posX;
       const elY = pageY - posY;
 
-      setState((prev) => ({
-        ...prev,
-        isEnter: elX >= 0 && elX <= elW && elY >= 0 && elY <= elH,
-        docX: pageX,
-        docY: pageY,
-        posX,
-        posY,
-        elX,
-        elY,
-        elH,
-        elW,
-      }));
+      setState((prev) => {
+        const isEnter = elX >= 0 && elX <= elW && elY >= 0 && elY <= elH;
+
+        return isEnter || prev.isMouseDown || prev.isEnter !== isEnter
+          ? {
+              ...prev,
+              isEnter,
+              docX: pageX,
+              docY: pageY,
+              posX,
+              posY,
+              elX,
+              elY,
+              elH,
+              elW,
+            }
+          : prev;
+      });
     };
 
     setState((prev) => ({ ...prev, ...getRect() }));

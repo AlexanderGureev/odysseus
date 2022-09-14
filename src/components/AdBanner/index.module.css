@@ -23,6 +23,7 @@
   bottom: 140px;
 }
 
+:global(.preview) .wrapper,
 :global(.controls-theme-trailer) .wrapper,
 :global(.trial-suggestion-before-pauseroll) .wrapper {
   display: none;

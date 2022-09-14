@@ -1,6 +1,6 @@
 import { Range } from 'components/UIKIT/Range';
 import { useAppDispatch, useAppSelector } from 'hooks';
-import React from 'react';
+import React, { useRef } from 'react';
 import { sendEvent } from 'store';
 import { secToHumanReadeable } from 'utils';
 
@@ -10,6 +10,8 @@ export const ProgressBar = () => {
   const dispatch = useAppDispatch();
   const { currentTime, duration } = useAppSelector((state) => state.playback);
   const { bufferedEnd } = useAppSelector((state) => state.buffering);
+
+  const time = secToHumanReadeable(currentTime || 0);
 
   return (
     <div className={Styles.progress}>
@@ -26,7 +28,17 @@ export const ProgressBar = () => {
         step={30}
         getFormattedLabel={(value) => secToHumanReadeable(value)}
       />
-      <div className={Styles.duration}>{secToHumanReadeable(duration || 0)}</div>
+      <div className={Styles['time-info']}>
+        <span
+          className={Styles.time}
+          style={{
+            minWidth: time.length < 6 ? 38 : 54,
+          }}>
+          {time}
+        </span>
+        <span className={Styles.separator}>{'/'}</span>
+        <span>{secToHumanReadeable(duration || 0)}</span>
+      </div>
     </div>
   );
 };

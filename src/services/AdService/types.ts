@@ -86,6 +86,7 @@ export type TAdBlock = {
   getAdFoxParams: () => {
     [x: string]: any;
   };
+  isYandexCreative: () => boolean;
 };
 
 export type InitOpts = {

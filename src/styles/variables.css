@@ -1,7 +1,6 @@
 :root {
   --font-default: 'SFProDisplay', Helvetica, Arial, sans-serif;
 
-  /* Buttons border radiuses related to height - https://jira.more.tv/browse/MOREFT-51 */
   --border-radius-h32: 12px;
   --border-radius-h40: 14px;
   --border-radius-h54: 18px;
@@ -25,19 +24,8 @@
   --z-index-overlay: 10;
   --overlay-background: rgba(14, 14, 14, 0.9);
   --modal-background: #141414;
-}
 
-.theme-more-tv {
-  --font-default: 'Montserrat';
-  --primary-color: #21a4f7;
-  --secondary-color: #1b1b1b;
-  --primary-text-color: #fff;
-}
-
-.theme-ctc {
-  --primary-color: #fed444;
-  --secondary-color: #1b1b1b;
-  --primary-text-color: #000;
+  --ad-primary-color: #ce2226;
 }
 
 .theme-ctc,
@@ -46,4 +34,53 @@
 .theme-che,
 .theme-ctc-kids {
   --font-default: 'CTCSans';
+  --text-weight: 800;
+  --text-transform: uppercase;
+}
+
+.theme-vm,
+.theme-default,
+.theme-more-tv {
+  --font-default: 'Montserrat';
+  --primary-color: #21a4f7;
+  --secondary-color: #1b1b1b;
+  --primary-text-color: #fff;
+  --color-invert: 0;
+  --text-weight: 600;
+  --text-transform: none;
+}
+
+.theme-ctc {
+  --primary-color: #fed444;
+  --secondary-color: #1b1b1b;
+  --primary-text-color: #000;
+  --color-invert: 1;
+}
+
+.theme-ctc-love {
+  --primary-color: #ea0d8c;
+  --secondary-color: #1b1b1b;
+  --primary-text-color: #fff;
+  --color-invert: 0;
+}
+
+.theme-home {
+  --primary-color: #d5275e;
+  --secondary-color: #1b1b1b;
+  --primary-text-color: #fff;
+  --color-invert: 0;
+}
+
+.theme-che {
+  --primary-color: #ed0e0e;
+  --secondary-color: #1b1b1b;
+  --primary-text-color: #fff;
+  --color-invert: 0;
+}
+
+.theme-ctc-kids {
+  --primary-color: #fed444;
+  --secondary-color: #1b1b1b;
+  --primary-text-color: #000;
+  --color-invert: 1;
 }

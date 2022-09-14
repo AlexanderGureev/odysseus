@@ -38,8 +38,8 @@ export const getTrackUrls = (state: AppState) => {
   const { origin } = new URL(sharing_url);
 
   return {
-    project_url: project_url ? `${origin}${project_url}` : null,
-    season_url: season_url ? `${origin}${season_url}` : null,
+    project_url: project_url ? (project_url.includes('://') ? project_url : `${origin}${project_url}`) : null,
+    season_url: season_url ? (season_url.includes('://') ? season_url : `${origin}${season_url}`) : null,
     track_url: sharing_url,
   };
 };

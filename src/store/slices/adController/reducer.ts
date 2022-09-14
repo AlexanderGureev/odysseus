@@ -8,7 +8,7 @@ import { logger } from 'utils/logger';
 
 import { checkPauseRoll, checkPostRoll, checkTimePoint, init, initAdBreak, preloadAdBlock } from './effects';
 import { Opts } from './effects/initAdBreak';
-import { ActionPayload, Event, FSMState, State } from './types';
+import { FSMState, State } from './types';
 
 const initialState: FSMState = {
   step: 'IDLE',
@@ -17,18 +17,6 @@ const initialState: FSMState = {
   point: null,
   isStarted: false,
   adBreaksCount: 0,
-};
-
-const extend = (config: FSMConfig<State, Event>, transition: { [event in Event]?: State | null }) => {
-  return Object.entries(config).reduce((acc, [state, value]) => {
-    return {
-      ...acc,
-      [state]: {
-        ...value,
-        ...transition,
-      },
-    };
-  }, {});
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -67,14 +55,14 @@ const config: FSMConfig<State, AppEvent> = {
   },
   INITIALIZING_AD_BREAK: {
     AD_BREAK_STARTED: 'AD_BREAK',
-    AD_BREAK_END: 'END',
+    AD_BREAK_END: 'IDLE',
     DISPOSE_PLAYER: 'IDLE',
   },
   AD_BREAK: {
-    AD_BREAK_END: 'END',
+    AD_BREAK_END: 'DISPOSE_AD_BREAK',
   },
-  END: {
-    RESET: 'IDLE',
+  DISPOSE_AD_BREAK: {
+    RESUME_VIDEO: 'IDLE',
   },
   DISABLED: {
     AD_INIT: 'INIT_AD_PENDING',
@@ -92,14 +80,14 @@ const adController = createSlice({
       const next = config[state.step]?.[type];
       const step = next || state.step;
 
-      if (type === 'RESET') return { ...initialState, adBreaksCount: state.adBreaksCount };
       if (type === 'CHANGE_TRACK') return initialState;
-
       if (next === undefined) return state;
 
       logger.log('[FSM]', 'adController', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
+        case 'AD_BREAK_END':
+          return { ...initialState, step, adBreaksCount: state.adBreaksCount };
         case 'AD_BREAK_STARTED':
           return { ...state, step, isStarted: true, adBreaksCount: state.adBreaksCount + 1 };
         default:
@@ -197,24 +185,7 @@ const addMiddleware = () =>
 
           initAdBreak(payload, opts);
         },
-        END: () => {
-          const { isStarted } = getState().adController;
-
-          dispatch(
-            sendEvent({
-              type: 'RESET',
-            })
-          );
-
-          if (isStarted) {
-            dispatch(
-              sendEvent({
-                type: 'RESUME_VIDEO',
-              })
-            );
-          }
-        },
-        DISABLED: () => {
+        DISPOSE_AD_BREAK: () => {
           dispatch(
             sendEvent({
               type: 'RESUME_VIDEO',

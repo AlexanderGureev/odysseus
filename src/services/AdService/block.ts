@@ -104,7 +104,7 @@ export const AdBlock = ({
           return adStore
             .preload({
               videoSlot: _video,
-              desiredBitrate: 1000, //если не задать, то в safari реклама не играет
+              // desiredBitrate: 1000, //если не задать, то в safari реклама не играет
             })
             .then(() => adStore)
             .catch(() => {
@@ -133,17 +133,17 @@ export const AdBlock = ({
         bufferFullTimeout: 30000,
         // pauseOnClickThrough: false,
         controlsSettings: {
-          controlsVisibility: true,
+          controlsVisibility: isYaCreative
+            ? true
+            : {
+                mute: false,
+                skip: false,
+                title: false,
+                adLabel: false,
+                timeline: false,
+              },
         },
       });
-
-      // {
-      //   mute: false,
-      //   skip: false,
-      //   title: false,
-      //   adLabel: false,
-      //   timeline: false,
-      // },
 
       adPlaybackController.subscribe('AdStarted', () => {
         mediator.emit('AdStarted');
@@ -324,6 +324,7 @@ export const AdBlock = ({
     preload,
     isPromo,
     isExclusive: () => Boolean(meta.extensions?.exclusive),
+    isYandexCreative: () => isYaCreative,
     isDisposed: () => isDisposed,
     getAdVolumeAvailability,
     setVolume,

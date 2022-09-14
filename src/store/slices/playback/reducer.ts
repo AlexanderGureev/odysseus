@@ -47,6 +47,7 @@ const config: FSMConfig<State, AppEvent> = {
   },
   PLAY_PENDING: {
     DO_PLAY_RESOLVE: 'PLAYING',
+    AUTO_PLAY_RESOLVE: 'PLAYING',
   },
   PAUSE_PENDING: {
     DO_PAUSE_RESOLVE: 'PAUSED',
@@ -63,6 +64,7 @@ const config: FSMConfig<State, AppEvent> = {
   PAUSED: {
     SET_PLAYING: 'PLAYING',
     DO_PLAY: 'CHECK_TOKEN_PENDING',
+    AUTO_PLAY: 'PLAY_PENDING',
     AD_BREAK_STARTED: 'AD_BREAK',
     ENDED: 'END',
     TIME_UPDATE: null,
@@ -254,12 +256,16 @@ const addMiddleware = () => {
         CHECK_TOKEN_PENDING: () => checkToken(opts),
         CHECK_MANIFEST_PENDING: () => checkManifest(opts),
         PLAY_PENDING: () => {
+          const {
+            payload: { type },
+          } = action as PayloadAction<EventPayload>;
+
           const { isFirstPlay } = getState().playback;
           opts.services.playerService.play();
 
           dispatch(
             sendEvent({
-              type: 'DO_PLAY_RESOLVE',
+              type: type === 'AUTO_PLAY' ? 'AUTO_PLAY_RESOLVE' : 'DO_PLAY_RESOLVE',
               meta: { isFirstPlay },
             })
           );

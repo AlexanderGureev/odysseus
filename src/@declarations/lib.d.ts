@@ -37,6 +37,16 @@ interface Window {
 
   meta: import('../../types/TrackMeta').TrackMeta | null;
   mediaFile: import('../../types/MediaFile').MediaFile;
+
+  debug?: {
+    play: () => void;
+    pause: () => void;
+    seek: (to: number) => void;
+    seekToAutoswitch: () => void;
+    seekToEnd: () => void;
+    seekToAd: (index: number) => void;
+    invokeError: (code: number) => void;
+  };
 }
 
 declare interface HTMLVideoElement {

@@ -128,6 +128,7 @@ export const baseEvents = (
       });
       break;
     case 'CLICK_SUB_BUTTON':
+      postMessageService.emit('show_payment_popup');
       postMessageService.emit('pay_and_watch_button', {
         payload: {
           time_cursor: playback.currentTime || 0,

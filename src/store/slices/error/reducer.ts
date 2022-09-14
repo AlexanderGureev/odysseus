@@ -3,6 +3,7 @@ import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { RawPlayerError } from 'types/errors';
+import { buildQueryParams } from 'utils';
 import { logger } from 'utils/logger';
 
 import { FSMState, State } from './types';
@@ -98,7 +99,20 @@ const addMiddleware = () =>
 
       const handler: { [key in State]?: () => Promise<void> | void } = {
         RELOADING: () => {
-          window.location.reload();
+          const {
+            playback: { currentTime },
+            root: {
+              meta: { trackId, partnerId, userToken },
+              params,
+            },
+          } = getState();
+
+          const queryParams = buildQueryParams({ ...params, startAt: currentTime || 0 });
+          const target = `${window.location.origin}/player/${partnerId}/${trackId}${userToken ? `/${userToken}` : ''}${
+            queryParams ? `?${queryParams}` : ''
+          }`;
+
+          window.location.href = target;
           dispatch(sendEvent({ type: 'RELOADING_RESOLVE' }));
         },
         OPENING_NEW_PAGE: () => {

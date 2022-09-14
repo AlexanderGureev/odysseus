@@ -7,16 +7,35 @@
   z-index: 1;
 }
 
+:global(.unmute-button:not(.mobile):not(.theme-more-tv):not(.theme-ctc)) .progress {
+  margin-left: 148px;
+}
+
+:global(.wrapper.unmute-button:not(.mobile).theme-default) .progress,
+:global(.wrapper.unmute-button:not(.mobile).theme-vm) .progress {
+  margin-left: 168px;
+}
+
 :global(.mobile) .progress {
   margin-left: 0;
 }
 
-.duration {
+.time-info {
   color: var(--text-color-87);
   font-size: 13px;
   font-weight: 500;
   line-height: 1.15;
   margin-left: 24px;
+  display: flex;
+}
+
+.time {
+  min-width: 38px;
+  text-align: left;
+}
+
+.separator {
+  padding-right: 4px;
 }
 
 .progress :global .range-input-thumb {
@@ -38,7 +57,7 @@
 }
 
 .progress :global .range-input-thumb:hover {
-  transform: translate(-50%, -50%) scale(1.45);
+  transform: translateX(-50%) scale(1.45);
 }
 
 .progress :global .range-input-label,

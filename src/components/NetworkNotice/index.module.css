@@ -11,6 +11,7 @@
   padding: 6px 0;
   opacity: 0;
   user-select: none;
+  pointer-events: none;
 }
 
 .network img {
@@ -31,17 +32,18 @@
   background-color: #4cd964;
   animation: hide 0.3s ease forwards;
   animation-delay: 3s;
-  pointer-events: none;
   opacity: 1;
 }
 
 .offline {
   opacity: 1;
   background-color: #ff3b30;
+  pointer-events: all;
 }
 
 .rejected {
   background-color: #808080;
+  pointer-events: all;
 }
 
 .title {
@@ -85,12 +87,18 @@
 }
 
 @media (max-width: 599px) {
-  .network {
+  .network.offline,
+  .network.rejected {
     flex-direction: column;
+    height: 30px;
   }
 
   .group {
     margin-top: 4px;
     margin: 0;
+  }
+
+  .rejected .btn {
+    margin-left: 0;
   }
 }

@@ -4,7 +4,7 @@ import { sendEvent } from 'store/actions';
 
 export const getNext = ({ getState, dispatch, services: { adService, embeddedCheckService } }: EffectOpts) => {
   const {
-    adBlock: { links, point, limit, index, isExclusive, isPromo },
+    adBlock: { links, adPoint, limit, index, isExclusive, isPromo },
     root: {
       meta,
       session,
@@ -19,11 +19,11 @@ export const getNext = ({ getState, dispatch, services: { adService, embeddedChe
   const idx = index + 1;
 
   if (idx < 1 && !isPromo) {
-    const preloadedBlock = adService.getBlock(point, idx);
+    const preloadedBlock = adService.getBlock(adPoint, idx);
     if (preloadedBlock) currentLinks = preloadedBlock.getLinks();
     else {
       adService.createBlock(currentLinks, {
-        config: point,
+        config: adPoint,
         index: idx,
         limit,
         isPromo: isExclusive,
@@ -55,7 +55,7 @@ export const getNext = ({ getState, dispatch, services: { adService, embeddedChe
     dispatch(
       sendEvent({
         type: 'AD_BREAK_END',
-        meta: point,
+        meta: adPoint,
       })
     );
   }

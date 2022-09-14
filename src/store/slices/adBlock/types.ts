@@ -10,8 +10,7 @@ export type State =
   | 'PAUSE_AD_BLOCK_PENDING'
   | 'SKIP_AD_BLOCK_PENDING'
   | 'PLAYING'
-  | 'PAUSED'
-  | 'END';
+  | 'PAUSED';
 
 export type EventsWithPayload =
   | WithoutPayload<
@@ -20,7 +19,6 @@ export type EventsWithPayload =
       | 'DO_PAUSE_AD_BLOCK'
       | 'PLAY_AD_BLOCK_RESOLVE'
       | 'PAUSE_AD_BLOCK_RESOLVE'
-      | 'RESET'
       | 'AD_BLOCK_IMPRESSION'
       | 'AD_BLOCK_CLICK'
     >
@@ -75,7 +73,7 @@ export type EventsWithPayload =
     }
   | {
       type: 'SET_ADFOX_PARAMS';
-      payload: { adFoxParams: Record<string, any> };
+      payload: { adFoxParams: Record<string, any>; isYandexCreative: boolean };
     }
   | { type: 'AD_BLOCK_ERROR'; meta: { name: string | undefined; message: string | undefined } };
 
@@ -87,13 +85,14 @@ export type FSMState = {
   step: State;
 
   links: AdLinksByType;
-  point: TAdPointConfig;
+  adPoint: TAdPointConfig;
   limit: number;
   index: number;
   isExclusive: boolean;
   isPromo: boolean;
   skippable: boolean;
   isVolumeAvailable: boolean;
+  isYandexCreative: boolean;
 
   currentTime: number | null;
   duration: number | null;
