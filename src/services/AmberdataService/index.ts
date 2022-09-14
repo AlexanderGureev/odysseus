@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
 import { Nullable, SkinClass } from 'types';
@@ -60,6 +61,10 @@ const PARAMS_MAP: Record<string, string> = {
   userId: QUERY_PARAMS.USER_ID,
 };
 
+const PARSE_VALUE: Record<string, (value: string | number) => string> = {
+  eventPosition: (value: string | number) => `${value}`.replace(/\./, '_'),
+};
+
 const initQueryParams: Record<string, string> = {
   [PARAMS.SEASON]: 'season_id',
   [PARAMS.ADFOX_PARTNER]: 'adfox_partner',
@@ -114,7 +119,8 @@ const AmberdataService = () => {
 
     Object.entries(opts).forEach(([key, value]) => {
       if (!isNil(value)) {
-        const params = `${PARAMS_MAP[key]}__${value}`;
+        const val = PARSE_VALUE[key] ? PARSE_VALUE[key](value!) : value;
+        const params = `${PARAMS_MAP[key]}__${val}`;
         queryString += queryString === '' ? `${params}` : ` ${params}`;
       }
     });
