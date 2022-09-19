@@ -4,7 +4,7 @@ import { isIOS, isMobile } from 'react-device-detect';
 import { Device, FavouritesItemMeta } from 'services/FavouritesService/types';
 import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { AppState } from 'store';
-import { TExtendedConfig } from 'types';
+import { TConfig, TExtendedConfig } from 'types';
 import { AppliedTariffModifiers, SubscriptionStatus, SubscriptionType, UserSubscription } from 'types/UserSubscription';
 import { pad } from 'utils';
 import { declOfNum } from 'utils/declOfNum';
@@ -205,3 +205,5 @@ export const selectMailOptions = (state: AppState): MailOpts => {
     webVersion: params.web_version,
   };
 };
+
+export const selectSharingURL = (config: TConfig) => config?.playlist?.items?.[0]?.sharing_url;

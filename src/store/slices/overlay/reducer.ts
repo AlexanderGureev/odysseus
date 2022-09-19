@@ -107,7 +107,7 @@ const addMiddleware = () =>
         },
         CLOSING_OVERLAY: () => {
           const { autoPause } = getState().overlay;
-          if (autoPause) dispatch(sendEvent({ type: 'DO_PLAY' }));
+          if (autoPause) dispatch(sendEvent({ type: 'AUTO_PLAY' }));
           dispatch(sendEvent({ type: 'CLOSING_OVERLAY_RESOLVE' }));
         },
       };

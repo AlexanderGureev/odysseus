@@ -272,7 +272,7 @@ export type UpdateConfigType = PlayerParams & {
 
 // Команды направленные к плееру от веба
 export type INPUT_PLAYER_POST_MESSAGE = {
-  setPageLocation: (p: any) => void;
+  setPageLocation: (p: { location: string }) => void;
   updateLinkedTracks: (p: any) => void;
   userReachedCorrectAge: (p: any) => void;
   userNotReachedCorrectAge: (p: any) => void;

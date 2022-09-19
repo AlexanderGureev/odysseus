@@ -304,12 +304,18 @@
  */
 
 /**
+ * ExperimentsCfg
+ * @typedef {object} ExperimentsCfg
+ */
+
+/**
  * PlayerConfig
  * @typedef {object} PlayerConfig
  * @property {Config} config
  * @property {Playlist} playlist
- * @property {MediascopeCounter} mediascopeCounter
+ * @property {SkinData} features
  * @property {array<ServiceTariff>} serviceTariffs
  * @property {array<Subscription>} subscriptions
  * @property {TrackInfo} trackInfo
+ * @property {ExperimentsCfg} experiments
  */

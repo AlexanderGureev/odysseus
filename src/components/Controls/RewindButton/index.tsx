@@ -17,8 +17,15 @@ export const RewindBackwardButton = () => {
 
   return (
     <div className={Styles.backward} onClick={onClick}>
-      {dec < 0 && <span className={Styles.acc}>- {Math.abs(dec)} сек</span>}
-      <img src={controlBackwardIcon} />
+      {dec < 0 && (
+        <span key={dec} className={Styles.acc}>
+          - {Math.abs(dec)} сек
+        </span>
+      )}
+      <div className={Styles.control}>
+        <img src={controlBackwardIcon} />
+        <span className={Styles.text}>{BACKWARD_REWIND_STEP}</span>
+      </div>
     </div>
   );
 };
@@ -33,8 +40,15 @@ export const RewindForwardButton = () => {
 
   return (
     <div className={Styles.forward} onClick={onClick}>
-      {inc > 0 && <span className={Styles.acc}>+ {inc} сек</span>}
-      <img src={controlForwardIcon} />
+      {inc > 0 && (
+        <span key={inc} className={Styles.acc}>
+          + {inc} сек
+        </span>
+      )}
+      <div className={Styles.control}>
+        <img src={controlForwardIcon} />
+        <span className={Styles.text}>{FORWARD_REWIND_STEP}</span>
+      </div>
     </div>
   );
 };

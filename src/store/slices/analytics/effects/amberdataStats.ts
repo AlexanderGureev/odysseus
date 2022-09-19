@@ -94,7 +94,7 @@ export const amberdataStats = async (
       amberdataService.sendAmberdataStat({
         eventType: 'move',
         eventPosition: currentTime,
-        eventManual: fullscreen.step === 'FULLSCREEN' && isIOS ? 1 : 0,
+        eventManual: 1,
       });
       break;
     case 'SEEK_STARTED':

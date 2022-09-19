@@ -22,14 +22,14 @@
   height: var(--xl-icon-size);
 }
 
-.hidden {
-  display: none;
-}
-
 .group {
   display: flex;
   position: absolute;
   top: 100%;
+}
+
+.group.hidden {
+  display: none;
 }
 
 :global(.wrapper:not(.theme-more-tv)) .agree,

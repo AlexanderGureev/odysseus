@@ -35,7 +35,7 @@ export const QualityMenu: React.FC<{ data: TQualityList; selected: QUALITY_MARKS
   const dispatch = useAppDispatch();
 
   const items = useMemo(() => {
-    return data.map((mark) => qualityOptions[mark]);
+    return data.map((mark) => ({ ...qualityOptions[mark], id: mark }));
   }, [data]);
 
   const onSelect = useCallback(

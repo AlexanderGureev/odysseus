@@ -1,5 +1,6 @@
 .resume {
   composes: fade-in from global;
+  padding-top: 35px;
 }
 
 .agree,
@@ -22,5 +23,9 @@
   .agree,
   .disagree {
     width: 200px;
+  }
+
+  .resume {
+    padding-top: 0;
   }
 }

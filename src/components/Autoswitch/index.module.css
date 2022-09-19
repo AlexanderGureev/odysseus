@@ -143,7 +143,8 @@
 }
 
 :global(.theme-more-tv) .poster-text,
-:global(.theme-more-tv) .episode .poster-wrapper {
+:global(.theme-more-tv) .episode .poster-wrapper,
+:global(.theme-more-tv) .episode .badge {
   display: none;
 }
 

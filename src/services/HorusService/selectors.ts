@@ -150,7 +150,7 @@ export const createParamsSelector = ({
   streaming_session_id: () => getState().root.session.id,
   ad_roll_type_puid3: () => getState().adBlock.adFoxParams?.puid3 || null,
   video_business_model: () => {
-    const paid = getPlaylistItem(getState()).paid ?? 'unknown';
+    const paid = getPlaylistItem(getState())?.paid ?? 'unknown';
     return getState().root.previews ? VIDEO_BUSSINESS_MODEL_TYPES.PREVIEW : VIDEO_BUSSINESS_MODEL_MAP[`${paid}`];
   },
   partner_id: () => getState().root.meta.partnerId,

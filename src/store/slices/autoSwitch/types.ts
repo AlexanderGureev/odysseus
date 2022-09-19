@@ -62,6 +62,6 @@ export type FSMState = {
   previousTime: number | null;
   auto: boolean;
 
-  autoswitchNotifyType: AutoswitchNotifyType;
+  autoswitchNotifyType: AutoswitchNotifyType | null;
   autoswitchNotifyText: string | null;
 };

@@ -1,4 +1,5 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { isIOS } from 'react-device-detect';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
@@ -86,9 +87,10 @@ const addMiddleware = () =>
           services.playerService.on('seeking', () => {
             const {
               rewind: { step },
+              fullscreen,
             } = getState();
 
-            if (step === 'READY') {
+            if (step === 'READY' && isIOS && fullscreen.step === 'FULLSCREEN') {
               dispatch(
                 sendEvent({
                   type: 'SET_SEEKING',
@@ -102,7 +104,7 @@ const addMiddleware = () =>
               rewind: { step },
             } = getState();
 
-            if (step !== 'DISABLED') {
+            if (step === 'SEEKING') {
               dispatch(
                 sendEvent({
                   type: 'SEEK_END',

@@ -146,7 +146,9 @@ const addMiddleware = () =>
         INIT_AD_DISABLE_SUGGESTION: () => {
           const {
             root: { adConfig, subscription },
-            experiments: { experiments },
+            experiments: {
+              web: { experiments },
+            },
           } = getState();
 
           const { num_in_project } = getPlaylistItem(getState());

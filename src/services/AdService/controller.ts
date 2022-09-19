@@ -74,7 +74,7 @@ const AdService = (localStorageService: ILocalStorageService) => {
       if (!isPreloadable() || block.isPromo) return;
 
       if (index + 1 < limit) {
-        logger.log('[AdService]', 'preload next');
+        logger.log('[AdService]', 'preload next', { config });
 
         const isExclusive = index === 0 && block.isExclusive();
         const nextBlock = createBlock(block.getLinks(), {

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { EffectOpts } from 'interfaces';
-import { PLAYER_ID } from 'services/PlayerService/types';
 import { sendEvent } from 'store/actions';
 import { getPlaylistItem } from 'store/selectors';
 import { ERROR_CODES } from 'types/errors';
@@ -16,7 +15,6 @@ export const initAnalytics = async (opts: EffectOpts) => {
       ymService,
       gaService,
       amberdataService,
-      vigoService,
       tnsCounter,
       demonService,
       embeddedCheckService,
@@ -41,11 +39,6 @@ export const initAnalytics = async (opts: EffectOpts) => {
         transactionId: data.transaction_id,
         userId: config.config.user_id,
         trackId: data.track_id,
-      }),
-      vigoService.init({
-        playerId: PLAYER_ID,
-        sid: session.sid!,
-        skinName: meta.skin!,
       }),
       ymService.init({
         videosession_id: session.videosession_id,

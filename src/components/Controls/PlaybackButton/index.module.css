@@ -2,12 +2,14 @@
   cursor: pointer;
   margin: 0 105px;
   user-select: none;
+  width: var(--xl-icon-size);
+  height: var(--xl-icon-size);
 }
 
 .icon {
   composes: fade-in from global;
-  width: var(--xl-icon-size);
-  height: var(--xl-icon-size);
+  width: 100%;
+  height: 100%;
 }
 
 @media (max-width: 599px) {
@@ -15,7 +17,7 @@
     margin: 0 76px;
   }
 
-  .icon {
+  .playback {
     width: var(--m-icon-size);
     height: var(--m-icon-size);
   }

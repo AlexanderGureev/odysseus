@@ -86,6 +86,12 @@ const Wrapper = React.memo(({ children, className }: React.PropsWithChildren<{ c
     <div
       className={cn(Styles.controls, isUnmuteButton && 'unmute-btn', status, className)}
       onMouseMove={onMouseMove}
+      onMouseEnter={show}
+      onMouseLeave={() => {
+        if (playbackStep === 'PLAYING') {
+          setControlsStatus('controls-hidden');
+        }
+      }}
       onClick={show}>
       <div className={Styles.wrapper}>{children}</div>
     </div>

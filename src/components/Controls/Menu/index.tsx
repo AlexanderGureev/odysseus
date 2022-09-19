@@ -10,6 +10,7 @@ import { MenuItem } from 'components/UIKIT/Menu/types';
 import { useAppDispatch, useAppSelector, useFeatures, useLocalStorage } from 'hooks';
 import useMediaQuery from 'hooks/useMedia';
 import React, { useCallback } from 'react';
+import { isMobile } from 'react-device-detect';
 import { STORAGE_SETTINGS } from 'services/LocalStorageService/types';
 import { QUALITY_MARKS } from 'services/VigoService';
 import { sendEvent } from 'store';
@@ -23,7 +24,7 @@ export const Menu = () => {
   const quality = useAppSelector((state) => state.quality);
   const playbackSpeed = useAppSelector((state) => state.playbackSpeed);
   const errorReports = useAppSelector((state) => state.errorReports);
-  const isMobile = useMediaQuery('(max-width: 428px)');
+  const isMobileResolution = useMediaQuery('(max-width: 428px)');
 
   const { COMPLAINT_LIMIT_TIME, SHARING } = useFeatures();
   const { getItemByDomain } = useLocalStorage();
@@ -61,16 +62,18 @@ export const Menu = () => {
     items: quality.qualityList.map((v) => qualityOptions[v]),
     selected: quality.currentQualityMark,
     onSelect: onSelectQuality,
+    closeOnSelect: isMobile,
   };
 
   const playbackSpeedSubMenu = {
     items: playbackSpeed.list.map((v) => ({ title: v === 1 ? 'Обычная' : `${v}`, value: `${v}` })),
     selected: `${playbackSpeed.currentSpeed}`,
     onSelect: onSelectPlaybackSpeed,
+    closeOnSelect: isMobile,
   };
 
   const menu = [
-    isMobile
+    isMobileResolution
       ? {
           id: '1',
           icon: qualityMenuIcon,
@@ -100,7 +103,7 @@ export const Menu = () => {
           value: 'embedding',
         }
       : null,
-    !isMobile
+    !isMobileResolution
       ? {
           id: '5',
           icon: hotkeysIcon,

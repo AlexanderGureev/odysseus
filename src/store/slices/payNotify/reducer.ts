@@ -9,6 +9,7 @@ import { SkinClass, SubscriptionPreviewType } from 'types';
 import { declOfNum } from 'utils/declOfNum';
 import { logger } from 'utils/logger';
 
+import { clickSubscribeButton } from '../adDisableSuggestion/effects/clickSubscribeButton';
 import { getButtonTextBySkin } from '../paywall';
 import { FSMState, State } from './types';
 
@@ -60,6 +61,7 @@ const config: FSMConfig<State, AppEvent> = {
   READY: {
     VIDEO_END: 'DISABLED',
     CLICK_SUB_BUTTON: 'CLICK_SUB_BUTTON_PROCESSING',
+    CHANGE_TRACK: 'IDLE',
   },
   CLICK_SUB_BUTTON_PROCESSING: {
     CLICK_SUB_BUTTON_PROCESSING_RESOLVE: 'READY',
@@ -107,6 +109,12 @@ const addMiddleware = () => {
 
       const { step } = getState().payNotify;
 
+      const opts = {
+        dispatch,
+        getState,
+        services,
+      };
+
       const handler: { [key in State]?: () => Promise<void> | void } = {
         SETUP_PAY_NOTIFY: () => {
           const state = getState();
@@ -132,27 +140,10 @@ const addMiddleware = () => {
         },
         CLICK_SUB_BUTTON_PROCESSING: () => {
           const {
-            root: {
-              config,
-              meta: { isEmbedded, trackId },
-              previews,
-            },
+            root: { previews },
           } = getState();
 
-          const item = getPlaylistItem(getState());
-
-          if (item.sharing_url && isEmbedded) {
-            const queryParams = services.utmService
-              .buildUTMQueryParams({
-                term: previews ? 'preview' : 'subscribe_cta',
-                trackId,
-                skinId: config.config.skin_id,
-              })
-              .toString();
-
-            window.open(`${item.sharing_url}?${queryParams}`, '_blank');
-          }
-
+          clickSubscribeButton(opts, { term: previews ? 'preview' : 'subscribe_cta' });
           dispatch(sendEvent({ type: 'CLICK_SUB_BUTTON_PROCESSING_RESOLVE' }));
         },
       };

@@ -1,6 +1,7 @@
 .wrapper {
   composes: fade-in from global;
 
+  user-select: none;
   position: absolute;
   top: 78px;
   width: 100%;

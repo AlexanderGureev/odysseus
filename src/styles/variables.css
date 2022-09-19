@@ -22,8 +22,13 @@
   --xxl-icon-size: 48px;
 
   --z-index-overlay: 10;
+  --z-index-loader: 1000;
+  --z-index-error-screen: 2000;
+  --z-index-network-notice: 3000;
+
   --overlay-background: rgba(14, 14, 14, 0.9);
   --modal-background: #141414;
+  --modal-overlay: rgba(0, 0, 0, 0.1);
 
   --ad-primary-color: #ce2226;
 }

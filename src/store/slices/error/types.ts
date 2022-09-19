@@ -4,7 +4,7 @@ import { RawPlayerError } from 'types/errors';
 export type State = 'IDLE' | 'RELOADING' | 'OPENING_NEW_PAGE' | 'ERROR' | 'NETWORK_ERROR' | 'DISABLED';
 
 export type EventsWithPayload =
-  | ErrorPayload<'PLAYER_ERROR' | 'NETWORK_ERROR' | 'SHOW_ERROR'>
+  | ErrorPayload<'PLAYER_ERROR' | 'SHOW_ERROR'>
   | {
       type: 'ERROR_SHOWN' | 'RELOAD' | 'RELOADING_RESOLVE' | 'OPENING_NEW_PAGE_RESOLVE';
     }
@@ -14,6 +14,10 @@ export type EventsWithPayload =
         url: string;
         target?: string;
       };
+    }
+  | {
+      type: 'NETWORK_ERROR';
+      meta: { error: RawPlayerError; playbackState?: 'PAUSED' | 'PLAYING' };
     };
 
 export type Event = EventsWithPayload['type'];

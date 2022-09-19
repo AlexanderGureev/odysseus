@@ -64,6 +64,8 @@ const YMService = () => {
   };
 
   const log = (payload: Partial<YMQueryParams> = {}) => {
+    logger.log('[YMService]', 'log', payload);
+
     ymInstance(
       YMID,
       'params',

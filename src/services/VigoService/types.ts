@@ -3,9 +3,12 @@ import { Nullable, SkinClass } from 'types';
 import { QUALITY_MARKS } from '.';
 
 export type TVigoParams = {
-  playerId: string;
+  videoNode: HTMLVideoElement;
   sid: string;
   skinName: SkinClass;
+  getBitrate: () => number | null;
+  getBytes: () => number | null;
+  qualityMark: QUALITY_MARKS | null;
 };
 
 export type VigoInfo = {
@@ -15,6 +18,8 @@ export type VigoInfo = {
   quality: Nullable<number>;
   player: string;
   host?: string;
+  getBitrate: () => number | null;
+  getBytes: () => number | null;
 };
 
 export type VigoInitOpts = VigoInfo & {
@@ -52,4 +57,5 @@ export type VigoEvent =
 export type TVigoService = {
   init: (params: TVigoParams) => void;
   sendStat: (event: VigoEvent) => void;
+  dispose: () => void;
 };

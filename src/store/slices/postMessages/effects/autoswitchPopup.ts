@@ -12,7 +12,7 @@ export const autoswitchPopup = (
     autoSwitch,
   } = getState();
 
-  if (autoSwitch.step !== 'AUTOSWITCH_NOTIFY') return;
+  if (autoSwitch.step !== 'AUTOSWITCH_NOTIFY' || autoSwitch.autoswitchNotifyType !== 'avod_popup') return;
 
   switch (payload.type) {
     case 'HIDE_AUTOSWITCH_NOTIFY':

@@ -11,6 +11,22 @@
   user-select: none;
 }
 
+@keyframes show {
+  0% {
+    opacity: 0;
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
 .splashscreen img {
+  animation-name: show;
+  animation-fill-mode: forwards;
   width: 100%;
 }

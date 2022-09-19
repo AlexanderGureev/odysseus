@@ -35,7 +35,7 @@ export const horusStat = (
         horusService.routeEvent(isEnded || isHidden ? 'HORUS_AUTO_PAUSE' : 'HORUS_CLICK_PAUSE');
         break;
       case 'SET_SEEKING':
-      case 'SEEK':
+      case 'SEEK_STARTED':
         horusService.routeEvent('HORUS_GOTO');
         break;
     }
@@ -46,6 +46,8 @@ export const horusStat = (
     case 'PARSE_CONFIG_RESOLVE':
       horusService.routeEvent('HORUS_SESSION_STARTED');
       break;
+
+    case 'AUTO_PLAY':
     case 'START_PLAYBACK':
       horusService.routeEvent('HORUS_AUTO_PLAY');
       break;
@@ -70,7 +72,9 @@ export const horusStat = (
       horusService.routeEvent('HORUS_AUTO_SWITCH_CLICK_NEXT_TRACK');
       break;
     case 'GO_TO_NEXT_TRACK':
-      horusService.routeEvent('HORUS_AUTO_SWITCH_SWITCH_NEXT_TRACK');
+      if (payload.meta?.overlay && payload.meta?.auto) {
+        horusService.routeEvent('HORUS_AUTO_SWITCH_SWITCH_NEXT_TRACK');
+      }
       break;
 
     case 'BUFFERING_START':

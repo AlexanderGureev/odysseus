@@ -28,7 +28,7 @@ const initialState: FSMState = {
   badge: null,
 
   auto: true,
-  autoswitchNotifyType: 'default',
+  autoswitchNotifyType: null,
   autoswitchNotifyText: null,
 };
 
@@ -155,13 +155,21 @@ const autoSwitch = createSlice({
           if (currentTime >= state.autoswitchPoint) {
             const diff = currentTime - previousTime;
             const countdownValue = state.countdownValue - diff;
-
-            return {
+            const payload = {
               ...state,
               previousTime: currentTime,
               countdownValue,
-              step: Math.ceil(countdownValue) > 0 ? 'SELECT_AUTOSWITCH_NOTIFY_TYPE' : 'AUTOSWITCH_PENDING',
             };
+
+            return Math.ceil(countdownValue) > 0
+              ? {
+                  ...payload,
+                  step: state.autoswitchNotifyType ? 'AUTOSWITCH_NOTIFY' : 'SELECT_AUTOSWITCH_NOTIFY_TYPE',
+                }
+              : {
+                  ...payload,
+                  step: 'AUTOSWITCH_PENDING',
+                };
           }
 
           return { ...state, previousTime: currentTime, countdownValue: state.countdown, step: 'READY' };

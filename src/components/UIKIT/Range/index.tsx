@@ -71,7 +71,7 @@ export const Range = ({
   const progressValue = w * (currentValue / max);
   const bufferPercent = bufferValue ? bufferValue / max : null;
 
-  useLayoutEffect(() => {
+  useUpdateEffect(() => {
     if (!transitionStep) return;
     isDisableTransition.current = Math.abs(initialValue - currentValue) > transitionStep;
   }, [currentValue, initialValue, transitionStep]);

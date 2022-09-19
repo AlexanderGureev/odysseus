@@ -4,7 +4,7 @@ import { browserVersion, engineName, engineVersion, isMobile, isSafari, osName, 
 import { createParamsSelector } from 'services/HorusService/selectors';
 import { APP_DB_NAME, CollectionName, Indexes } from 'services/IDBService/types';
 import { sendEvent } from 'store/actions';
-import { featuresSelector } from 'store/selectors';
+import { featuresSelector, selectSharingURL } from 'store/selectors';
 import { ERROR_CODES } from 'types/errors';
 import { on } from 'utils';
 import { debounce } from 'utils/debounce';
@@ -126,8 +126,10 @@ export const initialize = async (opts: EffectOpts) => {
     registerListeners(opts);
     setupRequest();
 
+    const sharingURL = selectSharingURL(window.ODYSSEUS_PLAYER_CONFIG);
+
     const [isEmbedded] = await Promise.all([
-      embeddedCheckService.getEmbededStatus(),
+      embeddedCheckService.getEmbededStatus(sharingURL),
       sauronService.init(),
       favouritesService.init(dbService, {
         getToken: () => getState().root.meta.userToken,

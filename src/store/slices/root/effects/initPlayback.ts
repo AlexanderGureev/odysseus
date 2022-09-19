@@ -4,6 +4,7 @@ import { sendEvent } from 'store/actions';
 export const initPlayback = ({ getState, dispatch }: EffectOpts) => {
   const {
     root: { isFirstStartPlayback },
+    resumeVideo: { startPosition },
     playback: { ended },
   } = getState();
 
@@ -17,6 +18,9 @@ export const initPlayback = ({ getState, dispatch }: EffectOpts) => {
     dispatch(
       sendEvent({
         type: 'START_PLAYBACK',
+        payload: {
+          currentTime: startPosition,
+        },
         meta: {
           isFirst: isFirstStartPlayback,
         },

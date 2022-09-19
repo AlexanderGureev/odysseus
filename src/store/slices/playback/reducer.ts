@@ -31,6 +31,7 @@ const config: FSMConfig<State, AppEvent> = {
   READY: {
     AD_BREAK_STARTED: 'AD_BREAK',
     START_PLAYBACK: 'PLAY_PENDING',
+    RESTORE_PLAYBACK: null,
     END_PLAYBACK: 'CHECK_AUTOSWITCH_PENDING',
     META_LOADED: null,
   },
@@ -101,7 +102,7 @@ const playback = createSlice({
       const step = next || state.step;
 
       if (['CHANGE_TRACK'].includes(type)) return { ...initialState, step: 'READY' };
-      if (['RESUME_VIDEO'].includes(type)) return { ...state, step: 'READY' };
+      if (['RESUME_VIDEO', 'INIT_RESUME_VIDEO'].includes(type)) return { ...state, step: 'READY' };
       if (['NETWORK_ERROR', 'GO_TO_NEXT_TRACK', 'GO_TO_PREV_TRACK'].includes(type)) {
         return { ...state, step: 'PAUSE_PENDING' };
       }
@@ -115,8 +116,18 @@ const playback = createSlice({
           return { ...state, isFirstPlay: false, step };
         case 'ENDED':
           return { ...state, step, ended: true };
+        case 'RESTORE_PLAYBACK':
+          return {
+            ...state,
+            step: meta.state === 'PLAYING' ? 'PLAY_PENDING' : 'PAUSED',
+          };
         case 'START_PLAYBACK':
-          return { ...state, step, ...payload, pausedAt: null };
+          return {
+            ...state,
+            step,
+            ...payload,
+            pausedAt: null,
+          };
         case 'SEEK_STARTED':
           const duration = state.duration || 0;
           state.currentTime = meta.to < 0 ? 0 : meta.to > duration ? duration : meta.to;
@@ -255,13 +266,13 @@ const addMiddleware = () => {
         },
         CHECK_TOKEN_PENDING: () => checkToken(opts),
         CHECK_MANIFEST_PENDING: () => checkManifest(opts),
-        PLAY_PENDING: () => {
+        PLAY_PENDING: async () => {
           const {
             payload: { type },
           } = action as PayloadAction<EventPayload>;
 
           const { isFirstPlay } = getState().playback;
-          opts.services.playerService.play();
+          await services.playerService.play();
 
           dispatch(
             sendEvent({

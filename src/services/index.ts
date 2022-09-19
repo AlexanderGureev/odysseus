@@ -3,6 +3,7 @@ export { AmberdataService } from './AmberdataService';
 export { ChannelService } from './ChannelService';
 export { DemonService } from './DemonService';
 export { EmbeddedCheckService } from './EmbeddedCheckService';
+export { ExperimentsService } from './ExperimentsService';
 export { FavouritesService } from './FavouritesService';
 export { GAService } from './GaService/service';
 export { HorusService } from './HorusService';

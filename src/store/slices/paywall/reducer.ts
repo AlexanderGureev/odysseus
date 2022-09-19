@@ -7,6 +7,7 @@ import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { SkinClass } from 'types';
 import { logger } from 'utils/logger';
 
+import { clickSubscribeButton } from '../adDisableSuggestion/effects/clickSubscribeButton';
 import { FSMState, State, SubType } from './types';
 
 const DEFAULT_TITLE = 'Оформи подписку<br/>для продолжения просмотра';
@@ -109,6 +110,12 @@ const addMiddleware = () => {
 
       const { step } = getState().paywall;
 
+      const opts = {
+        dispatch,
+        getState,
+        services,
+      };
+
       const handler: { [key in State]?: () => Promise<void> | void } = {
         SETUP_PAYWALL: () => {
           const state = getState();
@@ -135,27 +142,10 @@ const addMiddleware = () => {
         },
         CLICK_SUB_BUTTON_PROCESSING: () => {
           const {
-            root: {
-              config,
-              meta: { isEmbedded, trackId },
-              previews,
-            },
+            root: { previews },
           } = getState();
 
-          const item = getPlaylistItem(getState());
-
-          if (item.sharing_url && isEmbedded) {
-            const queryParams = services.utmService
-              .buildUTMQueryParams({
-                term: previews ? 'preview' : 'paywall',
-                trackId,
-                skinId: config.config.skin_id,
-              })
-              .toString();
-
-            window.open(`${item.sharing_url}?${queryParams}`, '_blank');
-          }
-
+          clickSubscribeButton(opts, { term: previews ? 'preview' : 'paywall' });
           dispatch(sendEvent({ type: 'CLICK_SUB_BUTTON_PROCESSING_RESOLVE' }));
         },
       };

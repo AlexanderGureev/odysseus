@@ -15,6 +15,7 @@ const initialState: FSMState = {
   ym_client_id: null,
   hacks_detected: [],
   isViewSent: false,
+  isActiveWatchProgress: false,
 };
 
 const config: FSMConfig<State, AppEvent> = {
@@ -22,6 +23,8 @@ const config: FSMConfig<State, AppEvent> = {
     DO_INIT: 'INIT_ANALYTICS_SUBCRIBERS',
     SET_ANALYTICS_DATA: null,
     CHANGE_TRACK: null,
+    HEARTBEAT_VIDEO: null,
+    START_PLAYBACK: null,
   },
   INIT_ANALYTICS_SUBCRIBERS: {
     INIT_ANALYTICS_SUBCRIBERS_RESOLVE: 'IDLE',
@@ -43,8 +46,14 @@ const analytics = createSlice({
       logger.log('[FSM]', 'analytics', `${state.step} -> ${type} -> ${next}`);
 
       switch (type) {
+        case 'HEARTBEAT_VIDEO':
+          if (!state.isActiveWatchProgress && payload.value === 30) {
+            state.isActiveWatchProgress = true;
+          }
+          break;
         case 'CHANGE_TRACK':
           state.isViewSent = false;
+          state.isActiveWatchProgress = false;
           break;
         default:
           return { ...state, step, ...payload };

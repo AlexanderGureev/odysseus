@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: center;
   padding: 16px 8px 8px;
-  pointer-events: none;
+  pointer-events: all;
   user-select: none;
 }
 
@@ -26,10 +26,6 @@
   width: 6px;
   opacity: 0;
   transition: var(--default-transition);
-}
-
-.volume:hover {
-  pointer-events: all;
 }
 
 .volume.dragging::before,
@@ -56,6 +52,7 @@
   display: flex;
   align-items: center;
   user-select: none;
+  pointer-events: all;
   cursor: pointer;
   opacity: var(--icon-opacity);
   transition: var(--default-transition);

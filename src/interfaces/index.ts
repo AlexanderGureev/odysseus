@@ -1,14 +1,9 @@
-import { ConditionFunction } from '@reduxjs/toolkit/dist/listenerMiddleware/types';
 import { BannerOptions } from 'services/AdBannerManager/types';
 import { AdHookType, AdLinksByType, AdServiceHooks, InitOpts, NewBlockOpts, TAdBlock } from 'services/AdService/types';
-import {
-  AmberdataEventPayload,
-  CrashEventPayload,
-  TAmberdataInitParams,
-  TAmberdataParams,
-} from 'services/AmberdataService/types';
+import { AmberdataEventPayload, TAmberdataInitParams, TAmberdataParams } from 'services/AmberdataService/types';
 import { DemonInitOpts, PlayerStats } from 'services/DemonService/types';
 import { LocationState } from 'services/EmbeddedCheckService/types';
+import { DistributionCfg, ExperimentsCfg, ExperimentsState, PlayerExperiment } from 'services/ExperimentsService/types';
 import {
   CreateFavourite,
   DeleteFavouriteById,
@@ -43,7 +38,7 @@ import { AdCategory, TAdConfig, TAdPointConfig, TAdPointsConfig } from 'types/ad
 import { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
 
 export interface IEmbeddedCheckService {
-  getEmbededStatus: () => Promise<boolean>;
+  getEmbededStatus: (sharingUrl: string) => Promise<boolean>;
   getIframeLocation: () => Promise<LocationState>;
   getState: () => LocationState;
 }
@@ -102,6 +97,7 @@ export interface IUTMService {
 export interface IVigoService {
   init: (params: TVigoParams) => void;
   sendStat: (event: VigoEvent) => void;
+  dispose: () => void;
 }
 
 export interface IYMService {
@@ -253,6 +249,15 @@ export interface IMailService {
   send: (data: EmailBody) => Promise<void>;
 }
 
+export interface IExperimentsService {
+  init: (cfg: ExperimentsCfg) => { experiments: ExperimentsState; distribution: DistributionCfg };
+  engageExperiment: (
+    name: PlayerExperiment,
+    currentState: ExperimentsState,
+    distributionCfg: DistributionCfg
+  ) => false | ExperimentsState;
+}
+
 export interface IServices {
   embeddedCheckService: IEmbeddedCheckService;
   dbService: IDBService;
@@ -278,6 +283,7 @@ export interface IServices {
   p2pService: IP2PService;
   bannerService: IAdBannerService;
   mailService: IMailService;
+  experimentsService: IExperimentsService;
 }
 
 export type EffectOpts = {

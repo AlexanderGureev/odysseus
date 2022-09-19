@@ -43,7 +43,7 @@ export type EventsWithPayload =
       type: 'START_AD_BREAK';
       payload: {
         links: AdLinksByType;
-        point: TAdPointConfig;
+        adPoint: TAdPointConfig;
         limit: number;
       };
     }

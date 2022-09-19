@@ -1,31 +1,34 @@
 import { useAppDispatch } from 'hooks';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { sendEvent } from 'store';
 import { Screens } from 'store/slices/splashscreen';
-import { sleep } from 'utils/retryUtils';
 
 import Styles from './index.module.css';
 
 export const SpashScreen: React.FC<{ data: Screens }> = ({ data }) => {
   const dispatch = useAppDispatch();
-  const [image, setImage] = React.useState<string | null>(null);
+  const [index, setIndex] = React.useState<number>(0);
 
-  React.useLayoutEffect(() => {
-    const imageIterator = async () => {
-      for (const { img, duration } of data) {
-        setImage(img);
-        await sleep(duration);
-      }
-    };
-
-    imageIterator().then(() => {
+  useEffect(() => {
+    if (index === data.length) {
       dispatch(sendEvent({ type: 'SHOWING_SPLASHCREEN_END' }));
-    });
-  }, [data, dispatch]);
+    }
+  }, [data.length, dispatch, index]);
 
-  return image ? (
+  return (
     <div className={Styles.splashscreen}>
-      <img src={image} />
+      {data[index] ? (
+        <img
+          key={index}
+          src={data[index].img}
+          style={{
+            animationDuration: `${data[index].duration / 1000}s`,
+          }}
+          onAnimationEnd={() => {
+            setIndex(index + 1);
+          }}
+        />
+      ) : null}
     </div>
-  ) : null;
+  );
 };

@@ -20,6 +20,7 @@ export const AudioTracksMenu: React.FC<{ config: LinkedAudioTrackItem }> = ({ co
   }, [dispatch]);
 
   const items = Object.keys(AudioTracksMap).map((key) => ({
+    id: key,
     title: AudioTracksMap[key as Lang],
     value: key,
   }));

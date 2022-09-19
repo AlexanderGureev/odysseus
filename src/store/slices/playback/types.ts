@@ -49,7 +49,14 @@ export type EventsWithPayload =
     }
   | {
       type: 'START_PLAYBACK';
+      payload: {
+        currentTime: number;
+      };
       meta: { isFirst: boolean };
+    }
+  | {
+      type: 'RESTORE_PLAYBACK';
+      meta: { state: 'PLAYING' | 'PAUSED' };
     }
   | {
       type: 'END_PLAYBACK';

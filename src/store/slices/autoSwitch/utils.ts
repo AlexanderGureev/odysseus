@@ -7,7 +7,9 @@ import { AutoswitchNotifyType } from './types';
 
 export const selectAutoswitchNotifyType = ({ getState, services }: EffectOpts): AutoswitchNotifyType => {
   const {
-    experiments: { experiments },
+    experiments: {
+      web: { experiments },
+    },
     root: { features, adConfig, adPoints, subscription },
     adController,
   } = getState();

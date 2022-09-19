@@ -182,7 +182,7 @@ export type HorusInitOpts = {
 export type DebugInfo = Record<string, any> & {
   type?: 'persistent_error' | 'rebuffer';
   duration?: number;
-  additional?: {
+  additional?: Record<string, any> & {
     hint?: string;
     location?: string;
     video_type?: string;

@@ -11,10 +11,9 @@ export const Menu = <T extends object, V>(props: React.PropsWithChildren<MenuPro
   const { state, close } = useMenuState(ref, isMobile ? 0 : 500);
   const [ids, setSubMenu] = useState<string[]>([]);
 
-  const sub = ids.reduce(
-    (acc: MenuProps<T, V> | undefined, id) => acc?.items?.find((i) => i.id === id)?.subMenu,
-    props
-  );
+  const sub = ids.length
+    ? ids.reduce((acc: MenuProps<T, V> | undefined, id) => acc?.items?.find((i) => i.id === id)?.subMenu, props)
+    : null;
 
   const { items, onSelect, selected = null, closeOnSelect = false, onOpen, onClick } = sub || props;
 
@@ -26,12 +25,22 @@ export const Menu = <T extends object, V>(props: React.PropsWithChildren<MenuPro
     if (state === 'enter') onOpen?.();
   }, [onOpen, state]);
 
+  const onBack = useCallback(() => {
+    setSubMenu((prev) => prev.slice(0, -1));
+  }, []);
+
   return (
     <div
       ref={ref}
       className={cn(Styles.container, { [Styles.selectable]: selected !== null })}
       onAnimationEnd={onAnimationEnd}>
       <div className={cn(Styles.menu, Styles[`${state}`])}>
+        {sub ? (
+          <div className={cn(Styles.item, Styles.back)} onClick={onBack}>
+            Назад
+          </div>
+        ) : null}
+
         {items.map(({ id, title, icon, value, selectedTitle, subMenu, disabled = false }, index) => {
           return (
             <div

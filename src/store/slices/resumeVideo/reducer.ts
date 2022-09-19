@@ -128,10 +128,15 @@ const addMiddleware = () =>
           const qualityCfg = qualityRecord[currentQualityMark];
           if (qualityCfg) await services.qualityService.setInitialQuality(qualityCfg);
 
-          const value =
-            (isResetStartTime || previews ? 0 : isFirstStartPlayback ? startAt ?? savedTime : currentTime) ?? 0;
+          let time: number | null = null;
 
-          const startPosition = value < (duration || 0) ? value : 0;
+          if (isResetStartTime) time = 0;
+          else if (isFirstStartPlayback) time = previews ? 0 : startAt ?? savedTime;
+          else time = currentTime;
+
+          if (!time) time = 0;
+
+          const startPosition = time < (duration || 0) ? time : 0;
 
           if (isOldSafari(getState())) {
             services.playerService.one('timeupdate', () => {
@@ -143,7 +148,7 @@ const addMiddleware = () =>
 
           console.log('[TEST] launch setup', {
             isFirstStartPlayback,
-            time: value,
+            time,
             savedTime,
             startAt,
             currentTime,

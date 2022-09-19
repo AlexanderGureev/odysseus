@@ -6,6 +6,7 @@ import {
   AmberdataService,
   DemonService,
   EmbeddedCheckService,
+  ExperimentsService,
   FavouritesService,
   GAService,
   HorusService,
@@ -64,6 +65,7 @@ const opts: CreateListenerMiddlewareOptions<MiddlewareDeps> = {
       p2pService: P2PManager,
       bannerService: AdBannerManager,
       mailService: MailService,
+      experimentsService: ExperimentsService,
     },
   },
 };

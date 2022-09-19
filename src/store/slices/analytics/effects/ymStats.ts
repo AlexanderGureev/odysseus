@@ -12,7 +12,7 @@ export const ymStats = async (
   const {
     playback,
     root: { meta, session, config, deviceInfo, previews },
-    analytics: { isViewSent },
+    analytics: { isViewSent, isActiveWatchProgress },
   } = getState();
 
   switch (payload.type) {
@@ -108,7 +108,7 @@ export const ymStats = async (
       });
       break;
     case 'HEARTBEAT_VIDEO':
-      if (payload.payload.value === 10) {
+      if (payload.payload.value === 10 && isActiveWatchProgress) {
         postMessageService.emit('watchprogress', {
           data: {
             track_id: meta.trackId,

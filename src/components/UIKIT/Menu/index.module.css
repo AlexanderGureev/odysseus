@@ -27,20 +27,6 @@
   pointer-events: none;
 }
 
-.menu::-webkit-scrollbar-track {
-  margin: 5px 0;
-}
-
-.menu::-webkit-scrollbar {
-  visibility: hidden;
-  width: 5px;
-}
-
-.menu::-webkit-scrollbar-thumb {
-  border-radius: 2.5px;
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
 .enter {
   composes: fade-in from global;
   pointer-events: auto;
@@ -75,7 +61,8 @@
   content: '';
   position: absolute;
   left: 12px;
-  background: url('assets/icons/icons-24-check-light.svg') no-repeat center center;
+  background-image: url('assets/icons/icons-24-check-light.svg');
+  background-position: center center;
   background-size: cover;
   width: 16px;
   height: 16px;
@@ -84,6 +71,15 @@
 }
 
 .item.active::before {
+  opacity: 1;
+}
+
+.item.back {
+  border-bottom: 1px solid #2b2b2b;
+}
+
+.item.back::before {
+  background-image: url('assets/icons/icons-24-chevron-left.svg');
   opacity: 1;
 }
 

@@ -1,4 +1,5 @@
 import { TParams } from 'server/utils';
+import { ExperimentsCfg } from 'services/ExperimentsService/types';
 import { LogLevel } from 'utils/logger';
 
 import { TContentRollsConfig, TMiddleRollsConfig, TPreRollsConfig, TRawAdConfig } from './ad';
@@ -73,6 +74,7 @@ export const MAP_HOST_TO_SKIN = {
 export const SERVICE_GROUP_ID: { [key in SkinClass]?: number } = {
   [SkinClass.MORE_TV]: 1,
   [SkinClass.CTC]: 2,
+  [SkinClass.DOMASHNIY]: 5,
 };
 
 export type SubscriptionPreviewType = 'HUB' | 'PAK' | 'FALSE';
@@ -105,6 +107,7 @@ export type TFeatureConfig = {
   FEATURE_OFF_ADS_DISPLAY_TIME?: number;
   FEATURE_COMPLAIN?: boolean;
   COMPLAINT_LIMIT_TIME?: number;
+  PAYWALL_NO_ADS_PATH?: string;
 
   AUTH_URL?: string; // используется для открытия страницы авторизации в эмбедах
 
@@ -367,6 +370,7 @@ export type TConfig = {
   trackInfo: TrackInfoData | null;
   subscription: UserSubscription[] | null;
   mediascopeCounter: MediascopeCounterResponse | null;
+  experiments: ExperimentsCfg | null;
 };
 
 export type Override<T, O> = Omit<T, keyof O> & O;

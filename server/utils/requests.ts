@@ -1,10 +1,11 @@
 import express from 'express';
 import FormData from 'form-data';
+import { ExperimentsCfg } from 'services/ExperimentsService/types';
 
 import { PlayerError } from '../../src/utils/errors';
 import { logger } from '../../src/utils/logger';
 import { HTTPResponseError, ReqInit, request } from '../../src/utils/request';
-import { ApiResponse, ERROR, SkinClass, TBaseConfig, TConfigSource, THydraResponse } from '../../types';
+import { ApiResponse, ERROR, SkinClass, TBaseConfig, TConfig, TConfigSource, THydraResponse } from '../../types';
 import { Channels } from '../../types/channel';
 import { MediaFile } from '../../types/MediaFile';
 import { MediascopeCounterResponse } from '../../types/MediascopeCounter';
@@ -276,4 +277,40 @@ export const uploadScreenshotToPAK = async (endpoint: string, image: Buffer) => 
 
   const data = await response.json();
   return data;
+};
+
+export const fetchExperiments = async () => {
+  try {
+    const response = await request.get(`${process.env.HYDRA_HOST}/experiments/player`, {
+      timeout: DATA_REQUEST_TIMEOUT,
+    });
+
+    if (!response.ok) throw new RequestError(response.statusText, response.status);
+
+    const { data }: { data: ExperimentsCfg } = await response.json();
+    return data;
+  } catch (err) {
+    logger.error('[fetchExperiments]', err);
+
+    if (err instanceof PlayerError) throw err;
+    return null;
+  }
+};
+
+export const fetchMockConfig = async (trackId: string) => {
+  try {
+    const response = await request.get(`${process.env.HYDRA_HOST}/private/player/test_config/${trackId}`, {
+      timeout: DATA_REQUEST_TIMEOUT,
+    });
+
+    if (!response.ok) throw new RequestError(response.statusText, response.status);
+
+    const { data }: { data: TConfig } = await response.json();
+    return data;
+  } catch (err) {
+    logger.error('[fetchMockConfig]', err);
+
+    if (err instanceof PlayerError) throw err;
+    return null;
+  }
 };

@@ -72,12 +72,12 @@ sendEvent(type: "DO_INIT", payload: {}, meta: {})
 const rootReducer = combineReducers({
   debug: debug.reducer,
   loader: loader.reducer,
-  //  обработка экспериментов от веба
-  experiments: experiments.reducer,
   // прослушивание событий приложения и отправка событий в различные системы аналитики
   analytics: analytics.reducer,
   // отправка и обработка postmessages
   postMessages: postMessages.reducer,
+  //  обработка экспериментов от веба
+  experiments: experiments.reducer,
   // управление рекламными баннерами
   adBanner: adBanner.reducer,
   trialSuggestion: trialSuggestion.reducer,
@@ -165,9 +165,9 @@ const rootReducer = combineReducers({
 });
 
 debug.addMiddleware();
-experiments.addMiddleware();
 analytics.addMiddleware();
 postMessages.addMiddleware();
+experiments.addMiddleware();
 adBanner.addMiddleware();
 trialSuggestion.addMiddleware();
 adDisableSuggestion.addMiddleware();

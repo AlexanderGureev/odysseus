@@ -10,6 +10,8 @@ import { createEnv, createHeaders, isNumber, isValidBase64, TParams, URL_MAP_BY_
 import { createError, RequestError } from '../../utils/error';
 import {
   configRequest,
+  fetchExperiments,
+  fetchMockConfig,
   hydraRequest,
   mediascopeCounterRequest,
   serviceTariffsRequest,
@@ -42,16 +44,35 @@ export const PlayerController = () => {
             if (!isNumber(params.track_id)) throw new RequestError(ERROR.INVALID_TRACK_ID, 400);
 
             const { isNcanto, ...reqParams } = params;
+
+            if (process.env.DEBUG_MODE === 'true') {
+              const mockConfig = await fetchMockConfig(params.track_id);
+              if (mockConfig) {
+                res.status(200).render('index', {
+                  isProduction: !IS_DEV,
+                  env: createEnv(req),
+                  config: mockConfig,
+                  context: {
+                    ...reqParams,
+                  },
+                });
+                return;
+              }
+            }
+
             const options = { headers: createHeaders(req) };
             const features = await hydraRequest(params.partner_id, options);
 
-            const [config, serviceTariffs, trackInfo, subscription, mediascopeCounter] = await Promise.all([
-              configRequest(req, features.config_source, reqParams, { headers: { ...options.headers, isNcanto } }),
-              serviceTariffsRequest(reqParams.user_token, features.skin_theme_class, options),
-              trackInfoRequest(reqParams.track_id, features.skin_theme_class, options),
-              userSubscriptionRequest(reqParams.user_token, features.skin_theme_class, options),
-              mediascopeCounterRequest(SERVICE_GROUP_ID[features.skin_theme_class], options),
-            ]);
+            const [config, serviceTariffs, trackInfo, subscription, mediascopeCounter, experiments] = await Promise.all(
+              [
+                configRequest(req, features.config_source, reqParams, { headers: { ...options.headers, isNcanto } }),
+                serviceTariffsRequest(reqParams.user_token, features.skin_theme_class, options),
+                trackInfoRequest(reqParams.track_id, features.skin_theme_class, options),
+                userSubscriptionRequest(reqParams.user_token, features.skin_theme_class, options),
+                mediascopeCounterRequest(SERVICE_GROUP_ID[features.skin_theme_class], options),
+                fetchExperiments(),
+              ]
+            );
 
             res.status(200).render('index', {
               isProduction: !IS_DEV,
@@ -64,6 +85,7 @@ export const PlayerController = () => {
                 trackInfo: trackInfo || null,
                 subscription: subscription || null,
                 mediascopeCounter,
+                experiments,
               },
               context: {
                 ...reqParams,
@@ -90,6 +112,7 @@ export const PlayerController = () => {
                 trackInfo: null,
                 subscription: null,
                 mediascopeCounter: null,
+                experiments: null,
               },
               context: {
                 ...params,
@@ -166,6 +189,14 @@ export const PlayerController = () => {
             if (!hostname) throw new RequestError(ERROR.INVALID_BODY, 400);
             if (!isNumber(params.partner_id)) throw new RequestError(ERROR.INVALID_PARTNER_ID, 400);
 
+            if (process.env.DEBUG_MODE === 'true') {
+              const mockConfig = await fetchMockConfig(params.track_id);
+              if (mockConfig) {
+                res.status(200).json(mockConfig);
+                return;
+              }
+            }
+
             const options = { headers: createHeaders(req) };
             const features = await hydraRequest(params.partner_id, options);
 
@@ -198,11 +229,12 @@ export const PlayerController = () => {
               },
             }[features.config_source]?.());
 
-            const [config, serviceTariffs, trackInfo, subscription] = await Promise.all([
+            const [config, serviceTariffs, trackInfo, subscription, experiments] = await Promise.all([
               configRequest(req, features.config_source, params as TParams, options),
               serviceTariffsRequest(params.user_token, features.skin_theme_class, options),
               trackInfoRequest(params.track_id, features.skin_theme_class, options),
               userSubscriptionRequest(params.user_token, features.skin_theme_class, options),
+              fetchExperiments(),
             ]);
 
             res.status(200).json({
@@ -212,6 +244,7 @@ export const PlayerController = () => {
               serviceTariffs: serviceTariffs || null,
               trackInfo: trackInfo || null,
               subscription: subscription || null,
+              experiments,
             });
           } catch (err) {
             logger.error('GET /config', err);

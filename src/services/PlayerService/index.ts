@@ -17,23 +17,7 @@ import { Events, Hooks, HookType, PLAYER_TYPE, PlayerHooks, SetSourceOpts, TStat
 const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
   let player: VideoJsPlayer;
   let videoNode: HTMLVideoElement;
-  let state: TState = {
-    src: null,
-    currentTime: 0,
-    volume: 50,
-    muted: true,
-    paused: true,
-    playing: false,
-    duration: 0,
-    remainingTime: 0,
-    loadedPercent: 0,
-    videoHeight: 0,
-    videoWidth: 0,
-    bitrate: null,
-    representations: null,
-    seeking: false,
-    videoType: VIDEO_TYPE.PLAIN,
-  };
+  let videoType = VIDEO_TYPE.PLAIN;
 
   let isSetupSource = false;
 
@@ -50,35 +34,6 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
   };
 
   const mediator = Mediator<Events>();
-
-  const updateState = () => {
-    if (!player) return;
-
-    state = {
-      ...state,
-      src: player.src(),
-      currentTime: player.currentTime(),
-      volume: player.volume(),
-      muted: player.muted(),
-      paused: player.paused(),
-      playing: !player.paused(),
-      duration: player.duration(),
-      remainingTime: player.remainingTime(),
-      loadedPercent: player.bufferedPercent() * 100,
-      videoHeight: player.videoHeight(),
-      videoWidth: player.videoWidth(),
-      bitrate: getBitrate(),
-      representations: getRepresentations(),
-    };
-  };
-
-  const getState = () => {
-    updateState();
-
-    // @ts-ignore
-    window.state = { ...state };
-    return { ...state };
-  };
 
   const getTech = () => {
     // @ts-ignore
@@ -128,8 +83,12 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
       player.on('dblclick', () => {});
 
       const events: { [key in keyof Events]?: () => void } = {
-        seeking: () => mediator.emit('seeking'),
-        seeked: () => mediator.emit('seeked'),
+        seeking: () => {
+          mediator.emit('seeking');
+        },
+        seeked: () => {
+          mediator.emit('seeked');
+        },
         ended: () => mediator.emit('ended'),
         waiting: () => mediator.emit('waiting'),
         canplay: () => mediator.emit('canplay'),
@@ -179,7 +138,7 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
 
   const setSource = (source: videojs.Tech.SourceObject, { type = VIDEO_TYPE.PLAIN, timeout }: SetSourceOpts = {}) =>
     new Promise<void>(async (resolve, reject) => {
-      if (type === VIDEO_TYPE.FAKE_VIDEO && state.videoType === VIDEO_TYPE.FAKE_VIDEO) return resolve();
+      if (type === VIDEO_TYPE.FAKE_VIDEO && videoType === VIDEO_TYPE.FAKE_VIDEO) return resolve();
 
       isSetupSource = true;
 
@@ -212,7 +171,7 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
       player.src(source);
       player.loop(false);
       player.ready(() => {
-        state.videoType = type;
+        videoType = type;
         player.one('loadedmetadata', () => {
           if (timer) {
             clearTimeout(timer);
@@ -326,7 +285,6 @@ const PlayerService = (type: PLAYER_TYPE = PLAYER_TYPE.VIDEO_JS) => {
     getVolume,
     isMuted,
     setMute,
-    getState,
     getTech,
     getRepresentations,
     getPlayer,

@@ -17,7 +17,7 @@ export const initAdBreak = ({ data, point }: Opts, { dispatch, services: { adSer
       payload: {
         limit: data.limit,
         links,
-        point,
+        adPoint: point,
       },
     })
   );
