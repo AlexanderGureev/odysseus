@@ -61,7 +61,6 @@ export const fetchConfig = async (sirenURL: string, outerHost: string | null) =>
 
     return data;
   } catch (err) {
-    logger.error('[fetchConfig]', err);
     throw new PlayerError(err.code || ERROR_CODES.ERROR_NOT_AVAILABLE, err?.message);
   }
 };

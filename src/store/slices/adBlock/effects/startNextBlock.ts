@@ -116,8 +116,6 @@ export const startNextBlock = async ({ getState, dispatch, services: { adService
         );
       })
       .on('AdVolumeChange', ({ volume }) => {
-        console.log('[TEST] AdVolumeChange', { isSyncPhase, isSynced, volume });
-
         // некоторая реклама при старте включает или выключает звук независимо от состояния звук в видеотеге
         // если в течение 2сек yasdk присылает ивент изменения звука, то мы считает, что это автоивент
         // и пытаемся принудительно синхронизировать звук видео и рекламы

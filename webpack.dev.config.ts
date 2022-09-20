@@ -22,6 +22,7 @@ const config: webpack.Configuration = {
   entry: {
     app: ['./src/index.tsx'],
     private: ['./pak-player/index.ts'],
+    errors: ['./errors/index.tsx'],
   },
   module: {
     rules: [
@@ -114,6 +115,12 @@ const config: webpack.Configuration = {
       template: path.resolve('server', 'templates', 'pak_player.pug'),
       filename: path.resolve('build', 'server', 'views', 'pak_player.ejs'),
       chunks: ['private'],
+    }),
+    new HtmlWebpackPlugin({
+      inject: 'body',
+      template: path.resolve('server', 'templates', 'errors.pug'),
+      filename: path.resolve('build', 'server', 'views', 'errors.ejs'),
+      chunks: ['errors'],
     }),
     new ForkTsCheckerWebpackPlugin({
       async: false,

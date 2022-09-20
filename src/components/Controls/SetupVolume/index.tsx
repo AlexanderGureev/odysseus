@@ -6,7 +6,6 @@ import { Range } from 'components/UIKIT/Range';
 import { useAppDispatch, useAppSelector, useSkin } from 'hooks';
 import React, { useEffect, useState } from 'react';
 import { sendEvent } from 'store';
-import { VOLUME_STEP } from 'store/slices/hotkeys/constants';
 import { SkinClass } from 'types';
 
 import Styles from './index.module.css';

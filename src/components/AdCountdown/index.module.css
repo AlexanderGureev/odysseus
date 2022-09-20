@@ -12,11 +12,12 @@
   width: 160px;
   user-select: none;
   transition: var(--default-transition);
+  z-index: 1;
 }
 
 :global(.volume-range-active) .countdown,
 :global(.trial-suggestion) .countdown {
-  opacity: 0 !important;
+  display: none;
 }
 
 @media (max-width: 599px) {
@@ -31,6 +32,20 @@
   }
 
   :global(.unmute-button.mobile) .countdown {
-    bottom: 114px;
+    bottom: 104px;
+  }
+
+  :global(.fullscreen) .countdown {
+    bottom: 72px;
+  }
+
+  :global(.unmute-button.mobile.fullscreen) .countdown {
+    bottom: 120px;
+  }
+}
+
+@media (max-width: 599px) and (max-height: 400px) {
+  :global(.unmute-button.mobile) .countdown {
+    display: none;
   }
 }

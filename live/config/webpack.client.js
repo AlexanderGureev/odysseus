@@ -113,11 +113,6 @@ const config = {
     new HtmlWebpackPlugin({
       inject: 'body',
       template: 'live/src/index.pug',
-      filename: 'index.html',
-    }),
-    new HtmlWebpackPlugin({
-      inject: 'body',
-      template: 'live/src/index.pug',
       filename: './../server/views/live.ejs',
       env: {
         isProduction: true,

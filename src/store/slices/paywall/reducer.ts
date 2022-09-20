@@ -12,8 +12,9 @@ import { FSMState, State, SubType } from './types';
 
 const DEFAULT_TITLE = 'Оформи подписку<br/>для продолжения просмотра';
 
-export const getButtonTextBySkin = (state: AppState, type: SubType): string => {
+export const getButtonTextBySkin = (state: AppState, type: SubType, notice?: boolean): string => {
   const { skin } = state.root.meta;
+  const isPreview = Boolean(state.root.previews?.length);
 
   const textBySkin: { [key in SkinClass]?: { [type in SubType]: string } } = {
     MORE_TV: {
@@ -21,7 +22,7 @@ export const getButtonTextBySkin = (state: AppState, type: SubType): string => {
       TRIAL: 'оформить подписку со скидкой',
     },
     CTC: {
-      FULL_PRICE: 'попробовать подписку',
+      FULL_PRICE: !isPreview ? 'отключить рекламу' : notice ? 'попробовать подписку' : 'продолжить просмотр',
       TRIAL: `${getTrialDurationText(state)} бесплатно без рекламы`,
     },
     DEFAULT: {

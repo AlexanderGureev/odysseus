@@ -6,7 +6,6 @@ export const handleWidevineSource = (licenseServerUrl: string) => {
       'com.widevine.alpha': {
         getLicense: (emeOptions: any, keyMessage: any, callback: any) => {
           const handleLicenseLoadError = (ev: any) => {
-            // licenseErrorHandler(DRM_TYPE.WIDEVINE); // TODO FIX
             callback(ev);
           };
 
@@ -14,7 +13,6 @@ export const handleWidevineSource = (licenseServerUrl: string) => {
             const { response, status } = ev.target;
 
             if (status !== 200) {
-              // licenseErrorHandler(DRM_TYPE.WIDEVINE);
               callback(PLAYER_ERROR.FETCH_LICENSE);
               return;
             }

@@ -4,7 +4,13 @@ import fs from 'fs';
 import path from 'path';
 import requestIp from 'request-ip';
 
-import { LivePlayerController, MetricsController, PAKAdminPlayerController, PlayerController } from './controllers';
+import {
+  ErrorsPageController,
+  LivePlayerController,
+  MetricsController,
+  PAKAdminPlayerController,
+  PlayerController,
+} from './controllers';
 import { httpserver } from './httpserver';
 import { MetricsService } from './services/metrics_service';
 
@@ -31,7 +37,7 @@ const bootstrap = async () => {
     express.static(path.resolve(__dirname, '..', 'client')),
     express.static(path.resolve(__dirname, '..', 'client-vitrina')),
     (_, res, next) => {
-      if (process.env.CANARY_RELEASE) res.setHeader('x-canary', 'true');
+      if (process.env.CANARY_RELEASE === 'true') res.setHeader('x-canary', 'true');
       next();
     },
     (req, res, next) => {
@@ -45,6 +51,14 @@ const bootstrap = async () => {
     LivePlayerController(),
     PAKAdminPlayerController(),
     MetricsController(metricsService),
+    ErrorsPageController(),
+    {
+      register: (app) => {
+        app.use('*', (req, res) => {
+          res.status(404).end();
+        });
+      },
+    },
   ]);
 
   if (IS_DEV)

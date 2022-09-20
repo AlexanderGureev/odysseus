@@ -18,7 +18,7 @@ export const getNext = ({ getState, dispatch, services: { adService, embeddedChe
   let currentLinks = links;
   const idx = index + 1;
 
-  if (idx < 1 && !isPromo) {
+  if (idx < limit && !isPromo) {
     const preloadedBlock = adService.getBlock(adPoint, idx);
     if (preloadedBlock) currentLinks = preloadedBlock.getLinks();
     else {

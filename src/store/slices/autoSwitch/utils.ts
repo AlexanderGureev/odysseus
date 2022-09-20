@@ -14,8 +14,6 @@ export const selectAutoswitchNotifyType = ({ getState, services }: EffectOpts): 
     adController,
   } = getState();
 
-  // return 'avod_popup';
-
   const isExperiment = experiments?.EXP_AB_MONEY687?.includes('test');
 
   if (!isExperiment || !adConfig || !adPoints.length || subscription.ACTIVE || adController.step === 'DISABLED') {
@@ -42,10 +40,10 @@ export const getAutoswitchNotifyContent = (state: AppState, type: AutoswitchNoti
 
   if (getStatusTrialSelector(state)) {
     const trialText = getTrialDurationText(state);
-    autoswitchNotifyText = `Если это отвлекает от сюжета и мешает просмотру,<br/>то рекламу можно отключить на ${trialText} бесплатно`;
+    autoswitchNotifyText = `Если это отвлекает от сюжета и мешает просмотру,<br/> то рекламу можно отключить на ${trialText} бесплатно`;
   } else {
     const subText = getSubPriceText(state);
-    autoswitchNotifyText = `Если это отвлекает от сюжета и мешает просмотру,<br/>то рекламу можно отключить за ${subText} в месяц`;
+    autoswitchNotifyText = `Если это отвлекает от сюжета и мешает просмотру,<br/> то рекламу можно отключить за ${subText} в месяц`;
   }
 
   return {

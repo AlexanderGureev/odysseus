@@ -21,12 +21,14 @@
   }
 
   100% {
-    opacity: 0;
+    opacity: 1;
   }
 }
 
 .splashscreen img {
   animation-name: show;
   animation-fill-mode: forwards;
+  height: 100%;
   width: 100%;
+  object-fit: contain;
 }

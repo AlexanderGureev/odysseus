@@ -169,9 +169,10 @@ export const Controls = React.memo(() => {
         {ALLOW_FULLSCREEN && <FullscreenButton />}
       </div>
 
-      {isUnmuteButton && <UnmuteButton />}
       {payNotify.step === 'READY' && <PayNotice />}
       {payButton.step === 'READY' && <PayButton />}
+
+      {isUnmuteButton && <UnmuteButton />}
 
       {trialSuggestion.step === 'SHOWING_TRIAL_NOTICE' &&
         trialSuggestion.notifyType &&

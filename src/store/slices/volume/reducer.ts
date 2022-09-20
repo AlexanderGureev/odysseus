@@ -139,7 +139,6 @@ const addMiddleware = () =>
           const volume = services.localStorageService.getItemByDomain<number>(STORAGE_SETTINGS.VOLUME) ?? 0.5;
           const muted = (mute || services.localStorageService.getItemByDomain<boolean>(STORAGE_SETTINGS.MUTED)) ?? true;
 
-          console.log('[TEST] SETUP_INITIAL_VOLUME', { muted, volume });
           services.playerService.setMute(muted);
           services.playerService.setVolume(volume);
 

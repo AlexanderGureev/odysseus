@@ -3,6 +3,7 @@
 
   position: relative;
   margin-left: 24px;
+  z-index: 1;
 }
 
 .thumb {

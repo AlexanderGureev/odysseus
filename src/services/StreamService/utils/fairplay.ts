@@ -52,7 +52,6 @@ export const handleFairplaySource = (licenseServerUrl: string) => {
 
   function getLicense(emeOptions: any, contentId: string, keyMessage: any, callback: any) {
     const handleLicenseLoadError = (ev: any) => {
-      // licenseErrorHandler(DRM_TYPE.FAIRPLAY);
       callback(ev);
     };
 
@@ -60,7 +59,6 @@ export const handleFairplaySource = (licenseServerUrl: string) => {
       const { response, status } = ev.target;
 
       if (status !== 200) {
-        // licenseErrorHandler(DRM_TYPE.FAIRPLAY);
         callback(PLAYER_ERROR.FETCH_LICENSE);
         return;
       }

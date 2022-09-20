@@ -86,6 +86,7 @@ const addMiddleware = () =>
                   dispatch(sendEvent({ type: 'SEEK', meta: { to: duration - 5 } }));
                 }
               },
+              getAdPoints: () => adPoints,
               seekToAd: (pointIndex: number) => {
                 if (!adPoints[pointIndex]) logger.log('point not found');
                 else {

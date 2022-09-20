@@ -57,6 +57,7 @@ export const PlayerManager = React.memo(() => {
   const trialSuggestion = useAppSelector((state) => state.trialSuggestion);
   const payNotify = useAppSelector((state) => state.payNotify);
   const isUnmuteButton = useAppSelector((state) => state.volume.muted && !state.volume.unmuted);
+  const adNotify = useAppSelector((state) => state.adTimeNotify);
 
   const { CONTROLS = true } = useFeatures();
 
@@ -76,6 +77,7 @@ export const PlayerManager = React.memo(() => {
         paywall.step === 'READY' && 'paywall',
         isAutoswitch && 'autoswitch',
         payNotify.step === 'READY' && 'pay-notice',
+        !!adNotify.time && 'ad-countdown',
         isAutoswitch && autoSwitch.autoswitchNotifyType && `autoswitch-${autoSwitch.autoswitchNotifyType}`,
         trialSuggestion.step === 'SHOWING_TRIAL_NOTICE' && 'trial-suggestion',
         trialSuggestion.notifyType === 'triggerBeforePauserolls' && 'trial-suggestion-before-pauseroll',

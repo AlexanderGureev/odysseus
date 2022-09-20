@@ -5,6 +5,7 @@
   height: 24px;
   cursor: pointer;
   margin-left: 24px;
+  z-index: 1;
 }
 
 .wrapper img {

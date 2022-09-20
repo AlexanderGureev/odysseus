@@ -40,9 +40,9 @@
   margin-right: 12px;
 }
 
-.theme-more-tv.code-104 .header img,
-.theme-vm.code-104 .header img,
-.theme-default.code-104 .header img {
+.theme-more-tv.code-104 .header,
+.theme-vm.code-104 .header,
+.theme-default.code-104 .header {
   width: 191px;
   height: 32px;
 }
@@ -126,10 +126,6 @@
   transform: scale(0.95);
 }
 
-.theme-more-tv .footer {
-  height: 40px;
-}
-
 .theme-more-tv .footer-btn {
   height: 40px;
   box-sizing: border-box;
@@ -194,8 +190,7 @@
   .theme-more-tv.code-104 .header,
   .theme-vm.code-104 .header,
   .theme-default.code-104 .header {
-    width: 144px;
-    height: 24px;
+    width: 124px;
   }
 
   .error-container .body {
@@ -220,8 +215,7 @@
     bottom: 4px;
   }
 
-  .error-container .footer-btn {
-    height: 32px;
+  .theme-more-tv .footer-btn {
     font-size: 10px;
     font-weight: 700;
     line-height: 1.6;
@@ -262,8 +256,8 @@
 
 @media (max-height: 300px) {
   .header {
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    height: 36px;
   }
 
   .error-container .body {
@@ -271,7 +265,12 @@
     margin: 2px 0 10px;
   }
 
-  .meta-container {
+  .error-container.code-104 .body {
+    font-size: 14px;
+    margin: 12px 0;
+  }
+
+  .error-container:not(.code-104) .meta-container {
     font-size: 9px;
     bottom: 3px;
   }

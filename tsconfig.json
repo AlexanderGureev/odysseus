@@ -23,5 +23,5 @@
       "types/*": ["../types/*"]
     }
   },
-  "include": ["src", "server", "types", "plugins", "pak-player"]
+  "include": ["src", "server", "types", "plugins", "pak-player", "errors"]
 }

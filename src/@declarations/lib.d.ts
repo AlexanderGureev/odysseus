@@ -44,6 +44,7 @@ interface Window {
     seek: (to: number) => void;
     seekToAutoswitch: () => void;
     seekToEnd: () => void;
+    getAdPoints: () => import('../../types/ad').TAdPointsConfig;
     seekToAd: (index: number) => void;
     invokeError: (code: number) => void;
   };

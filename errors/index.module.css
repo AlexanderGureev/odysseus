@@ -1,0 +1,13 @@
+.input-group {
+  position: absolute;
+  z-index: 5000;
+  right: 10px;
+  top: 10px;
+}
+
+@media (max-width: 600px) {
+  .input-group {
+    top: 30px;
+    left: 10px;
+  }
+}

@@ -186,6 +186,7 @@ const addMiddleware = () =>
           initAdBreak(payload, opts);
         },
         DISPOSE_AD_BREAK: () => {
+          services.adService.updateTimeout();
           dispatch(
             sendEvent({
               type: 'RESUME_VIDEO',

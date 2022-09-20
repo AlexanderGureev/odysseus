@@ -146,14 +146,6 @@ const addMiddleware = () =>
             services.playerService.setCurrentTime(startPosition);
           }
 
-          console.log('[TEST] launch setup', {
-            isFirstStartPlayback,
-            time,
-            savedTime,
-            startAt,
-            currentTime,
-          });
-
           dispatch(
             sendEvent({
               type: 'LAUNCH_SETUP_RESOLVE',

@@ -8,7 +8,6 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  z-index: var(--z-index-loader);
 }
 
 .wrapper::before {
@@ -21,6 +20,10 @@
   background: #000;
   opacity: 0;
   transition: var(--default-transition);
+}
+
+.wrapper.active {
+  z-index: var(--z-index-loader);
 }
 
 .wrapper.active::before {
@@ -68,4 +71,11 @@
 }
 :global(.theme-ctc-kids) .loader {
   background-image: url('assets/icons/loader_kids.png');
+}
+
+@media (max-width: 599px) {
+  .loader {
+    width: 72px;
+    height: 72px;
+  }
 }

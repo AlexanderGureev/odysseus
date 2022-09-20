@@ -3,7 +3,6 @@ import { AppState } from 'store';
 import { FSM_EVENT, sendEvent } from 'store/actions';
 import { isStepChange, startListening } from 'store/middleware';
 import { getStatusTrialSelector } from 'store/selectors';
-import { getPlaylistItem } from 'store/selectors';
 import type { AppEvent, EventPayload, FSMConfig } from 'store/types';
 import { SkinClass, SubscriptionPreviewType } from 'types';
 import { declOfNum } from 'utils/declOfNum';
@@ -130,7 +129,7 @@ const addMiddleware = () => {
           const type = isTrialAvailable ? 'TRIAL' : 'FULL_PRICE';
 
           const text = previews ? getPreviewNotifyText(state) : adConfig ? SUBSCRIPTION_TEXT : null;
-          const btnText = getButtonTextBySkin(state, type);
+          const btnText = getButtonTextBySkin(state, type, true);
 
           if (text && btnText) {
             dispatch(sendEvent({ type: 'SETUP_PAY_NOTIFY_RESOLVE', payload: { text, btnText } }));

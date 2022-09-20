@@ -62,9 +62,6 @@ const AdService = (localStorageService: ILocalStorageService) => {
     ADV_PAUSE_ROLL_ACTIVATE_TIMEOUT = features.ADV_PAUSE_ROLL_ACTIVATE_TIMEOUT || 5000;
 
     await loadYaSdk();
-
-    // TODO DELETE
-    // throw new Error('test');
   };
 
   const isPreloadable = () => ADV_CACHE_LOOKAHEAD > 0;
@@ -208,7 +205,6 @@ const AdService = (localStorageService: ILocalStorageService) => {
 
   const getCurrentPoint = (points: TAdPointsConfig, currentTime: number) => {
     return points.find(({ point }) => {
-      // TODO и блок не обработан
       return currentTime >= point && currentTime - point < ADV_MAX_TIMELINE_OFFSET / 1000;
     });
   };

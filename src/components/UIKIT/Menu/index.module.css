@@ -16,7 +16,7 @@
 
 .menu {
   position: absolute;
-  max-height: calc(100vh - 160px);
+  max-height: calc(100vh - 75px);
   overflow-y: scroll;
   background: var(--secondary-color);
   right: -8px;
@@ -125,4 +125,16 @@
 :global(.wrapper:not(.theme-more-tv)) .item:hover::before,
 :global(.wrapper:not(.theme-more-tv)) .item:hover img {
   filter: invert(var(--color-invert));
+}
+
+@media (max-height: 450px) {
+  :global(.mobile) .menu {
+    max-height: 180px;
+  }
+}
+
+@media (max-height: 250px) {
+  :global(.mobile) .menu {
+    max-height: 120px;
+  }
 }

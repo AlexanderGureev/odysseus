@@ -36,17 +36,24 @@ export const PLAYER_ERROR_CODES: Record<PLAYER_ERROR_TYPE, string> = {
   [PLAYER_ERROR_TYPE.ERROR_INVALID_STREAMS]: '301',
 };
 
+export type ErrorCfg = {
+  icon: string;
+  text: (isMobile: boolean) => React.ReactNode;
+  btn_text?: Nullable<() => React.ReactNode | null>;
+  footer_icons?: () => {
+    src: string;
+    href: string;
+  }[];
+  getRedirectURL?: () => string;
+};
+
 export type ErrorConfigByType = {
-  [key in ERROR_TYPE]: (opts: { theme: SkinClass; isEmbedded: boolean; mailOpts: MailOpts; sharingUrl?: string }) => {
-    icon: string;
-    text: (isMobile: boolean) => React.ReactNode;
-    btn_text?: Nullable<() => React.ReactNode | null>;
-    footer_icons?: () => {
-      src: string;
-      href: string;
-    }[];
-    onClick?: (dispatch: AppDispatch) => void;
-  };
+  [key in ERROR_TYPE]: (opts: {
+    theme: SkinClass;
+    isEmbedded: boolean;
+    mailOpts: MailOpts;
+    sharingUrl?: string;
+  }) => ErrorCfg;
 };
 
 export type MailData = { subject: string; code: number };

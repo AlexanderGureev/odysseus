@@ -14,6 +14,19 @@
   user-select: none;
 }
 
+.overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  transition: var(--default-transition);
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .close {
   width: 20px;
   height: 20px;
@@ -49,6 +62,7 @@
 }
 
 .group {
+  display: flex;
 }
 
 .cancel-btn,
@@ -81,7 +95,70 @@
 }
 
 @media (max-width: 599px) {
-  .wrapper {
+  :global(.wrapper:not(.embedded):not(.fullscreen)) .container {
     display: none;
+  }
+
+  .wrapper {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: 556px;
+    width: 100%;
+    margin: 0 auto;
+    z-index: 6;
+    padding: 24px;
+  }
+
+  .overlay {
+    pointer-events: all;
+    opacity: 1;
+  }
+
+  .title {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .description {
+    font-size: 13px;
+    margin-bottom: 24px;
+    color: #c6c6c6;
+  }
+
+  .description br {
+    display: none;
+  }
+
+  .wrapper {
+    border-radius: 5px 5px 0 0;
+    background-color: #2b2b2b;
+  }
+
+  .start-btn {
+    background-color: #404040;
+  }
+
+  .cancel-btn {
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+
+  .group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .close {
+    top: -14px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    padding: 6px;
+    box-sizing: border-box;
+    background-color: #404040;
+    border-radius: 100%;
+    opacity: 1;
   }
 }

@@ -11,6 +11,7 @@
   padding: 16px 8px 8px;
   pointer-events: none;
   user-select: none;
+  z-index: 1;
 }
 
 :global(.mobile) .volume {
@@ -45,7 +46,6 @@
 
 .mute-button {
   composes: icon from global;
-  z-index: 1;
   margin-top: 12px;
   pointer-events: all;
   transform: translate(2px, 0);
@@ -62,11 +62,6 @@
   position: absolute;
   left: 16px;
   bottom: 18px;
-  z-index: 1;
-}
-
-:global(.mobile) .unmute-button {
-  z-index: 0;
 }
 
 .label {
@@ -166,7 +161,7 @@
 
 @media (max-width: 599px) {
   .volume {
-    bottom: 9px;
+    bottom: 8px;
   }
 
   .unmute-button {
@@ -179,11 +174,23 @@
   }
 
   .unmute-button {
-    bottom: 14px;
+    bottom: 12px;
   }
 
   :global(.mobile) .unmute-button {
-    bottom: 64px;
+    bottom: 54px;
+  }
+
+  :global(.fullscreen) .volume {
+    bottom: 24px;
+  }
+
+  :global(.fullscreen) .unmute-button {
+    bottom: 28px;
+  }
+
+  :global(.fullscreen.mobile) .unmute-button {
+    bottom: 72px;
   }
 
   :global(.wrapper:not(.theme-more-tv):not(.theme-ctc)) .unmute-button {

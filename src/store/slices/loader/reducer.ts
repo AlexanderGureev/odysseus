@@ -37,6 +37,8 @@ const config: FSMConfig<State, AppEvent> = {
     PLAY_AD_BLOCK_RESOLVE: 'IDLE',
     AD_BREAK_END: 'IDLE',
     DISPOSE_PLAYER: 'IDLE',
+
+    SHOW_AD_DISABLE_SUGGESTION: 'IDLE',
   },
 };
 

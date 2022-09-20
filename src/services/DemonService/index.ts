@@ -59,8 +59,6 @@ const DemonService = () => {
 
       await send(url);
     }
-
-    // this._playerStat = cloneDeep(DEFAULT_PLAYER_STAT_OBJ);
   };
 
   return {

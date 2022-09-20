@@ -104,13 +104,11 @@ export const selectActiveNotify = (state: AppState, category: AdCategory, servic
 
   if (!isValidSettings || !intervalValue) return false;
 
-  // TODO fix
-  return trigger;
-  // if (Date.now() - (lastActivatedAt || 0) > intervalValue * 60 * 60 * 1000) {
-  //   return trigger;
-  // }
+  if (Date.now() - (lastActivatedAt || 0) > intervalValue * 60 * 60 * 1000) {
+    return trigger;
+  }
 
-  // return null;
+  return null;
 };
 
 export const notifyConditions: CheckConditionFn[] = [

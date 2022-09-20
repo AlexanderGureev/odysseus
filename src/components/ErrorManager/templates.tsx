@@ -10,7 +10,6 @@ import error_network_icon from 'assets/sprite/error_network_icon.svg';
 import error_restriction_icon from 'assets/sprite/error_restriction_icon.svg';
 import React from 'react';
 import { isAndroid, isIOS } from 'react-device-detect';
-import { sendEvent } from 'store';
 import { SkinClass } from 'types';
 import { ERROR_CODES, ERROR_TYPE } from 'types/errors';
 
@@ -188,11 +187,7 @@ export const ERROR_TEXT_BY_TYPE: ErrorConfigByType = {
       </>
     ),
     btn_text: () => (isEmbedded ? `Смотреть на ${HostMap[theme]}` : null),
-    onClick: (dispatch) => {
-      dispatch(
-        sendEvent({ type: 'OPEN_URL', meta: { url: sharingUrl ?? `https://${HostMap[theme]}`, target: '_blank' } })
-      );
-    },
+    getRedirectURL: () => sharingUrl ?? `https://${HostMap[theme]}`,
   }),
   [ERROR_TYPE.GEOBLOCK_ERROR]: () => ({
     icon: error_restriction_icon,
@@ -212,11 +207,7 @@ export const ERROR_TEXT_BY_TYPE: ErrorConfigByType = {
       </>
     ),
     btn_text: () => (isEmbedded ? 'Перейти и смотреть' : null),
-    onClick: (dispatch) => {
-      dispatch(
-        sendEvent({ type: 'OPEN_URL', meta: { url: sharingUrl ?? `https://${HostMap[theme]}`, target: '_blank' } })
-      );
-    },
+    getRedirectURL: () => sharingUrl ?? `https://${HostMap[theme]}`,
   }),
   [ERROR_TYPE.NOT_ALLOWED_ERROR]: ({ theme, mailOpts }) => ({
     icon: error_icon,
